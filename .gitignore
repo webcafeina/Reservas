@@ -1,0 +1,42 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Build output
+/assets/dist/*
+!/assets/dist/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+/coverage/
+/.phpunit.result.cache
+/.phpunit.cache/
+.phpcs-cache
+.phpstan.cache
+
+# Logs
+*.log
+npm-debug.log*
+
+# Release artifacts
+/dist/
+/release/
+*.zip
+
+# Husky runtime
+.husky/_/
+
+# Legacy (must not return)
+_legacy_assets/
