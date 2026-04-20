@@ -31,9 +31,10 @@ async function request<T>(
         for (const [k, v] of Object.entries(options.query)) {
             if (v === undefined || v === null || v === '') continue;
             if (Array.isArray(v)) {
-                for (const item of v) params.append(`${k}[]`, String(item));
+                for (const item of v)
+                    params.append(`${k}[]`, String(item as string | number | boolean));
             } else {
-                params.append(k, String(v));
+                params.append(k, String(v as string | number | boolean));
             }
         }
         const qs = params.toString();
@@ -48,7 +49,7 @@ async function request<T>(
         method,
         headers,
         credentials: 'same-origin',
-        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
     });
 
     const text = await res.text();

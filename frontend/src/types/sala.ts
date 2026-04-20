@@ -20,11 +20,11 @@ export interface Sala {
 }
 
 export interface SpacesQuery {
-    aforo_min?: number;
-    aforo_max?: number;
-    edificio?: number;
-    servicios?: number[];
-    disponible?: boolean;
-    per_page?: number;
-    page?: number;
+    aforo_min?: number | undefined;
+    aforo_max?: number | undefined;
+    edificio?: number | undefined;
+    servicios?: number[] | undefined;
+    disponible?: boolean | undefined;
+    per_page?: number | undefined;
+    page?: number | undefined;
 }

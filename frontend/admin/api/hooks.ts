@@ -11,20 +11,23 @@ export interface BookingListResponse {
 }
 
 export interface BookingFilters {
-    estado?: BookingState | '';
-    sala_id?: number;
-    email?: string;
-    from?: string;
-    to?: string;
-    page?: number;
-    per_page?: number;
+    estado?: BookingState | '' | undefined;
+    sala_id?: number | undefined;
+    email?: string | undefined;
+    from?: string | undefined;
+    to?: string | undefined;
+    page?: number | undefined;
+    per_page?: number | undefined;
 }
 
 export function useAdminBookings(filters: BookingFilters) {
     return useQuery({
         queryKey: ['admin', 'bookings', filters],
         queryFn: () =>
-            adminApi.get<BookingListResponse>('/admin/bookings', filters as Record<string, unknown>),
+            adminApi.get<BookingListResponse>(
+                '/admin/bookings',
+                filters as Record<string, unknown>,
+            ),
         staleTime: 15_000,
     });
 }
@@ -51,7 +54,8 @@ export function useUpdateBooking() {
 export function useDeleteBooking() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (id: number) => adminApi.delete<{ deleted: boolean; id: number }>(`/admin/bookings/${id}`),
+        mutationFn: (id: number) =>
+            adminApi.delete<{ deleted: boolean; id: number }>(`/admin/bookings/${id}`),
         onSuccess: async () => {
             await qc.invalidateQueries({ queryKey: ['admin', 'bookings'] });
         },
@@ -107,8 +111,9 @@ export function useSettings() {
 export function useUpdateSettings() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (payload: Partial<Settings>) => adminApi.put<Settings>('/admin/settings', payload),
-        onSuccess: async (data) => {
+        mutationFn: (payload: Partial<Settings>) =>
+            adminApi.put<Settings>('/admin/settings', payload),
+        onSuccess: (data) => {
             qc.setQueryData(['admin', 'settings'], data);
         },
     });

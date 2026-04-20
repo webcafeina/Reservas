@@ -1,4 +1,9 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, ReactNode } from 'react';
+import type {
+    InputHTMLAttributes,
+    TextareaHTMLAttributes,
+    SelectHTMLAttributes,
+    ReactNode,
+} from 'react';
 import { useId } from 'react';
 
 import styles from './Field.module.css';
@@ -6,9 +11,9 @@ import styles from './Field.module.css';
 interface FieldWrapperProps {
     label: string;
     htmlFor: string;
-    hint?: string;
-    error?: string | null;
-    required?: boolean;
+    hint?: string | undefined;
+    error?: string | null | undefined;
+    required?: boolean | undefined;
     children: ReactNode;
 }
 
@@ -27,9 +32,7 @@ function FieldWrapper({
                 {required === true && <span className={styles.required}> *</span>}
             </label>
             {children}
-            {hint !== undefined && error == null && (
-                <span className={styles.hint}>{hint}</span>
-            )}
+            {hint !== undefined && error == null && <span className={styles.hint}>{hint}</span>}
             {error != null && error !== '' && <span className={styles.error}>{error}</span>}
         </div>
     );
@@ -44,22 +47,10 @@ type BaseProps = {
 
 type TextFieldProps = BaseProps & Omit<InputHTMLAttributes<HTMLInputElement>, 'id'>;
 
-export function TextField({
-    label,
-    hint,
-    error,
-    required,
-    ...rest
-}: TextFieldProps): JSX.Element {
+export function TextField({ label, hint, error, required, ...rest }: TextFieldProps): JSX.Element {
     const id = useId();
     return (
-        <FieldWrapper
-            label={label}
-            htmlFor={id}
-            hint={hint}
-            error={error}
-            required={required}
-        >
+        <FieldWrapper label={label} htmlFor={id} hint={hint} error={error} required={required}>
             <input
                 id={id}
                 {...rest}
@@ -81,13 +72,7 @@ export function TextareaField({
 }: TextareaFieldProps): JSX.Element {
     const id = useId();
     return (
-        <FieldWrapper
-            label={label}
-            htmlFor={id}
-            hint={hint}
-            error={error}
-            required={required}
-        >
+        <FieldWrapper label={label} htmlFor={id} hint={hint} error={error} required={required}>
             <textarea
                 id={id}
                 rows={rows}
@@ -112,13 +97,7 @@ export function SelectField({
 }: SelectFieldProps): JSX.Element {
     const id = useId();
     return (
-        <FieldWrapper
-            label={label}
-            htmlFor={id}
-            hint={hint}
-            error={error}
-            required={required}
-        >
+        <FieldWrapper label={label} htmlFor={id} hint={hint} error={error} required={required}>
             <select
                 id={id}
                 {...rest}
