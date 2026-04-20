@@ -16,9 +16,9 @@ interface TurnstileGlobal {
         options: {
             sitekey: string;
             callback: (token: string) => void;
-            'error-callback'?: () => void;
-            'expired-callback'?: () => void;
-            theme?: 'light' | 'dark' | 'auto';
+            'error-callback'?: (() => void) | undefined;
+            'expired-callback'?: (() => void) | undefined;
+            theme?: 'light' | 'dark' | 'auto' | undefined;
         },
     ): string;
     remove(widgetId: string): void;
@@ -84,7 +84,7 @@ export function TurnstileWidget({
                     'expired-callback': onExpire,
                     theme,
                 });
-            } catch (err) {
+            } catch {
                 if (!cancelled) onError?.();
             }
         };
