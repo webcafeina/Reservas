@@ -1,0 +1,293 @@
+# Copyright (C) 2026 Webcafeína
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: Reservas Aldealab 0.1.0\n"
+"Report-Msgid-Bugs-To: https://webcafeina.com/\n"
+"Last-Translator: Webcafeína <info@webcafeina.com>\n"
+"Language-Team: Webcafeína <info@webcafeina.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-20T00:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Domain: reservas-aldealab\n"
+
+#. Plugin Name of the plugin
+msgid "Reservas Aldealab"
+msgstr ""
+
+#. Description of the plugin
+msgid "Sistema autónomo de reservas de salas para Aldealab (Cáceres). Recurrencias RFC 5545, PDF oficial y notificaciones."
+msgstr ""
+
+#: src/Activator.php
+#, php-format
+msgid "Reservas Aldealab requiere PHP %2$s o superior. Tienes %1$s."
+msgstr ""
+
+#: src/Activator.php
+msgid "Reservas Aldealab: PHP incompatible"
+msgstr ""
+
+#: src/Activator.php
+#, php-format
+msgid "Reservas Aldealab requiere WordPress %2$s o superior. Tienes %1$s."
+msgstr ""
+
+#: src/Activator.php
+msgid "Reservas Aldealab: WordPress incompatible"
+msgstr ""
+
+#: reservas-aldealab.php
+msgid "Faltan dependencias de Composer. Ejecuta `composer install --no-dev --optimize-autoloader` en el directorio del plugin, o descarga el ZIP oficial de la release que ya las incluye."
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Reservas"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Panel"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Salas"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Cargando panel…"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "El panel requiere JavaScript. Actívalo para continuar."
+msgstr ""
+
+#: src/Frontend/FormShortcode.php
+msgid "Cargando formulario de reservas…"
+msgstr ""
+
+#: src/Frontend/FormShortcode.php
+msgid "Activa JavaScript para usar el formulario de reservas."
+msgstr ""
+
+#: src/PostTypes/SalaCpt.php
+msgctxt "post type general name"
+msgid "Salas"
+msgstr ""
+
+#: src/PostTypes/SalaCpt.php
+msgctxt "post type singular name"
+msgid "Sala"
+msgstr ""
+
+#: src/PostTypes/SalaCpt.php
+msgid "Salas reservables del edificio Aldealab."
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Detalles de la sala"
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Aforo mínimo"
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Aforo máximo"
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Disponible para reserva"
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Espacio CPA"
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Desmarca para ocultar esta sala en el formulario público sin eliminarla."
+msgstr ""
+
+#: src/PostTypes/SalaMetabox.php
+msgid "Marca esta casilla si la sala pertenece al Centro de Producciones Audiovisuales. Las reservas usarán la plantilla PDF específica y las instrucciones de Sede Electrónica."
+msgstr ""
+
+#: src/Roles/RoleManager.php
+msgid "Usuario alojado"
+msgstr ""
+
+#: src/Roles/RoleManager.php
+msgid "Gestor de Reservas"
+msgstr ""
+
+#: src/Rest/Controllers/BookingsController.php
+#: src/Rest/Controllers/AvailabilityController.php
+msgid "Faltan parámetros obligatorios."
+msgstr ""
+
+#: src/Rest/Controllers/BookingsController.php
+msgid "El campo profile es obligatorio."
+msgstr ""
+
+#: src/Rest/Controllers/BookingsController.php
+#: src/Rest/Controllers/ProfileController.php
+msgid "El email no es válido."
+msgstr ""
+
+#: src/Rest/Controllers/BookingsController.php
+msgid "Demasiados intentos. Espera unos minutos e inténtalo de nuevo."
+msgstr ""
+
+#: src/Rest/Controllers/BookingsController.php
+msgid "Error al crear la reserva."
+msgstr ""
+
+#: src/Rest/Controllers/ProfileController.php
+msgid "Debes iniciar sesión."
+msgstr ""
+
+#: src/Rest/Controllers/ProfileController.php
+#: src/Rest/Controllers/Admin/AdminSettingsController.php
+msgid "Payload inválido."
+msgstr ""
+
+#: src/Rest/Controllers/SpacesController.php
+msgid "Sala no encontrada."
+msgstr ""
+
+#: src/Rest/Controllers/Admin/AdminBookingsController.php
+msgid "Reserva no encontrada."
+msgstr ""
+
+#: src/Rest/Controllers/Admin/AdminBookingsController.php
+msgid "Estado no válido."
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Hemos recibido tu reserva"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#, php-format
+msgid "Hola %s, gracias por tu solicitud. Aquí tienes el resumen de tu reserva:"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#: src/Emails/templates/confirmation-admin.php
+#: src/Emails/templates/cancellation-user.php
+msgid "Sala"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#: src/Emails/templates/confirmation-admin.php
+#: src/Emails/templates/cancellation-user.php
+msgid "Fecha(s)"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#: src/Emails/templates/confirmation-admin.php
+#: src/Emails/templates/cancellation-user.php
+msgid "Horario"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#: src/Emails/templates/confirmation-admin.php
+msgid "Objeto"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+#: src/Emails/templates/cancellation-user.php
+msgid "Nº de reserva"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Próximos pasos: Sede Electrónica"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Adjunto a este correo encontrarás el PDF oficial con tus datos ya rellenados. Para formalizar la reserva, debes presentarlo en la Sede Electrónica del Ayuntamiento de Cáceres:"
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Descarga el PDF adjunto."
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Fírmalo con certificado digital o Cl@ve."
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Preséntalo en la Sede Electrónica del Ayuntamiento como \"Solicitud de espacios municipales\"."
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Al ser usuario ya alojado en el edificio, no necesitas presentar ninguna documentación adicional. Tu reserva quedará confirmada en breve."
+msgstr ""
+
+#: src/Emails/templates/confirmation-user.php
+msgid "Tu reserva está en estado \"pendiente\" hasta que un gestor la confirme. Te avisaremos por email cuando cambie el estado."
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Nueva reserva recibida"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+#, php-format
+msgid "Se ha creado una reserva pendiente para la sala \"%s\"."
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Solicitante"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "NIF"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Email"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Móvil"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Referencia"
+msgstr ""
+
+#: src/Emails/templates/confirmation-admin.php
+msgid "Revisar en el panel"
+msgstr ""
+
+#: src/Emails/templates/cancellation-user.php
+msgid "Tu reserva ha sido cancelada"
+msgstr ""
+
+#: src/Emails/templates/cancellation-user.php
+#, php-format
+msgid "Hola %s, te informamos de que tu reserva ha sido cancelada por un gestor."
+msgstr ""
+
+#: src/Emails/templates/cancellation-user.php
+msgid "Si la cancelación no te parece correcta, contacta con el gestor del espacio."
+msgstr ""
+
+#: src/Services/EmailNotifier.php
+msgid "Confirmación de tu reserva en Aldealab"
+msgstr ""
+
+#: src/Services/EmailNotifier.php
+#, php-format
+msgid "Nueva reserva: %s"
+msgstr ""
+
+#: src/Services/EmailNotifier.php
+msgid "Tu reserva en Aldealab ha sido cancelada"
+msgstr ""
+
+#: src/Emails/templates/layout.php
+msgid "Este mensaje se ha generado automáticamente desde el sistema de reservas Aldealab. Por favor, no respondas directamente a este correo."
+msgstr ""
