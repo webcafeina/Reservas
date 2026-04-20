@@ -390,19 +390,26 @@ Empaqueta el ZIP de producción y lo publica como GitHub Release.
 
 ## 11. Roadmap y limitaciones conocidas
 
+### Ya entregado en v0.2
+
+- **Uploader de plantillas PDF** desde **Reservas → Ajustes → Plantillas PDF**. Cada plantilla indica si está en modo "empaquetada" o "personalizada", muestra la fecha de subida y ofrece un botón para revertir. Se valida el tipo MIME por magic bytes (`%PDF`) y se limita a 5 MB. Los ficheros se guardan en `wp-content/uploads/reservas-aldealab/pdf-templates/` con `.htaccess deny from all`, por lo que sobreviven a actualizaciones del plugin.
+- **Exportación iCal** (`.ics`) por reserva: botón en el paso final del formulario público y enlace en el email de confirmación. Endpoint `GET /bookings/{uuid}/ical` protegido por UUID.
+- **Notificaciones SMS opcionales** con `TwilioSmsProvider` listo para usar. Se activa desde **Ajustes → Notificaciones SMS** eligiendo "Twilio" y configurando SID + token + número emisor. Si se deja en "Ninguno" el plugin no envía SMS. Extender a otros proveedores (Vonage, MessageBird…) requiere implementar `SmsProviderInterface`.
+- **Panel de estadísticas con rangos personalizados**: `from` / `to` en `GET /admin/stats`, selector de fechas en el dashboard con presets rápidos.
+- **Exportación CSV de reservas** vía `GET /admin/bookings/export`, respeta los filtros activos, BOM UTF-8 para que Excel abra bien el encoding. Botones desde Dashboard y desde el listado.
+
 ### Limitaciones actuales
 
-- **Subida de plantillas PDF desde el admin** no está implementada. Las plantillas se sustituyen manualmente en `assets/pdf-templates/` vía FTP/SSH. Incluir un uploader con validación segura de PDFs está en el roadmap.
 - **Importación de reservas del plugin legacy** no existe. Hacer una migración requiere un script a medida.
 - **Rate limiter sin soporte de proxy** — usa `REMOTE_ADDR`. Si el sitio está detrás de Cloudflare u otro proxy y todos los visitantes comparten IP, el rate limiter limita a todos juntos. Añadir soporte de `CF-Connecting-IP` o `X-Forwarded-For` es trivial si hace falta; pidelo.
-- **Sin exportación a iCal** del usuario final. El formulario no devuelve un `.ics`.
 - **Tests de integración REST** (WP-Browser / Codeception) están pendientes. La cobertura actual está en unit tests con mocks.
+- **Validación profunda de AcroForm** al subir plantillas PDF: hoy se valida el tipo MIME y el tamaño, pero no que los nombres de campo coincidan con los esperados por `PdfFields`. Si el Ayuntamiento publica una plantilla con campos renombrados, pdftk los ignorará silenciosamente. Queda como mejora futura.
 
 ### Próximos hitos sugeridos
 
-- v0.2: Uploader de plantillas PDF + validación de campos AcroForm.
-- v0.3: Exportación a iCal y notificaciones por SMS opcionales.
-- v0.4: Panel de estadísticas con rangos de fechas personalizados y export CSV.
+- v0.3: Migrador automático de reservas históricas del plugin legacy.
+- v0.4: Validación profunda de AcroForm en el uploader (comparar campos con los de `PdfFields`).
+- v0.5: Soporte nativo de proxy inverso en el rate limiter y tests de integración REST con WP-Browser.
 
 ---
 
