@@ -1,0 +1,52 @@
+/*
+ * Admin panel styles. Scoped to #reservas-admin-app to avoid leaking into
+ * the rest of wp-admin. WP's .wrap container provides the outer padding.
+ */
+
+#reservas-admin-app {
+    font-family: var(--ra-font-family-sans);
+    color: var(--ra-color-text);
+    line-height: var(--ra-line-height-base);
+    box-sizing: border-box;
+}
+
+#reservas-admin-app *,
+#reservas-admin-app *::before,
+#reservas-admin-app *::after {
+    box-sizing: inherit;
+}
+
+#reservas-admin-app :focus-visible {
+    outline: none;
+    box-shadow: var(--ra-focus-ring);
+    border-radius: var(--ra-radius-sm);
+}
+
+#reservas-admin-app h1,
+#reservas-admin-app h2,
+#reservas-admin-app h3 {
+    font-family: inherit;
+    color: inherit;
+}
+
+#reservas-admin-app a {
+    color: var(--ra-color-primary);
+    text-decoration: none;
+}
+
+#reservas-admin-app a:hover {
+    text-decoration: underline;
+}
+
+#reservas-admin-app table {
+    background: transparent;
+}
+
+#reservas-admin-app code {
+    font-family: var(--ra-font-family-mono);
+    font-size: 0.92em;
+    background: var(--ra-color-bg-muted);
+    padding: 1px 6px;
+    border-radius: var(--ra-radius-sm);
+    border: 1px solid var(--ra-color-border);
+}

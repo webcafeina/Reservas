@@ -10,6 +10,7 @@
         "preview": "vite preview",
         "lint": "eslint \"frontend/**/*.{ts,tsx}\" --max-warnings=0",
         "lint:fix": "eslint \"frontend/**/*.{ts,tsx}\" --fix",
+        "dev:admin": "vite --mode admin",
         "format": "prettier --write \"frontend/**/*.{ts,tsx,css,json}\"",
         "format:check": "prettier --check \"frontend/**/*.{ts,tsx,css,json}\"",
         "test": "vitest run",

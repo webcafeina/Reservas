@@ -14,6 +14,7 @@ use WebcafeinaReservas\Rest\Controllers\BookingsController;
 use WebcafeinaReservas\Rest\Controllers\ProfileController;
 use WebcafeinaReservas\Rest\Controllers\SpacesController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminBookingsController;
+use WebcafeinaReservas\Rest\Controllers\Admin\AdminSettingsController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminStatsController;
 use WebcafeinaReservas\Roles\RoleManager;
 
@@ -37,6 +38,7 @@ final class RestApi {
         ( new ProfileController() )->register();
         ( new AdminBookingsController() )->register();
         ( new AdminStatsController() )->register();
+        ( new AdminSettingsController() )->register();
     }
 
     /**

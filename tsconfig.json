@@ -36,6 +36,6 @@
             "@/*": ["frontend/src/*"]
         }
     },
-    "include": ["frontend/src", "frontend/vite-env.d.ts"],
+    "include": ["frontend/src", "frontend/admin", "frontend/vite-env.d.ts"],
     "exclude": ["node_modules", "vendor", "assets/dist"]
 }

@@ -29,6 +29,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 app: resolve(__dirname, 'frontend/src/main.tsx'),
+                admin: resolve(__dirname, 'frontend/admin/main.tsx'),
             },
             output: {
                 entryFileNames: 'assets/[name]-[hash].js',
@@ -51,14 +52,15 @@ export default defineConfig({
         environment: 'jsdom',
         globals: true,
         setupFiles: resolve(__dirname, 'frontend/src/test-setup.ts'),
-        include: ['frontend/src/**/*.{test,spec}.{ts,tsx}'],
+        include: ['frontend/**/*.{test,spec}.{ts,tsx}'],
         coverage: {
             reporter: ['text', 'html', 'clover'],
-            include: ['frontend/src/**/*.{ts,tsx}'],
+            include: ['frontend/**/*.{ts,tsx}'],
             exclude: [
-                'frontend/src/**/*.{test,spec}.{ts,tsx}',
+                'frontend/**/*.{test,spec}.{ts,tsx}',
                 'frontend/src/test-setup.ts',
                 'frontend/src/main.tsx',
+                'frontend/admin/main.tsx',
             ],
         },
     },

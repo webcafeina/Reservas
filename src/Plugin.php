@@ -53,7 +53,11 @@ final class Plugin {
         // Email handlers: async confirmation + admin cancellation hook.
         Services\EmailNotifier::register();
 
-        // Subsystems wired in later phases:
-        // - Admin\AdminMenu::register()
+        // Admin: settings, menu page, React bundle.
+        Admin\SettingsRegistrar::register();
+        if ( is_admin() ) {
+            Admin\AdminMenu::register();
+            Admin\AdminAssetLoader::register();
+        }
     }
 }
