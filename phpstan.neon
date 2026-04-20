@@ -1,0 +1,17 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 6
+    phpVersion: 70400
+    paths:
+        - reservas-aldealab.php
+        - src
+    excludePaths:
+        - src/Database/Migrations/legacy/*
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+    ignoreErrors:
+        # Allow $wpdb->prefix concatenation in table names.
+        - '#Parameter \#1 \$query of method wpdb::prepare\(\) expects string, string given\.#'
+    treatPhpDocTypesAsCertain: false

@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }} / WP ${{ matrix.wp }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2']
+        wp: ['6.0', 'latest']
+    services:
+      mysql:
+        image: mariadb:10.5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, pdo, pdo_mysql, intl, mbstring, json, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Install pdftk (for PDF filling smoke tests)
+        run: sudo apt-get update && sudo apt-get install -y pdftk-java
+
+      - name: Cache composer vendor
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php${{ matrix.php }}-composer-
+
+      - name: Composer install
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: PHP syntax
+        run: find src reservas-aldealab.php -name '*.php' -print0 | xargs -0 -n1 -P4 php -l >/dev/null
+
+      - name: PHPCS
+        run: composer run lint
+
+      - name: PHPStan
+        run: composer run stan
+
+      - name: PHPUnit (unit suite)
+        run: composer run test:unit
+
+  js:
+    name: JS / build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: npm ci
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Vitest
+        run: npm test
+
+      - name: Prettier check
+        run: npm run format:check
+
+      - name: Vite build
+        run: npm run build

@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  package:
+    name: Package plugin zip
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Composer install (production)
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: npm ci
+        run: npm ci
+
+      - name: Vite build
+        run: npm run build
+
+      - name: Resolve version from tag
+        id: vars
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Assemble plugin folder
+        run: |
+          set -euo pipefail
+          OUT="${{ runner.temp }}/reservas-aldealab"
+          mkdir -p "$OUT"
+          rsync -a \
+            --include='reservas-aldealab.php' \
+            --include='uninstall.php' \
+            --include='README.md' \
+            --include='CHANGELOG.md' \
+            --include='LICENSE' \
+            --include='composer.json' \
+            --include='composer.lock' \
+            --include='src/***' \
+            --include='vendor/***' \
+            --include='assets/pdf-templates/***' \
+            --include='assets/email/***' \
+            --include='assets/dist/***' \
+            --include='languages/***' \
+            --exclude='*' \
+            ./ "$OUT"/
+          # Clean up dev artifacts that may have slipped in.
+          find "$OUT" -name 'node_modules' -type d -prune -exec rm -rf {} +
+          find "$OUT" -name '*.test.*' -delete
+          find "$OUT" -name '*.spec.*' -delete
+
+      - name: Zip plugin
+        id: zip
+        run: |
+          set -euo pipefail
+          cd "${{ runner.temp }}"
+          ZIP_NAME="reservas-aldealab-v${{ steps.vars.outputs.version }}.zip"
+          zip -r "$ZIP_NAME" reservas-aldealab
+          echo "path=${{ runner.temp }}/$ZIP_NAME" >> "$GITHUB_OUTPUT"
+          echo "name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.zip.outputs.path }}
+          name: Reservas Aldealab v${{ steps.vars.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true

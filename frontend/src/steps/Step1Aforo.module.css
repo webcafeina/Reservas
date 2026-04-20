@@ -1,0 +1,66 @@
+.aforo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ra-space-4);
+}
+
+.services {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-3);
+}
+
+.servicesLegend {
+    font-size: var(--ra-font-size-sm);
+    font-weight: var(--ra-font-weight-medium);
+    margin-bottom: var(--ra-space-2);
+    padding: 0;
+}
+
+.servicesGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ra-space-2);
+}
+
+.loading {
+    color: var(--ra-color-text-muted);
+    font-size: var(--ra-font-size-sm);
+    margin: 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ra-space-2);
+    padding: var(--ra-space-2) var(--ra-space-4);
+    background: var(--ra-color-bg);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-pill);
+    cursor: pointer;
+    font-size: var(--ra-font-size-sm);
+    transition: all var(--ra-duration-fast) var(--ra-ease);
+}
+
+.chip input {
+    display: none;
+}
+
+.chip:hover {
+    border-color: var(--ra-color-border-strong);
+}
+
+.chipChecked {
+    background: var(--ra-color-primary);
+    color: var(--ra-color-primary-contrast);
+    border-color: var(--ra-color-primary);
+}
+
+@media (max-width: 600px) {
+    .aforo {
+        grid-template-columns: 1fr;
+    }
+}

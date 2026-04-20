@@ -1,0 +1,118 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-4);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.exportLink {
+    padding: var(--ra-space-2) var(--ra-space-4);
+    background: var(--ra-color-accent);
+    color: var(--ra-color-text-inverted);
+    border-radius: var(--ra-radius-md);
+    font-size: var(--ra-font-size-sm);
+    font-weight: var(--ra-font-weight-medium);
+    text-decoration: none;
+    transition: background var(--ra-duration-fast) var(--ra-ease);
+}
+
+.exportLink:hover {
+    background: var(--ra-color-accent-hover);
+    text-decoration: none;
+    color: var(--ra-color-text-inverted);
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--ra-space-3);
+    padding: var(--ra-space-4);
+    background: var(--ra-color-bg);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--ra-color-bg);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    overflow: hidden;
+}
+
+.table th,
+.table td {
+    padding: var(--ra-space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--ra-color-border);
+    vertical-align: middle;
+}
+
+.table th {
+    background: var(--ra-color-bg-muted);
+    font-size: var(--ra-font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ra-color-text-muted);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.empty {
+    text-align: center;
+    color: var(--ra-color-text-muted);
+    padding: var(--ra-space-6) !important;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: var(--ra-radius-pill);
+    font-size: var(--ra-font-size-xs);
+    font-weight: var(--ra-font-weight-semibold);
+}
+
+.statePendiente {
+    background: color-mix(in srgb, var(--ra-color-warning) 15%, white);
+    color: var(--ra-color-warning);
+}
+.stateConfirmada {
+    background: color-mix(in srgb, var(--ra-color-success) 15%, white);
+    color: var(--ra-color-success);
+}
+.stateCancelada {
+    background: color-mix(in srgb, var(--ra-color-danger) 15%, white);
+    color: var(--ra-color-danger);
+}
+.stateFinalizada {
+    background: var(--ra-color-bg-muted);
+    color: var(--ra-color-text-muted);
+}
+
+.objeto {
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pager {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--ra-space-3);
+    color: var(--ra-color-text-muted);
+    font-size: var(--ra-font-size-sm);
+}
+
+.pagerBtns {
+    display: flex;
+    gap: var(--ra-space-2);
+}
