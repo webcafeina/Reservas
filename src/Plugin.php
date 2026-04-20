@@ -37,8 +37,13 @@ final class Plugin {
         // Run pending DB migrations on every admin pageload.
         add_action( 'admin_init', array( Database\MigrationRunner::class, 'maybeRun' ) );
 
-        // Subsystems are wired here in later phases:
-        // - PostTypes\SalaCpt::register()
+        // Custom post type + taxonomies + meta.
+        PostTypes\SalaCpt::register();
+        if ( is_admin() ) {
+            PostTypes\SalaMetabox::register();
+        }
+
+        // Subsystems wired in later phases:
         // - Rest\RestApi::register()
         // - Admin\AdminMenu::register()
         // - Frontend\FormShortcode::register()
