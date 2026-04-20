@@ -1,0 +1,92 @@
+/*
+ * Design tokens para Reservas Aldealab.
+ *
+ * Estos valores son placeholders corporativos razonables — el cliente
+ * aportará su paleta oficial y aquí sobreescribimos. Mantén estas
+ * variables como única fuente de verdad de colores/tipografía: nunca
+ * hardcodees un hex en otro archivo.
+ */
+
+:root {
+    /* ===== Colores ===== */
+    /* Primario Aldealab (placeholder — reemplazar con el oficial) */
+    --ra-color-primary: #0b5394;
+    --ra-color-primary-hover: #073e6b;
+    --ra-color-primary-contrast: #ffffff;
+
+    /* Acento (CTAs secundarios) */
+    --ra-color-accent: #f39c12;
+    --ra-color-accent-hover: #d88009;
+
+    /* Neutrales */
+    --ra-color-bg: #ffffff;
+    --ra-color-bg-muted: #f5f6f8;
+    --ra-color-border: #d9dde3;
+    --ra-color-border-strong: #9aa3b2;
+
+    /* Texto */
+    --ra-color-text: #1b1f24;
+    --ra-color-text-muted: #5a6370;
+    --ra-color-text-inverted: #ffffff;
+
+    /* Estados */
+    --ra-color-success: #1f8f4f;
+    --ra-color-warning: #d48806;
+    --ra-color-danger: #c0392b;
+    --ra-color-info: #2b7cd3;
+
+    /* ===== Tipografía ===== */
+    --ra-font-family-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --ra-font-family-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --ra-font-size-xs: 0.75rem;
+    --ra-font-size-sm: 0.875rem;
+    --ra-font-size-base: 1rem;
+    --ra-font-size-lg: 1.125rem;
+    --ra-font-size-xl: 1.25rem;
+    --ra-font-size-2xl: 1.5rem;
+    --ra-font-size-3xl: 1.875rem;
+
+    --ra-font-weight-regular: 400;
+    --ra-font-weight-medium: 500;
+    --ra-font-weight-semibold: 600;
+    --ra-font-weight-bold: 700;
+
+    --ra-line-height-tight: 1.25;
+    --ra-line-height-base: 1.5;
+    --ra-line-height-loose: 1.75;
+
+    /* ===== Espaciado (escala 4px) ===== */
+    --ra-space-1: 0.25rem;
+    --ra-space-2: 0.5rem;
+    --ra-space-3: 0.75rem;
+    --ra-space-4: 1rem;
+    --ra-space-5: 1.25rem;
+    --ra-space-6: 1.5rem;
+    --ra-space-8: 2rem;
+    --ra-space-10: 2.5rem;
+    --ra-space-12: 3rem;
+    --ra-space-16: 4rem;
+
+    /* ===== Radios, sombras ===== */
+    --ra-radius-sm: 0.25rem;
+    --ra-radius-md: 0.5rem;
+    --ra-radius-lg: 0.75rem;
+    --ra-radius-pill: 999px;
+
+    --ra-shadow-sm: 0 1px 2px rgba(20, 24, 33, 0.06);
+    --ra-shadow-md: 0 4px 12px rgba(20, 24, 33, 0.08);
+    --ra-shadow-lg: 0 12px 32px rgba(20, 24, 33, 0.12);
+
+    /* ===== Layout ===== */
+    --ra-container-max: 1040px;
+    --ra-step-width: 720px;
+
+    /* ===== Focus ring accesible ===== */
+    --ra-focus-ring: 0 0 0 3px rgba(11, 83, 148, 0.35);
+
+    /* ===== Motion ===== */
+    --ra-duration-fast: 120ms;
+    --ra-duration-base: 200ms;
+    --ra-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

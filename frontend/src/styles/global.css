@@ -1,0 +1,36 @@
+/*
+ * Base layout for the SPA root. Scoped to #reservas-app so we don't leak
+ * styles into the rest of the theme.
+ */
+
+#reservas-app {
+    font-family: var(--ra-font-family-sans);
+    font-size: var(--ra-font-size-base);
+    line-height: var(--ra-line-height-base);
+    color: var(--ra-color-text);
+    box-sizing: border-box;
+    max-width: var(--ra-container-max);
+    margin: 0 auto;
+    padding: var(--ra-space-6) var(--ra-space-4);
+}
+
+#reservas-app *,
+#reservas-app *::before,
+#reservas-app *::after {
+    box-sizing: inherit;
+}
+
+#reservas-app :focus-visible {
+    outline: none;
+    box-shadow: var(--ra-focus-ring);
+    border-radius: var(--ra-radius-sm);
+}
+
+.reservas-app-root {
+    min-height: 360px;
+    padding: var(--ra-space-6);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-lg);
+    background: var(--ra-color-bg);
+    box-shadow: var(--ra-shadow-sm);
+}

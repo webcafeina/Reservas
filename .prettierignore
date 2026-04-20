@@ -1,0 +1,10 @@
+vendor/
+node_modules/
+assets/dist/
+assets/pdf-templates/
+assets/email/
+languages/
+coverage/
+*.pot
+*.po
+*.mo
