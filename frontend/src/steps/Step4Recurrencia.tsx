@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 
 import { Button } from '../components/Button';
 import { SelectField, TextField } from '../components/Field';
+import { OccurrenceCalendar } from '../components/OccurrenceCalendar';
 import { StepFrame } from '../components/StepFrame';
 import { useBookingStore } from '../store/bookingStore';
 import type { Freq, Weekday, MonthlyMode } from '../store/buildRrule';
+import { expandOccurrences } from '../store/expandOccurrences';
 
 import styles from './Step4Recurrencia.module.css';
 
@@ -23,10 +25,9 @@ export function Step4Recurrencia(): JSX.Element {
     const setRruleInput = useBookingStore((s) => s.setRruleInput);
     const fechasExcluidas = useBookingStore((s) => s.fechasExcluidas);
     const setFechasExcluidas = useBookingStore((s) => s.setFechasExcluidas);
+    const fechaInicio = useBookingStore((s) => s.fechaInicio);
     const goBack = useBookingStore((s) => s.goBack);
     const setStep = useBookingStore((s) => s.setStep);
-
-    const [exclusion, setExclusion] = useState('');
 
     const toggleWeekday = (wd: Weekday): void => {
         const current = rrule.byweekday ?? [];
@@ -36,17 +37,25 @@ export function Step4Recurrencia(): JSX.Element {
         setRruleInput({ byweekday: next });
     };
 
-    const addExclusion = (): void => {
-        if (exclusion === '') return;
-        if (!fechasExcluidas.includes(exclusion)) {
-            setFechasExcluidas([...fechasExcluidas, exclusion]);
-        }
-        setExclusion('');
+    const toggleExclusion = (iso: string): void => {
+        setFechasExcluidas(
+            fechasExcluidas.includes(iso)
+                ? fechasExcluidas.filter((x) => x !== iso)
+                : [...fechasExcluidas, iso],
+        );
     };
 
-    const removeExclusion = (d: string): void => {
-        setFechasExcluidas(fechasExcluidas.filter((x) => x !== d));
-    };
+    const occurrences = useMemo<Date[]>(() => {
+        if (fechaInicio === '') return [];
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fechaInicio);
+        if (!m) return [];
+        const start = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+        try {
+            return expandOccurrences(rrule, start);
+        } catch {
+            return [];
+        }
+    }, [rrule, fechaInicio]);
 
     const freqOptions = [
         { value: 'DAILY', label: 'Diaria' },
@@ -159,36 +168,14 @@ export function Step4Recurrencia(): JSX.Element {
             </div>
 
             <div>
-                <label className={styles.groupLabel}>Fechas a excluir (opcional)</label>
-                <div className={styles.exclusionRow}>
-                    <input
-                        type="date"
-                        value={exclusion}
-                        onChange={(e) => setExclusion(e.target.value)}
-                        className={styles.dateInput}
-                        aria-label="Nueva fecha a excluir"
-                    />
-                    <Button variant="secondary" onClick={addExclusion} disabled={exclusion === ''}>
-                        Añadir
-                    </Button>
-                </div>
-                {fechasExcluidas.length > 0 && (
-                    <ul className={styles.exclusionList}>
-                        {fechasExcluidas.map((d) => (
-                            <li key={d}>
-                                {d}
-                                <button
-                                    type="button"
-                                    onClick={() => removeExclusion(d)}
-                                    aria-label={`Quitar ${d}`}
-                                    className={styles.removeBtn}
-                                >
-                                    ×
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <label className={styles.groupLabel}>
+                    Vista previa (haz clic en una ocurrencia para excluirla)
+                </label>
+                <OccurrenceCalendar
+                    occurrences={occurrences}
+                    excluded={fechasExcluidas}
+                    onToggleExclude={toggleExclusion}
+                />
             </div>
         </StepFrame>
     );
