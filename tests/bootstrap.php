@@ -17,5 +17,18 @@ if ( ! file_exists( $autoload ) ) {
 
 require_once $autoload;
 
+// Stubs for WordPress classes that our unit tests need to type against.
+// Integration tests get the real classes from WP-Browser.
+require_once __DIR__ . '/Support/wp-stubs.php';
+
+// Define the runtime constant the plugin bootstrap sets, so code that reads
+// RESERVAS_ALDEALAB_PATH at load time doesn't fatal in tests.
+if ( ! defined( 'RESERVAS_ALDEALAB_PATH' ) ) {
+    define( 'RESERVAS_ALDEALAB_PATH', dirname( __DIR__ ) . '/' );
+}
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
 // Brain Monkey boots per-test in each test class's setUp()/tearDown().
 // See https://brain-wp.github.io/BrainMonkey/docs/wordpress-setup.html
