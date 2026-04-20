@@ -50,6 +50,9 @@ final class Plugin {
         Frontend\FormShortcode::register();
         Frontend\AssetLoader::register();
 
+        // Email handlers: async confirmation + admin cancellation hook.
+        Services\EmailNotifier::register();
+
         // Subsystems wired in later phases:
         // - Admin\AdminMenu::register()
     }
