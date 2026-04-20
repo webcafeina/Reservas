@@ -68,6 +68,25 @@ if ( ! class_exists( 'wpdb' ) ) {
         public function get_var( $query ) {
             return null;
         }
+
+        /**
+         * @param string $query
+         * @param int    $output
+         * @return array<string, mixed>|object|null
+         */
+        public function get_row( $query, $output = 0 ) {
+            return null;
+        }
+
+        /**
+         * @param string               $table
+         * @param array<string, mixed> $where
+         * @param array<int, string>|string|null $where_format
+         * @return int|false
+         */
+        public function delete( $table, array $where, $where_format = null ) {
+            return 1;
+        }
     }
     // phpcs:enable
 }

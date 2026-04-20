@@ -43,8 +43,10 @@ final class Plugin {
             PostTypes\SalaMetabox::register();
         }
 
+        // REST API (namespace reservas/v1).
+        Rest\RestApi::register();
+
         // Subsystems wired in later phases:
-        // - Rest\RestApi::register()
         // - Admin\AdminMenu::register()
         // - Frontend\FormShortcode::register()
     }
