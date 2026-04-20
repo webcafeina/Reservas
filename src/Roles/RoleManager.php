@@ -10,19 +10,66 @@ namespace WebcafeinaReservas\Roles;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Scaffold. Real implementation lands in Phase 2.
+ * Creates / removes the two roles owned by this plugin.
  *
- * Roles owned by this plugin:
- * - `usuario_alojado`: granted to tenants of the Aldealab building.
- * - `reservas_manager`: non-admin staff allowed into the reservations admin UI.
+ * - `usuario_alojado`: tenants of the Aldealab building. If the booking user
+ *   has this role *and* the sala is not CPA, they don't receive the Sede
+ *   Electrónica PDF (they already have presented the paperwork to be tenants).
+ * - `reservas_manager`: non-admin staff allowed into the reservations panel.
+ *
+ * Capabilities:
+ * - `manage_reservas` — the single gate checked by every admin REST endpoint
+ *   and the admin menu page.
  */
 final class RoleManager {
 
+    public const ROLE_TENANT  = 'usuario_alojado';
+    public const ROLE_MANAGER = 'reservas_manager';
+
+    public const CAP_MANAGE = 'manage_reservas';
+
     public static function ensureRoles(): void {
-        // Phase 2.
+        // Tenants: read-only WP access; the plugin uses the role *itself* as
+        // the signal, no extra capabilities needed.
+        if ( get_role( self::ROLE_TENANT ) === null ) {
+            add_role(
+                self::ROLE_TENANT,
+                __( 'Usuario alojado', 'reservas-aldealab' ),
+                array(
+                    'read' => true,
+                )
+            );
+        }
+
+        // Managers: plugin admin access only, not the whole WP admin.
+        if ( get_role( self::ROLE_MANAGER ) === null ) {
+            add_role(
+                self::ROLE_MANAGER,
+                __( 'Gestor de Reservas', 'reservas-aldealab' ),
+                array(
+                    'read'                => true,
+                    self::CAP_MANAGE      => true,
+                    'edit_posts'          => true,
+                    'upload_files'        => true,
+                )
+            );
+        }
+
+        // Administrators always get manage_reservas, even if they never
+        // touched this plugin before. Idempotent.
+        $admin = get_role( 'administrator' );
+        if ( $admin !== null && ! $admin->has_cap( self::CAP_MANAGE ) ) {
+            $admin->add_cap( self::CAP_MANAGE );
+        }
     }
 
     public static function removeRoles(): void {
-        // Phase 2.
+        remove_role( self::ROLE_TENANT );
+        remove_role( self::ROLE_MANAGER );
+
+        $admin = get_role( 'administrator' );
+        if ( $admin !== null && $admin->has_cap( self::CAP_MANAGE ) ) {
+            $admin->remove_cap( self::CAP_MANAGE );
+        }
     }
 }
