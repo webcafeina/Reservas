@@ -4,6 +4,28 @@
     gap: var(--ra-space-4);
 }
 
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.exportLink {
+    padding: var(--ra-space-2) var(--ra-space-4);
+    background: var(--ra-color-accent);
+    color: var(--ra-color-text-inverted);
+    border-radius: var(--ra-radius-md);
+    font-size: var(--ra-font-size-sm);
+    font-weight: var(--ra-font-weight-medium);
+    text-decoration: none;
+    transition: background var(--ra-duration-fast) var(--ra-ease);
+}
+
+.exportLink:hover {
+    background: var(--ra-color-accent-hover);
+    text-decoration: none;
+    color: var(--ra-color-text-inverted);
+}
+
 .filters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

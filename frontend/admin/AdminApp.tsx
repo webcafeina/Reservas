@@ -1,3 +1,5 @@
+import { WebcafeinaFooter } from '../src/components/WebcafeinaFooter';
+
 import { Dashboard } from './pages/Dashboard';
 import { BookingsList } from './pages/BookingsList';
 import { BookingDetail } from './pages/BookingDetail';
@@ -45,6 +47,8 @@ export function AdminApp(): JSX.Element {
                 {view.name === 'booking' && <BookingDetail id={view.id} />}
                 {view.name === 'settings' && <SettingsPage />}
             </main>
+
+            <WebcafeinaFooter />
         </div>
     );
 }

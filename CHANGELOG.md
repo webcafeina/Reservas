@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-04-20
+
+### Added
+
+- **PDF template uploader** from the admin panel. New settings section lists
+  both templates with their current source (custom upload vs. packaged),
+  accepts multipart uploads with PDF magic-byte + size validation, and
+  offers a "revert to packaged" button. Uploads are stored under
+  `wp-content/uploads/reservas-aldealab/pdf-templates/` with a deny-all
+  `.htaccess`, so they survive plugin upgrades. New REST surface:
+  GET/POST/DELETE `/admin/pdf-templates[/{key}]`.
+- **iCal export**. New service `IcalGenerator` emits RFC 5545 VCALENDAR
+  with one VEVENT per expanded date. Public endpoint
+  `GET /bookings/{uuid}/ical` (UUID-gated). iCal download button appears
+  in the success step of the public SPA and a CTA button in the user
+  confirmation email.
+- **SMS notifications (opt-in)**. Pluggable `SmsProviderInterface` with a
+  null provider by default and a concrete Twilio implementation
+  (`TwilioSmsProvider`) that uses the Twilio REST API. EmailNotifier
+  dispatches an SMS after the email when the provider is configured and
+  the profile has a mobile number, for both confirmation and cancellation
+  flows. Settings UI adds a provider selector and Twilio SID / token /
+  from-number fields. Auth token is masked on GET.
+- **Stats with custom date ranges**. `GET /admin/stats` now accepts
+  `from` / `to` (YYYY-MM-DD) query params. Dashboard gets a range picker
+  with "Last month / quarter / year" presets.
+- **CSV export of bookings**. `GET /admin/bookings/export` streams a
+  UTF-8 CSV (BOM for Excel) with the same filter set as the bookings
+  list, capped at 10 000 rows. Export buttons in Dashboard (by range)
+  and BookingsList (with current filters).
+- Small Webcafeína footer in both the public SPA and the admin panel.
+
+### Changed
+
+- `AdminSettingsController` masks both Turnstile secret and Twilio auth
+  token on GET, accepts the mask as "no change" on PUT.
+- `PdfGenerator` resolves template paths through `PdfTemplateStorage`
+  so admin uploads win over packaged templates.
+
 ## [0.1.0] — 2026-04-20
 
 Initial release. Complete rewrite from scratch of the legacy

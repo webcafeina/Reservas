@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Button } from '../../src/components/Button';
 import { SelectField, TextField } from '../../src/components/Field';
-import { useAdminBookings, type BookingFilters } from '../api/hooks';
+import { buildExportUrl, useAdminBookings, type BookingFilters } from '../api/hooks';
 import { navigate } from '../useHashRoute';
 import type { BookingState } from '../../src/types/booking';
 
@@ -39,6 +39,15 @@ export function BookingsList(): JSX.Element {
 
     return (
         <div className={styles.wrapper}>
+            <div className={styles.toolbar}>
+                <a
+                    href={buildExportUrl({ ...filters, page: undefined, per_page: undefined })}
+                    className={styles.exportLink}
+                    title="Exportar CSV con los filtros actuales"
+                >
+                    Exportar CSV con filtros actuales
+                </a>
+            </div>
             <header className={styles.filters}>
                 <SelectField
                     label="Estado"

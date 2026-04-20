@@ -4,6 +4,11 @@ import { useBookingStore } from '../store/bookingStore';
 
 import styles from './Step8Exito.module.css';
 
+function icalUrlFor(uuid: string): string {
+    const base = window.ReservasAldealab?.restBase ?? '/wp-json/reservas/v1';
+    return `${base.replace(/\/$/, '')}/bookings/${uuid}/ical`;
+}
+
 export function Step8Exito(): JSX.Element {
     const booking = useBookingStore((s) => s.confirmedBooking);
     const reset = useBookingStore((s) => s.reset);
@@ -36,6 +41,15 @@ export function Step8Exito(): JSX.Element {
                         Ayuntamiento de Cáceres, encontrarás el PDF adjunto en el correo y las
                         instrucciones en el propio email.
                     </p>
+                    <div className={styles.actions}>
+                        <a
+                            href={icalUrlFor(booking.uuid)}
+                            download={`reserva-${booking.uuid}.ics`}
+                            className={styles.icalLink}
+                        >
+                            Añadir al calendario (.ics)
+                        </a>
+                    </div>
                 </div>
             )}
             {booking === null && <p>Gracias. Puedes cerrar esta ventana.</p>}

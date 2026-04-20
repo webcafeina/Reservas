@@ -4,6 +4,55 @@
     gap: var(--ra-space-6);
 }
 
+.rangeBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--ra-space-3);
+    padding: var(--ra-space-4);
+    background: var(--ra-color-bg);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    flex-wrap: wrap;
+}
+
+.rangeFields {
+    display: flex;
+    gap: var(--ra-space-3);
+    align-items: flex-end;
+}
+
+.rangePresets {
+    display: flex;
+    gap: var(--ra-space-1);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.exportLink {
+    margin-left: var(--ra-space-2);
+    padding: var(--ra-space-2) var(--ra-space-4);
+    background: var(--ra-color-accent);
+    color: var(--ra-color-text-inverted);
+    border-radius: var(--ra-radius-md);
+    font-size: var(--ra-font-size-sm);
+    font-weight: var(--ra-font-weight-medium);
+    text-decoration: none;
+    transition: background var(--ra-duration-fast) var(--ra-ease);
+}
+
+.exportLink:hover {
+    background: var(--ra-color-accent-hover);
+    text-decoration: none;
+    color: var(--ra-color-text-inverted);
+}
+
+.section h2 small {
+    font-weight: normal;
+    color: var(--ra-color-text-muted);
+    font-size: var(--ra-font-size-sm);
+}
+
 .kpis {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

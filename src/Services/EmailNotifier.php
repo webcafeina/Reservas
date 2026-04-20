@@ -19,6 +19,7 @@ use WebcafeinaReservas\Repositories\BookingRepository;
 use WebcafeinaReservas\Repositories\EmailLogRepository;
 use WebcafeinaReservas\Repositories\UserProfileRepository;
 use WebcafeinaReservas\Roles\RoleManager;
+use WebcafeinaReservas\Services\Sms\SmsProviderFactory;
 
 /**
  * Transactional emails: booking confirmation (user + admin) and
@@ -80,6 +81,12 @@ final class EmailNotifier {
                 $ctx['sala'],
                 $pdfPath
             );
+            ( new self() )->maybeSendSms(
+                $ctx['booking'],
+                $ctx['profile'],
+                $ctx['sala'],
+                'confirmation'
+            );
         } finally {
             if ( $pdfPath !== null && is_file( $pdfPath ) ) {
                 @unlink( $pdfPath );
@@ -96,6 +103,56 @@ final class EmailNotifier {
             return;
         }
         ( new self() )->sendCancellation( $ctx['booking'], $ctx['profile'], $ctx['sala'] );
+        ( new self() )->maybeSendSms(
+            $ctx['booking'],
+            $ctx['profile'],
+            $ctx['sala'],
+            'cancellation'
+        );
+    }
+
+    /**
+     * Opt-in SMS dispatch. No-op when no provider is configured. Logs every
+     * attempt to reservas_email_log with tipo='sms'.
+     */
+    public function maybeSendSms(
+        Booking $booking,
+        UserProfile $profile,
+        Sala $sala,
+        string $kind
+    ): void {
+        $provider = SmsProviderFactory::fromSettings();
+        if ( ! $provider->isConfigured() ) {
+            return;
+        }
+        if ( $profile->movil === '' ) {
+            return;
+        }
+
+        $body = $kind === 'cancellation'
+            ? sprintf(
+                /* translators: 1: sala name, 2: date */
+                __( 'Tu reserva en "%1$s" el %2$s ha sido cancelada. Aldealab.', 'reservas-aldealab' ),
+                $sala->title,
+                PdfGenerator::isoToDdMmYyyy( $booking->fechaInicio )
+            )
+            : sprintf(
+                /* translators: 1: sala name, 2: first date, 3: start time */
+                __( 'Reserva recibida: %1$s el %2$s a las %3$s. Aldealab.', 'reservas-aldealab' ),
+                $sala->title,
+                PdfGenerator::isoToDdMmYyyy( $booking->fechaInicio ),
+                substr( $booking->horaInicio, 0, 5 )
+            );
+
+        $result = $provider->send( $profile->movil, $body );
+        self::log()->record(
+            $booking->id,
+            'sms-' . $kind,
+            $profile->movil,
+            'SMS ' . $result['provider'],
+            $result['success'] ? 'enviado' : 'error',
+            $result['error']
+        );
     }
 
     // ---------- Per-email senders ----------

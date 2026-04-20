@@ -63,12 +63,18 @@ export interface AdminStats {
     this_week: number;
     upcoming: number;
     per_sala: Array<{ sala_id: number; title: string; total: number }>;
+    range: { from: string; to: string };
 }
 
-export function useAdminStats() {
+export interface StatsRange {
+    from?: string;
+    to?: string;
+}
+
+export function useAdminStats(range: StatsRange = {}) {
     return useQuery({
-        queryKey: ['admin', 'stats'],
-        queryFn: () => adminApi.get<AdminStats>('/admin/stats'),
+        queryKey: ['admin', 'stats', range],
+        queryFn: () => adminApi.get<AdminStats>('/admin/stats', range as Record<string, unknown>),
         staleTime: 60_000,
     });
 }
@@ -84,6 +90,10 @@ export interface Settings {
     email_intro_user: string;
     email_intro_admin: string;
     delete_on_uninstall: boolean;
+    sms_provider: 'none' | 'twilio';
+    twilio_account_sid: string;
+    twilio_auth_token: string;
+    twilio_from_number: string;
 }
 
 export function useSettings() {
@@ -102,4 +112,37 @@ export function useUpdateSettings() {
             qc.setQueryData(['admin', 'settings'], data);
         },
     });
+}
+
+export interface PdfTemplate {
+    key: string;
+    filename: string;
+    source: 'custom' | 'packaged';
+    uploaded_at: string | null;
+    fields_ok: boolean;
+}
+
+export function usePdfTemplates() {
+    return useQuery({
+        queryKey: ['admin', 'pdf-templates'],
+        queryFn: () => adminApi.get<{ items: PdfTemplate[] }>('/admin/pdf-templates'),
+        staleTime: 30_000,
+    });
+}
+
+/**
+ * Admin-specific URL builder for file downloads (CSV / iCal). We need
+ * the absolute REST URL (including nonce in query string) because the
+ * browser navigates to it directly for downloads.
+ */
+export function buildExportUrl(filters: BookingFilters): string {
+    const base = window.ReservasAldealabAdmin?.restBase ?? '/wp-json/reservas/v1';
+    const nonce = window.ReservasAldealabAdmin?.nonce ?? '';
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(filters)) {
+        if (v === undefined || v === null || v === '') continue;
+        params.append(k, String(v));
+    }
+    if (nonce !== '') params.append('_wpnonce', nonce);
+    return `${base}/admin/bookings/export?${params.toString()}`;
 }

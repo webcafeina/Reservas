@@ -31,6 +31,11 @@ final class SettingsRegistrar {
     public const KEY_EMAIL_INTRO_ADMIN  = 'email_intro_admin';
     public const KEY_DELETE_ON_UNINSTALL = 'delete_on_uninstall';
 
+    public const KEY_SMS_PROVIDER        = 'sms_provider';
+    public const KEY_TWILIO_SID          = 'twilio_account_sid';
+    public const KEY_TWILIO_TOKEN        = 'twilio_auth_token';
+    public const KEY_TWILIO_FROM         = 'twilio_from_number';
+
     public static function register(): void {
         add_action( 'init', array( self::class, 'registerSetting' ) );
     }
@@ -63,6 +68,10 @@ final class SettingsRegistrar {
             self::KEY_EMAIL_INTRO_USER    => '',
             self::KEY_EMAIL_INTRO_ADMIN   => '',
             self::KEY_DELETE_ON_UNINSTALL => false,
+            self::KEY_SMS_PROVIDER        => 'none',
+            self::KEY_TWILIO_SID          => '',
+            self::KEY_TWILIO_TOKEN        => '',
+            self::KEY_TWILIO_FROM         => '',
         );
     }
 
@@ -101,9 +110,18 @@ final class SettingsRegistrar {
             self::KEY_PDFTK_PATH,
             self::KEY_EMAIL_INTRO_USER,
             self::KEY_EMAIL_INTRO_ADMIN,
+            self::KEY_TWILIO_SID,
+            self::KEY_TWILIO_TOKEN,
+            self::KEY_TWILIO_FROM,
         ) as $k ) {
             $merged[ $k ] = sanitize_text_field( (string) ( $merged[ $k ] ?? '' ) );
         }
+
+        // SMS provider: whitelist.
+        $smsProvider = (string) ( $merged[ self::KEY_SMS_PROVIDER ] ?? 'none' );
+        $merged[ self::KEY_SMS_PROVIDER ] = in_array( $smsProvider, array( 'none', 'twilio' ), true )
+            ? $smsProvider
+            : 'none';
 
         // URLs.
         foreach ( array(

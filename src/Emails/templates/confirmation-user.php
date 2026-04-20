@@ -17,6 +17,7 @@ declare(strict_types=1);
 /** @var \WebcafeinaReservas\Models\Sala $sala */
 /** @var string $fechas_humano */
 /** @var bool $incluye_sede */
+/** @var string $ical_url */
 
 ob_start();
 ?>
@@ -76,6 +77,15 @@ ob_start();
         <?php esc_html_e( 'Al ser usuario ya alojado en el edificio, no necesitas presentar ninguna documentación adicional. Tu reserva quedará confirmada en breve.', 'reservas-aldealab' ); ?>
     </p>
 <?php endif; ?>
+
+<p style="margin:20px 0 8px 0;">
+    <a
+        href="<?php echo esc_url( $ical_url ); ?>"
+        style="display:inline-block;padding:10px 20px;background:#ffffff;color:#0b5394;border:1px solid #0b5394;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;"
+    >
+        <?php esc_html_e( 'Añadir al calendario (.ics)', 'reservas-aldealab' ); ?>
+    </a>
+</p>
 
 <p style="margin:16px 0;color:#5a6370;font-size:14px;">
     <?php esc_html_e( 'Tu reserva está en estado "pendiente" hasta que un gestor la confirme. Te avisaremos por email cuando cambie el estado.', 'reservas-aldealab' ); ?>

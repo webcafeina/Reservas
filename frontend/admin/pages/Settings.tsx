@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '../../src/components/Button';
-import { TextField, TextareaField } from '../../src/components/Field';
+import { SelectField, TextField, TextareaField } from '../../src/components/Field';
 import { ErrorMessage } from '../../src/components/ErrorMessage';
 import { useSettings, useUpdateSettings, type Settings as SettingsShape } from '../api/hooks';
+
+import { PdfTemplates } from './PdfTemplates';
 
 import styles from './Settings.module.css';
 
@@ -41,6 +43,9 @@ export function SettingsPage(): JSX.Element {
             // Don't send the mask back as a literal secret value.
             if (payload.turnstile_secret === '__redacted__') {
                 delete payload.turnstile_secret;
+            }
+            if (payload.twilio_auth_token === '__redacted__') {
+                delete payload.twilio_auth_token;
             }
             await update.mutateAsync(payload);
             setFeedback('Ajustes guardados.');
@@ -142,6 +147,57 @@ export function SettingsPage(): JSX.Element {
                     onChange={(e) => patch('email_intro_admin', e.target.value)}
                     rows={3}
                 />
+            </section>
+
+            <section className={styles.group}>
+                <h2>Notificaciones SMS (opcional)</h2>
+                <p className={styles.muted}>
+                    Si activas un proveedor SMS, cada confirmación / cancelación enviará
+                    también un SMS al móvil del solicitante. Si lo dejas en "Ninguno",
+                    no se envía ningún SMS.
+                </p>
+                <SelectField
+                    label="Proveedor"
+                    value={form.sms_provider}
+                    onChange={(e) =>
+                        patch('sms_provider', e.target.value as SettingsShape['sms_provider'])
+                    }
+                    options={[
+                        { value: 'none', label: 'Ninguno (desactivado)' },
+                        { value: 'twilio', label: 'Twilio' },
+                    ]}
+                />
+                {form.sms_provider === 'twilio' && (
+                    <div className={styles.row}>
+                        <TextField
+                            label="Twilio Account SID"
+                            value={form.twilio_account_sid}
+                            onChange={(e) => patch('twilio_account_sid', e.target.value)}
+                        />
+                        <TextField
+                            label="Twilio Auth Token"
+                            type="password"
+                            value={form.twilio_auth_token}
+                            onChange={(e) => patch('twilio_auth_token', e.target.value)}
+                            hint="Guardado cifrado. Muestra '__redacted__' si ya hay uno."
+                        />
+                        <TextField
+                            label="Número emisor (E.164)"
+                            value={form.twilio_from_number}
+                            onChange={(e) => patch('twilio_from_number', e.target.value)}
+                            hint="Formato internacional, p. ej. +34600123456."
+                        />
+                    </div>
+                )}
+            </section>
+
+            <section className={styles.group}>
+                <h2>Plantillas PDF</h2>
+                <p className={styles.muted}>
+                    Sube una plantilla oficial actualizada si el Ayuntamiento la revisa.
+                    Si se elimina la personalizada, el plugin usa la que viene empaquetada.
+                </p>
+                <PdfTemplates />
             </section>
 
             <section className={styles.group}>

@@ -18,13 +18,18 @@ use WebcafeinaReservas\Rest\RestApi;
  * GET /admin/settings  — read plugin settings.
  * PUT /admin/settings  — merge-update plugin settings.
  *
- * Turnstile secret is returned **masked** on GET. PUT accepts the masked
- * string as "no change" so we don't clobber it when the admin submits
- * without touching the field.
+ * Secrets (Turnstile secret, Twilio auth token) are returned **masked** on
+ * GET. PUT accepts the mask as "no change" so we don't clobber them when
+ * the admin submits without touching the field.
  */
 final class AdminSettingsController {
 
     private const MASK = '__redacted__';
+
+    private const SECRET_KEYS = array(
+        SettingsRegistrar::KEY_TURNSTILE_SECRET,
+        SettingsRegistrar::KEY_TWILIO_TOKEN,
+    );
 
     public function register(): void {
         register_rest_route(
@@ -47,8 +52,10 @@ final class AdminSettingsController {
 
     public function show( WP_REST_Request $request ): WP_REST_Response {
         $settings = SettingsRegistrar::get();
-        if ( ! empty( $settings[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] ) ) {
-            $settings[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] = self::MASK;
+        foreach ( self::SECRET_KEYS as $key ) {
+            if ( ! empty( $settings[ $key ] ) ) {
+                $settings[ $key ] = self::MASK;
+            }
         }
         return new WP_REST_Response( $settings, 200 );
     }
@@ -70,12 +77,11 @@ final class AdminSettingsController {
 
         $existing = SettingsRegistrar::get();
 
-        // Preserve the real secret when the client sent the mask.
-        if (
-            isset( $raw[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] )
-            && $raw[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] === self::MASK
-        ) {
-            unset( $raw[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] );
+        // Preserve real secret values when the client sent the mask back.
+        foreach ( self::SECRET_KEYS as $key ) {
+            if ( isset( $raw[ $key ] ) && $raw[ $key ] === self::MASK ) {
+                unset( $raw[ $key ] );
+            }
         }
 
         $merged    = array_merge( $existing, $raw );
@@ -83,9 +89,11 @@ final class AdminSettingsController {
 
         update_option( SettingsRegistrar::OPTION, $sanitized, false );
 
-        // Re-mask for response.
-        if ( ! empty( $sanitized[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] ) ) {
-            $sanitized[ SettingsRegistrar::KEY_TURNSTILE_SECRET ] = self::MASK;
+        // Re-mask for the response.
+        foreach ( self::SECRET_KEYS as $key ) {
+            if ( ! empty( $sanitized[ $key ] ) ) {
+                $sanitized[ $key ] = self::MASK;
+            }
         }
         return new WP_REST_Response( $sanitized, 200 );
     }

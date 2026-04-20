@@ -11,9 +11,12 @@ defined( 'ABSPATH' ) || exit;
 
 use WebcafeinaReservas\Rest\Controllers\AvailabilityController;
 use WebcafeinaReservas\Rest\Controllers\BookingsController;
+use WebcafeinaReservas\Rest\Controllers\IcalController;
 use WebcafeinaReservas\Rest\Controllers\ProfileController;
 use WebcafeinaReservas\Rest\Controllers\SpacesController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminBookingsController;
+use WebcafeinaReservas\Rest\Controllers\Admin\AdminBookingsExportController;
+use WebcafeinaReservas\Rest\Controllers\Admin\AdminPdfTemplatesController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminSettingsController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminStatsController;
 use WebcafeinaReservas\Roles\RoleManager;
@@ -36,9 +39,12 @@ final class RestApi {
         ( new AvailabilityController() )->register();
         ( new BookingsController() )->register();
         ( new ProfileController() )->register();
+        ( new IcalController() )->register();
         ( new AdminBookingsController() )->register();
         ( new AdminStatsController() )->register();
         ( new AdminSettingsController() )->register();
+        ( new AdminPdfTemplatesController() )->register();
+        ( new AdminBookingsExportController() )->register();
     }
 
     /**

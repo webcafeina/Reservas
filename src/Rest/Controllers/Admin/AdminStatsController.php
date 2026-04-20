@@ -18,11 +18,20 @@ use WebcafeinaReservas\Rest\RestApi;
 /**
  * GET /admin/stats — dashboard KPIs for the admin panel.
  *
+ * Optional query params:
+ *   - from (YYYY-MM-DD): lower bound on fecha_inicio (inclusive)
+ *   - to   (YYYY-MM-DD): upper bound on fecha_inicio (inclusive)
+ *
+ * Defaults: last 30 days. The "weekly" and "upcoming" cards always use
+ * the current week / next 7 days, regardless of the custom range, since
+ * they're anchored to "now".
+ *
  * Returns:
- *   - by_state:    count of bookings grouped by estado
+ *   - by_state:    count of bookings in the range, grouped by estado
  *   - this_week:   bookings starting within the current ISO week
  *   - upcoming:    confirmed bookings in the next 7 days
- *   - per_sala:    top 5 salas by booking count (last 30 days)
+ *   - per_sala:    top 5 salas by booking count (within the range)
+ *   - range:       echoes back the effective {from, to}
  */
 final class AdminStatsController {
 
@@ -44,11 +53,26 @@ final class AdminStatsController {
         global $wpdb;
         $bookings = Schema::bookings();
 
+        $from = self::sanitizeDate( (string) $request->get_param( 'from' ) );
+        $to   = self::sanitizeDate( (string) $request->get_param( 'to' ) );
+        if ( $from === null ) {
+            $from = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
+        }
+        if ( $to === null ) {
+            $to = gmdate( 'Y-m-d', strtotime( '+30 days' ) );
+        }
+
         $by_state = array();
         foreach ( BookingState::ALL as $state ) {
             $by_state[ $state ] = (int) $wpdb->get_var(
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                $wpdb->prepare( "SELECT COUNT(*) FROM {$bookings} WHERE estado = %s", $state )
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$bookings} "
+                    . 'WHERE estado = %s AND fecha_inicio BETWEEN %s AND %s',
+                    $state,
+                    $from,
+                    $to
+                )
             );
         }
 
@@ -75,14 +99,14 @@ final class AdminStatsController {
             )
         );
 
-        $thirty_days_ago = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
-        $per_sala        = (array) $wpdb->get_results(
+        $per_sala = (array) $wpdb->get_results(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT sala_id, COUNT(*) AS total FROM {$bookings} "
-                . 'WHERE fecha_inicio >= %s AND estado <> %s '
+                . 'WHERE fecha_inicio BETWEEN %s AND %s AND estado <> %s '
                 . 'GROUP BY sala_id ORDER BY total DESC LIMIT 5',
-                $thirty_days_ago,
+                $from,
+                $to,
                 BookingState::CANCELADA
             ),
             ARRAY_A
@@ -105,8 +129,23 @@ final class AdminStatsController {
                 'this_week' => $this_week,
                 'upcoming'  => $upcoming,
                 'per_sala'  => $per_sala_out,
+                'range'     => array(
+                    'from' => $from,
+                    'to'   => $to,
+                ),
             ),
             200
         );
+    }
+
+    /**
+     * Accept YYYY-MM-DD or return null.
+     */
+    private static function sanitizeDate( string $raw ): ?string {
+        $raw = trim( $raw );
+        if ( $raw === '' ) {
+            return null;
+        }
+        return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $raw ) === 1 ? $raw : null;
     }
 }

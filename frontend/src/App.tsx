@@ -1,4 +1,5 @@
 import { ProgressBar } from './components/ProgressBar';
+import { WebcafeinaFooter } from './components/WebcafeinaFooter';
 import { useBookingStore } from './store/bookingStore';
 import { Step1Aforo } from './steps/Step1Aforo';
 import { Step2Sala } from './steps/Step2Sala';
@@ -34,6 +35,7 @@ export function App(): JSX.Element {
             {step === 6 && <Step6Perfil />}
             {step === 7 && <Step7Resumen />}
             {step === 8 && <Step8Exito />}
+            <WebcafeinaFooter />
         </div>
     );
 }

@@ -29,11 +29,11 @@ final class PdfGenerator {
     public const TEMPLATE_CPA      = 'solicitud-cpa.pdf';
 
     private PdfFillerInterface $filler;
-    private string $templatesDir;
+    private ?string $templatesDir;
 
     public function __construct( PdfFillerInterface $filler, ?string $templatesDir = null ) {
         $this->filler       = $filler;
-        $this->templatesDir = $templatesDir ?? RESERVAS_ALDEALAB_PATH . 'assets/pdf-templates/';
+        $this->templatesDir = $templatesDir;
     }
 
     /**
@@ -43,7 +43,14 @@ final class PdfGenerator {
      * @param array<string, string> $fields
      */
     public function generate( string $templateFile, array $fields ): string {
-        $path = $this->templatesDir . ltrim( $templateFile, '/' );
+        // Tests may inject a custom directory. Production resolves via
+        // PdfTemplateStorage so admin uploads take precedence.
+        if ( $this->templatesDir !== null ) {
+            $path = $this->templatesDir . ltrim( $templateFile, '/' );
+        } else {
+            $path = self::resolveByFilename( $templateFile );
+        }
+
         if ( ! is_file( $path ) || ! is_readable( $path ) ) {
             throw new RuntimeException( 'PDF template not found: ' . $path );
         }
@@ -68,6 +75,22 @@ final class PdfGenerator {
             $fields   = $this->buildAldealabFields( $booking, $profile, $sala );
         }
         return $this->generate( $template, $fields );
+    }
+
+    /**
+     * Maps a template filename back to its storage key and resolves the
+     * current path via PdfTemplateStorage (custom upload wins over packaged).
+     */
+    private static function resolveByFilename( string $templateFile ): string {
+        $filename = ltrim( $templateFile, '/' );
+        if ( $filename === self::TEMPLATE_CPA ) {
+            return PdfTemplateStorage::resolvePath( PdfTemplateStorage::KEY_CPA );
+        }
+        if ( $filename === self::TEMPLATE_ALDEALAB ) {
+            return PdfTemplateStorage::resolvePath( PdfTemplateStorage::KEY_ALDEALAB );
+        }
+        // Unknown filename — fall back to the packaged directory.
+        return RESERVAS_ALDEALAB_PATH . 'assets/pdf-templates/' . $filename;
     }
 
     /**
