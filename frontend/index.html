@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reservas Aldealab — dev</title>
+    </head>
+    <body>
+        <!-- Only used by `npm run dev`. In production, WP renders #reservas-app via shortcode. -->
+        <div id="reservas-app"></div>
+        <script type="module">
+            window.ReservasAldealab = window.ReservasAldealab ?? {
+                restBase: '/wp-json/reservas/v1',
+                nonce: '',
+                turnstileSiteKey: '',
+                locale: 'es_ES',
+                isLoggedIn: false,
+            };
+        </script>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>

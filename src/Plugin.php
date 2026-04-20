@@ -46,8 +46,11 @@ final class Plugin {
         // REST API (namespace reservas/v1).
         Rest\RestApi::register();
 
+        // Frontend: shortcode + Vite assets.
+        Frontend\FormShortcode::register();
+        Frontend\AssetLoader::register();
+
         // Subsystems wired in later phases:
         // - Admin\AdminMenu::register()
-        // - Frontend\FormShortcode::register()
     }
 }
