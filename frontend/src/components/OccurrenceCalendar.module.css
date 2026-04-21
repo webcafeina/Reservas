@@ -51,6 +51,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--ra-space-2);
+    /* Subtle bounded box so the user can tell months apart at a glance
+     * when multiple render side by side. */
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    padding: var(--ra-space-3);
+    background: var(--ra-color-bg);
 }
 
 .monthTitle {

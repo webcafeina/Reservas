@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.11] — 2026-04-21
+
+### Changed
+
+- **Step 6 (Tus datos) validation alert moved above the form.** A long
+  personal-data form hid the "Completa los campos marcados antes de
+  continuar" warning at the very bottom — most users never saw it. The
+  alert now renders right under the subtitle so it's visible without
+  scrolling.
+- **Recurrence calendar months now each render inside a subtle outlined
+  card** (`border`, `border-radius`, padding). Previously each month was
+  an unframed column of cells, so when multiple months rendered side by
+  side it was hard to tell where one ended and the next began.
+- **Step 7 (Resumen) shows the recurrence rule in human language**
+  instead of the raw RFC 5545 string. New helper
+  `humanizeRrule(input)` maps `{freq: WEEKLY, interval: 2, byweekday:
+  ['TH']}` → *"Semanal, cada 2 semanas, los jueves"*. The RRULE string
+  is still what gets sent to the backend.
+- **"Fin de la serie" in the resume now reflects the actual end rule**
+  the user chose: `until` → *"Hasta el 30 de junio de 2026"*, `count`
+  → *"Durante 10 ocurrencias"*, `never` → *"Sin fin (limitado a 1
+  año)"*. Previously it always fell back to the generic "Según reglas"
+  because the underlying `fechaFinSerie` state is never populated —
+  the end lives inside `rruleInput.end`.
+
 ## [0.2.10] — 2026-04-21
 
 ### Changed

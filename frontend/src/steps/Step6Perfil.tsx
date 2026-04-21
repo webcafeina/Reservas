@@ -46,6 +46,9 @@ export function Step6Perfil(): JSX.Element {
                 </>
             }
         >
+            {!canProceed && Object.keys(errors).length > 0 && (
+                <ErrorMessage message="Completa los campos marcados antes de continuar." />
+            )}
             <div className={styles.grid}>
                 <TextField
                     label="NIF"
@@ -174,9 +177,6 @@ export function Step6Perfil(): JSX.Element {
                 required
                 hint="Describe brevemente para qué vas a usar el espacio."
             />
-            {!canProceed && Object.keys(errors).length > 0 && (
-                <ErrorMessage message="Completa los campos marcados antes de continuar." />
-            )}
         </StepFrame>
     );
 }

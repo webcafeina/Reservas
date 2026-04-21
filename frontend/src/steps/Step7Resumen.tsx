@@ -9,6 +9,7 @@ import { useSpace } from '../api/spaces';
 import { ApiError } from '../api/client';
 import { useBookingStore } from '../store/bookingStore';
 import { buildRrule } from '../store/buildRrule';
+import { humanizeRrule, humanizeRruleEnd } from '../store/humanizeRrule';
 
 import styles from './Step7Resumen.module.css';
 
@@ -115,15 +116,15 @@ export function Step7Resumen(): JSX.Element {
                     <>
                         <div>
                             <dt>Recurrencia</dt>
-                            <dd>{rrule ?? 'Configuración incompleta'}</dd>
+                            <dd>
+                                {rrule !== null
+                                    ? humanizeRrule(state.rruleInput)
+                                    : 'Configuración incompleta'}
+                            </dd>
                         </div>
                         <div>
                             <dt>Fin de la serie</dt>
-                            <dd>
-                                {state.fechaFinSerie !== null && state.fechaFinSerie !== ''
-                                    ? formatDateEs(state.fechaFinSerie)
-                                    : 'Según reglas'}
-                            </dd>
+                            <dd>{humanizeRruleEnd(state.rruleInput.end)}</dd>
                         </div>
                         {state.fechasExcluidas.length > 0 && (
                             <div>
