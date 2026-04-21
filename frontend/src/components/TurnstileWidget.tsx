@@ -69,6 +69,18 @@ export function TurnstileWidget({
     const containerRef = useRef<HTMLDivElement | null>(null);
     const widgetIdRef = useRef<string | null>(null);
 
+    // Callers usually pass inline arrows for onError/onExpire, which create
+    // a fresh function reference on every render. Including them in the
+    // mount effect's deps caused the widget to remount continuously and the
+    // Turnstile challenge stayed stuck on "Verificando…". We keep callbacks
+    // in refs so the mount effect only restarts when siteKey/theme change.
+    const onVerifyRef = useRef(onVerify);
+    const onErrorRef = useRef(onError);
+    const onExpireRef = useRef(onExpire);
+    onVerifyRef.current = onVerify;
+    onErrorRef.current = onError;
+    onExpireRef.current = onExpire;
+
     useEffect(() => {
         let cancelled = false;
 
@@ -79,13 +91,13 @@ export function TurnstileWidget({
                 if (cancelled || containerRef.current === null) return;
                 widgetIdRef.current = ts.render(containerRef.current, {
                     sitekey: siteKey,
-                    callback: onVerify,
-                    'error-callback': onError,
-                    'expired-callback': onExpire,
+                    callback: (token: string) => onVerifyRef.current(token),
+                    'error-callback': () => onErrorRef.current?.(),
+                    'expired-callback': () => onExpireRef.current?.(),
                     theme,
                 });
             } catch {
-                if (!cancelled) onError?.();
+                if (!cancelled) onErrorRef.current?.();
             }
         };
 
@@ -98,7 +110,7 @@ export function TurnstileWidget({
                 widgetIdRef.current = null;
             }
         };
-    }, [siteKey, onVerify, onError, onExpire, theme]);
+    }, [siteKey, theme]);
 
     return <div ref={containerRef} />;
 }

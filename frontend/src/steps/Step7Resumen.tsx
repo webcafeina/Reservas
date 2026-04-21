@@ -12,6 +12,22 @@ import { buildRrule } from '../store/buildRrule';
 
 import styles from './Step7Resumen.module.css';
 
+const DATE_FORMATTER_ES = new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+});
+
+/** Convert a YYYY-MM-DD string to "21 de abril de 2026". Empty string in → '—'. */
+function formatDateEs(iso: string | null | undefined): string {
+    if (iso === null || iso === undefined || iso === '') return '—';
+    // Force UTC to avoid the off-by-one day caused by local-tz parsing of
+    // a bare YYYY-MM-DD literal.
+    const date = new Date(iso + 'T00:00:00Z');
+    if (Number.isNaN(date.getTime())) return iso;
+    return DATE_FORMATTER_ES.format(date);
+}
+
 export function Step7Resumen(): JSX.Element {
     const state = useBookingStore();
     const goBack = useBookingStore((s) => s.goBack);
@@ -28,7 +44,7 @@ export function Step7Resumen(): JSX.Element {
         if (state.dateMode !== 'recurring') return null;
         try {
             return buildRrule(state.rruleInput);
-        } catch (err) {
+        } catch {
             return null;
         }
     }, [state.dateMode, state.rruleInput]);
@@ -93,7 +109,7 @@ export function Step7Resumen(): JSX.Element {
                 </div>
                 <div>
                     <dt>Fecha de inicio</dt>
-                    <dd>{state.fechaInicio || '—'}</dd>
+                    <dd>{formatDateEs(state.fechaInicio)}</dd>
                 </div>
                 {state.dateMode === 'recurring' && (
                     <>
@@ -103,12 +119,16 @@ export function Step7Resumen(): JSX.Element {
                         </div>
                         <div>
                             <dt>Fin de la serie</dt>
-                            <dd>{state.fechaFinSerie ?? 'Según reglas'}</dd>
+                            <dd>
+                                {state.fechaFinSerie !== null && state.fechaFinSerie !== ''
+                                    ? formatDateEs(state.fechaFinSerie)
+                                    : 'Según reglas'}
+                            </dd>
                         </div>
                         {state.fechasExcluidas.length > 0 && (
                             <div>
                                 <dt>Fechas excluidas</dt>
-                                <dd>{state.fechasExcluidas.join(', ')}</dd>
+                                <dd>{state.fechasExcluidas.map(formatDateEs).join(', ')}</dd>
                             </div>
                         )}
                     </>

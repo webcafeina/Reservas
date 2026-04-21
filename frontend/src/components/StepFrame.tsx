@@ -16,8 +16,11 @@ export function StepFrame({ title, subtitle, children, actions }: StepFrameProps
                 <h2 className={styles.title}>{title}</h2>
                 {subtitle !== undefined && <p className={styles.subtitle}>{subtitle}</p>}
             </header>
+            {/* Actions are rendered ABOVE the body so users don't have to
+             * scroll past long forms (Step 3 fechas, Step 6 perfil…) to
+             * find the Back/Next buttons. */}
+            {actions !== undefined && <div className={styles.actions}>{actions}</div>}
             <div className={styles.body}>{children}</div>
-            {actions !== undefined && <footer className={styles.actions}>{actions}</footer>}
         </section>
     );
 }

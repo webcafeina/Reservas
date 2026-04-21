@@ -4,6 +4,20 @@
  */
 
 #reservas-app {
+    /* Public form runs at ~1.2x the default scale: typography larger and
+     * spacing more generous so it reads comfortably on the page (the form
+     * is embedded in a regular WordPress page, not behind admin chrome). */
+    --ra-font-size-xs: 0.9375rem;
+    --ra-font-size-sm: 1.0625rem;
+    --ra-font-size-base: 1.1875rem;
+    --ra-font-size-lg: 1.3125rem;
+    --ra-font-size-xl: 1.5rem;
+    --ra-font-size-2xl: 1.875rem;
+    --ra-font-size-3xl: 2.25rem;
+
+    --ra-step-width: 880px;
+    --ra-container-max: 1120px;
+
     font-family: var(--ra-font-family-sans);
     font-size: var(--ra-font-size-base);
     line-height: var(--ra-line-height-base);

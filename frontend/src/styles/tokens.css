@@ -35,6 +35,10 @@
     --ra-color-danger: #c0392b;
     --ra-color-info: #2b7cd3;
 
+    /* Color del paso activo y de la barra de progreso. Se usa en
+     * ProgressBar (relleno + burbuja del paso actual). */
+    --ra-color-progress: #05aae4;
+
     /* ===== Tipografía ===== */
     --ra-font-family-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     --ra-font-family-mono: ui-monospace, 'SF Mono', Menlo, monospace;

@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7] — 2026-04-21
+
+### Changed
+
+- **Public form scaled up ~1.2x.** Overrode `--ra-font-size-*` and
+  `--ra-step-width` / `--ra-container-max` scoped to `#reservas-app` so
+  the embedded form reads larger than the wp-admin scale. Doesn't affect
+  the admin panel.
+- **Back/Next buttons moved to the top of each step.** Long steps (3
+  fechas, 6 perfil…) no longer require scrolling to find the navigation.
+  `StepFrame` renders the actions row above the body.
+- **Dates in the Resumen step now display in Spanish human format**
+  ("21 de abril de 2026") instead of `YYYY-MM-DD`. Internal storage
+  unchanged. Implemented via `Intl.DateTimeFormat('es-ES', …)` parsing
+  the iso string as UTC midnight to avoid timezone-driven off-by-one.
+- **Progress bar fill + active step bullet are now solid `#05aae4`**
+  (no gradient). Added `--ra-color-progress` token so future tweaks live
+  in `tokens.css`.
+
+### Fixed
+
+- **Turnstile widget stuck on "Verificando…"**. `useEffect` deps
+  included `onVerify` / `onError` / `onExpire`, which Step7Resumen
+  passed as inline arrows — every render produced fresh refs, the effect
+  re-ran, the widget unmounted/remounted before the challenge could
+  complete, and the user never got past the resume step. Refactored to
+  keep callbacks in refs so the mount effect only restarts when
+  `siteKey` / `theme` actually change.
+
 ## [0.2.6] — 2026-04-21
 
 ### Changed
