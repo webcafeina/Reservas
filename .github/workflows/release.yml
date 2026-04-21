@@ -55,6 +55,7 @@ jobs:
             --include='composer.lock' \
             --include='src/***' \
             --include='vendor/***' \
+            --include='assets/' \
             --include='assets/pdf-templates/***' \
             --include='assets/email/***' \
             --include='assets/dist/***' \
@@ -65,6 +66,26 @@ jobs:
           find "$OUT" -name 'node_modules' -type d -prune -exec rm -rf {} +
           find "$OUT" -name '*.test.*' -delete
           find "$OUT" -name '*.spec.*' -delete
+
+      - name: Verify required assets are packaged
+        run: |
+          set -euo pipefail
+          OUT="${{ runner.temp }}/reservas-aldealab"
+          required=(
+            "$OUT/reservas-aldealab.php"
+            "$OUT/vendor/autoload.php"
+            "$OUT/assets/dist/.vite/manifest.json"
+            "$OUT/assets/pdf-templates"
+            "$OUT/assets/email"
+          )
+          missing=0
+          for path in "${required[@]}"; do
+            if [ ! -e "$path" ]; then
+              echo "::error::Missing required path: ${path#"$OUT"/}"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
 
       - name: Zip plugin
         id: zip

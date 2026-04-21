@@ -19,8 +19,10 @@ final class Activator {
 
     public static function activate(): void {
         self::guardEnvironment();
-        Database\MigrationRunner::runAll();
+        // Roles first so a mid-activation failure (DB migration, rewrite flush)
+        // can never leave the administrator without `manage_reservas`.
         Roles\RoleManager::ensureRoles();
+        Database\MigrationRunner::runAll();
         flush_rewrite_rules();
     }
 

@@ -1,7 +1,7 @@
 {
     "name": "reservas-aldealab",
     "private": true,
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Frontend SPA for the Reservas Aldealab WordPress plugin.",
     "type": "module",
     "scripts": {
@@ -59,7 +59,7 @@
             "prettier --write"
         ],
         "{src,tests}/**/*.php": [
-            "./vendor/bin/phpcs --standard=phpcs.xml.dist"
+            "sh -c 'if [ -x ./vendor/bin/phpcs ]; then ./vendor/bin/phpcs --standard=phpcs.xml.dist \"$@\"; else echo \"  [skip] ./vendor/bin/phpcs not installed locally — CI enforces PHPCS on push.\"; fi' _"
         ]
     }
 }

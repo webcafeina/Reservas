@@ -71,15 +71,18 @@ final class AdminAssetLoader {
             $manifest_path = RESERVAS_ALDEALAB_PATH . 'assets/dist/manifest.json';
         }
         if ( ! file_exists( $manifest_path ) ) {
+            self::noticeMissingBuild();
             return;
         }
 
         $contents = file_get_contents( $manifest_path );
         if ( ! is_string( $contents ) ) {
+            self::noticeMissingBuild();
             return;
         }
         $manifest = json_decode( $contents, true );
         if ( ! is_array( $manifest ) ) {
+            self::noticeMissingBuild();
             return;
         }
 
@@ -91,6 +94,7 @@ final class AdminAssetLoader {
             }
         }
         if ( $entry === null ) {
+            self::noticeMissingBuild();
             return;
         }
 
@@ -107,16 +111,44 @@ final class AdminAssetLoader {
             add_filter( 'script_loader_tag', array( self::class, 'scriptAsModule' ), 10, 3 );
         }
 
+        // Entry's own CSS + CSS from any imported chunk (Vite splits shared
+        // design tokens into their own chunk that also carries CSS).
+        $css_files = array();
         if ( isset( $entry['css'] ) && is_array( $entry['css'] ) ) {
-            foreach ( $entry['css'] as $idx => $css ) {
-                wp_enqueue_style(
-                    self::HANDLE_STYLE . '-' . $idx,
-                    $base . (string) $css,
-                    array(),
-                    RESERVAS_ALDEALAB_VERSION
-                );
+            $css_files = array_merge( $css_files, $entry['css'] );
+        }
+        if ( isset( $entry['imports'] ) && is_array( $entry['imports'] ) ) {
+            foreach ( $entry['imports'] as $imported_key ) {
+                if ( isset( $manifest[ $imported_key ]['css'] ) && is_array( $manifest[ $imported_key ]['css'] ) ) {
+                    $css_files = array_merge( $css_files, $manifest[ $imported_key ]['css'] );
+                }
             }
         }
+        foreach ( array_values( array_unique( $css_files ) ) as $idx => $css ) {
+            wp_enqueue_style(
+                self::HANDLE_STYLE . '-' . $idx,
+                $base . (string) $css,
+                array(),
+                RESERVAS_ALDEALAB_VERSION
+            );
+        }
+    }
+
+    private static function noticeMissingBuild(): void {
+        add_action(
+            'admin_notices',
+            static function (): void {
+                if ( ! current_user_can( 'manage_options' ) ) {
+                    return;
+                }
+                echo '<div class="notice notice-error"><p><strong>Reservas Aldealab:</strong> ';
+                esc_html_e(
+                    'No se encontró assets/dist/manifest.json. El panel no puede cargar. Instala el ZIP oficial de la release (no uses "Download ZIP" del repo) o ejecuta `npm run build`.',
+                    'reservas-aldealab'
+                );
+                echo '</p></div>';
+            }
+        );
     }
 
     public static function scriptAsModule( string $tag, string $handle, string $src ): string {

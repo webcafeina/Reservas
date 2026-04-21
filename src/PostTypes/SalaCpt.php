@@ -60,7 +60,9 @@ final class SalaCpt {
             'public'             => true,
             'publicly_queryable' => true,
             'show_ui'            => true,
-            'show_in_menu'       => true,
+            // Hang under the plugin's "Reservas" top-level menu (slug in
+            // Admin\AdminMenu::SLUG) instead of creating a duplicate top-level.
+            'show_in_menu'       => 'reservas-aldealab',
             'show_in_rest'       => true,
             'rest_base'          => self::REST_BASE,
             'query_var'          => true,

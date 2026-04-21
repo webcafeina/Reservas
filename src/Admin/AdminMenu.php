@@ -37,7 +37,10 @@ final class AdminMenu {
             25
         );
 
-        // Quick link to the CPT list ("Salas") under the same menu.
+        // Rename the auto-generated first submenu from "Reservas" to "Panel".
+        // The "Salas" submenu (plus Add New + taxonomies) is contributed
+        // automatically by the `sala` CPT because it declares
+        // `'show_in_menu' => 'reservas-aldealab'` in PostTypes\SalaCpt.
         add_submenu_page(
             self::SLUG,
             __( 'Panel', 'reservas-aldealab' ),
@@ -45,13 +48,6 @@ final class AdminMenu {
             RoleManager::CAP_MANAGE,
             self::SLUG,
             array( self::class, 'renderPage' )
-        );
-        add_submenu_page(
-            self::SLUG,
-            __( 'Salas', 'reservas-aldealab' ),
-            __( 'Salas', 'reservas-aldealab' ),
-            'edit_posts',
-            'edit.php?post_type=sala'
         );
     }
 

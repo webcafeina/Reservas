@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] — 2026-04-21
+
+### Fixed
+
+- **Release ZIP was missing `assets/`**. The `rsync` filter in
+  `.github/workflows/release.yml` excluded the `assets/` parent directory
+  before descending into `assets/dist/`, `assets/pdf-templates/` and
+  `assets/email/`, so the published ZIP shipped without the built Vite
+  bundle, PDF templates and email templates. Effect: the admin panel
+  stayed stuck on "Cargando panel…" and PDFs could never be generated.
+  Added `--include='assets/'` and a verification step that fails the
+  release build fast if any required path (`assets/dist/manifest.json`,
+  `assets/pdf-templates/`, `assets/email/`, `vendor/autoload.php`) is
+  missing from the assembled folder.
+- **Administrator role could end up without `manage_reservas`** if the
+  activation hook threw during DB migrations — the role step came after
+  migrations and never ran. Symptom: top-level "Reservas" menu visible
+  but the "Panel" submenu hidden, and clicking the parent jumped to the
+  Salas CPT. Roles now run **before** migrations inside
+  `Activator::activate`, and `RoleManager::ensureRoles` is also hooked on
+  `admin_init` as an idempotent self-heal for plugins replaced via FTP
+  without re-activation.
+- **Duplicate "Salas" top-level menu.** The `sala` CPT declared
+  `show_in_menu => true`, creating its own sidebar entry next to
+  "Reservas" and leaving the manual "Salas" submenu redundant. Now hangs
+  under `show_in_menu => 'reservas-aldealab'`; the CPT contributes "Todas
+  las salas", "Añadir nueva", "Edificios" and "Servicios" automatically.
+- **Shared Vite chunk CSS was never enqueued.** The design-tokens bundle
+  (`_tokens-*.js`) that both public and admin entries import carried its
+  own CSS, but both `AssetLoader`s only enqueued the entry's own CSS.
+  Now each loader walks `entry.imports[].css` too.
+- `AdminAssetLoader` now surfaces a WP admin error notice when
+  `assets/dist/manifest.json` is missing, instead of silently skipping the
+  enqueue (which previously produced the "Cargando panel…" symptom with
+  zero signal).
+
 ## [0.2.0] — 2026-04-20
 
 ### Added

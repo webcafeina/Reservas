@@ -37,6 +37,11 @@ final class Plugin {
         // Run pending DB migrations on every admin pageload.
         add_action( 'admin_init', array( Database\MigrationRunner::class, 'maybeRun' ) );
 
+        // Self-heal roles/capabilities on every admin pageload. Idempotent and
+        // cheap; recovers from botched activations (e.g. plugin replaced via
+        // FTP without re-activating).
+        add_action( 'admin_init', array( Roles\RoleManager::class, 'ensureRoles' ) );
+
         // Custom post type + taxonomies + meta.
         PostTypes\SalaCpt::register();
         if ( is_admin() ) {
