@@ -32,23 +32,25 @@ export function Step6Perfil(): JSX.Element {
     return (
         <StepFrame
             title="Tus datos"
-            subtitle={
-                loggedIn
-                    ? 'Hemos precargado tus datos — revisa que estén correctos.'
-                    : 'Necesitamos algunos datos para gestionar la reserva.'
-            }
+            subtitle="Introduce tus datos personales. Revisa que estén correctos."
             actions={
                 <>
                     <Button variant="ghost" onClick={goBack}>
-                        Atrás
+                        ← Atrás
                     </Button>
                     <Button onClick={() => setStep(7)} disabled={!canProceed}>
-                        Siguiente
+                        Siguiente →
                     </Button>
                 </>
             }
         >
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--ra-space-3)' }}>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 'var(--ra-space-3)',
+                }}
+            >
                 <TextField
                     label="NIF"
                     value={profile.nif}
@@ -177,9 +179,7 @@ export function Step6Perfil(): JSX.Element {
                 hint="Describe brevemente para qué vas a usar el espacio."
             />
             {!canProceed && Object.keys(errors).length > 0 && (
-                <ErrorMessage
-                    message="Completa los campos marcados antes de continuar."
-                />
+                <ErrorMessage message="Completa los campos marcados antes de continuar." />
             )}
         </StepFrame>
     );

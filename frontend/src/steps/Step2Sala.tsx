@@ -29,10 +29,10 @@ export function Step2Sala(): JSX.Element {
             actions={
                 <>
                     <Button variant="ghost" onClick={goBack}>
-                        Atrás
+                        ← Atrás
                     </Button>
                     <Button onClick={goNext} disabled={selectedSalaId === null}>
-                        Siguiente
+                        Siguiente →
                     </Button>
                 </>
             }

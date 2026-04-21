@@ -44,10 +44,10 @@ export function Step3Fechas(): JSX.Element {
             actions={
                 <>
                     <Button variant="ghost" onClick={goBack}>
-                        Atrás
+                        ← Atrás
                     </Button>
                     <Button onClick={handleNext} disabled={fechaInicio === ''}>
-                        Siguiente
+                        Siguiente →
                     </Button>
                 </>
             }

@@ -20,8 +20,18 @@
 }
 
 .selected {
+    border-width: 4px;
     border-color: var(--ra-color-primary);
     box-shadow: var(--ra-shadow-md);
+    /* Shrink slightly to give a tactile "pressed-in" feel without pushing
+     * surrounding grid items around — transform doesn't reflow layout. */
+    transform: scale(0.97);
+}
+
+.selected:hover {
+    /* Keep the scale-down so the selected state stays distinguishable
+     * even when the cursor lingers on it. */
+    transform: scale(0.97);
 }
 
 .image {

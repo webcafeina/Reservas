@@ -89,7 +89,7 @@ export function Step7Resumen(): JSX.Element {
             actions={
                 <>
                     <Button variant="ghost" onClick={goBack}>
-                        Atrás
+                        ← Atrás
                     </Button>
                     <Button
                         onClick={() => {

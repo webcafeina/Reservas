@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] — 2026-04-21
+
+### Changed
+
+- **Public form typography switched to px scale with 14px floor**
+  (xs=14 / sm=16 / base=18 / lg=20 / xl=24 / 2xl=30 / 3xl=36). Previous
+  rem values were at the mercy of the host theme's html font-size and
+  still rendered small on sites that shrank the root. Admin panel tokens
+  unchanged.
+- **Public form brand blue is now `#05aae4`** for primary CTAs
+  (Siguiente, Confirmar reserva), the selected sala card border, the
+  occurrence calendar day background, and the progress bar. Done by
+  overriding `--ra-color-primary` + `--ra-color-primary-hover` scoped to
+  `#reservas-app` — admin panel primary stays `#0b5394`.
+- **Back / Next buttons show directional arrows**: "← Atrás" and
+  "Siguiente →" in all 7 step screens.
+- **Selected sala card** now uses a 4px border (was 2px) and shrinks
+  slightly via `transform: scale(0.97)` so the selection reads at a
+  glance without reflowing the grid.
+- **Step 6 "Tus datos" subtitle** unified to *"Introduce tus datos
+  personales. Revisa que estén correctos."* for both logged-in and
+  anonymous visitors.
+
 ## [0.2.7] — 2026-04-21
 
 ### Changed

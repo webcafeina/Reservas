@@ -36,7 +36,7 @@ export function Step1Aforo(): JSX.Element {
             actions={
                 <>
                     <span />
-                    <Button onClick={goNext}>Siguiente</Button>
+                    <Button onClick={goNext}>Siguiente →</Button>
                 </>
             }
         >
@@ -63,9 +63,7 @@ export function Step1Aforo(): JSX.Element {
 
             <fieldset className={styles.services}>
                 <legend className={styles.servicesLegend}>Servicios necesarios</legend>
-                {isLoading && (
-                    <p className={styles.loading}>Cargando servicios…</p>
-                )}
+                {isLoading && <p className={styles.loading}>Cargando servicios…</p>}
                 {servicios !== undefined && servicios.length === 0 && (
                     <p className={styles.loading}>
                         Aún no hay servicios configurados. Continúa sin filtrar.

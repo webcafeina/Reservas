@@ -31,9 +31,7 @@ export function Step4Recurrencia(): JSX.Element {
 
     const toggleWeekday = (wd: Weekday): void => {
         const current = rrule.byweekday ?? [];
-        const next = current.includes(wd)
-            ? current.filter((x) => x !== wd)
-            : [...current, wd];
+        const next = current.includes(wd) ? current.filter((x) => x !== wd) : [...current, wd];
         setRruleInput({ byweekday: next });
     };
 
@@ -77,9 +75,9 @@ export function Step4Recurrencia(): JSX.Element {
             actions={
                 <>
                     <Button variant="ghost" onClick={goBack}>
-                        Atrás
+                        ← Atrás
                     </Button>
-                    <Button onClick={() => setStep(5)}>Siguiente</Button>
+                    <Button onClick={() => setStep(5)}>Siguiente →</Button>
                 </>
             }
         >
@@ -125,7 +123,12 @@ export function Step4Recurrencia(): JSX.Element {
                 </div>
             )}
 
-            {rrule.freq === 'MONTHLY' && <MonthlySelector rrule={rrule.monthly} onChange={(m) => setRruleInput({ monthly: m })} />}
+            {rrule.freq === 'MONTHLY' && (
+                <MonthlySelector
+                    rrule={rrule.monthly}
+                    onChange={(m) => setRruleInput({ monthly: m })}
+                />
+            )}
 
             <div className={styles.row}>
                 <SelectField
@@ -148,7 +151,9 @@ export function Step4Recurrencia(): JSX.Element {
                         label="Hasta la fecha"
                         type="date"
                         value={rrule.end.date}
-                        onChange={(e) => setRruleInput({ end: { kind: 'until', date: e.target.value } })}
+                        onChange={(e) =>
+                            setRruleInput({ end: { kind: 'until', date: e.target.value } })
+                        }
                     />
                 )}
                 {rrule.end.kind === 'count' && (
@@ -160,7 +165,10 @@ export function Step4Recurrencia(): JSX.Element {
                         value={rrule.end.count}
                         onChange={(e) =>
                             setRruleInput({
-                                end: { kind: 'count', count: Math.max(1, Number(e.target.value) || 1) },
+                                end: {
+                                    kind: 'count',
+                                    count: Math.max(1, Number(e.target.value) || 1),
+                                },
                             })
                         }
                     />

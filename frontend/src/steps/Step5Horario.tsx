@@ -18,16 +18,25 @@ export function Step5Horario(): JSX.Element {
             subtitle="Indica la franja horaria dentro de cada día reservado."
             actions={
                 <>
-                    <Button variant="ghost" onClick={() => setStep(dateMode === 'recurring' ? 4 : 3)}>
-                        Atrás
+                    <Button
+                        variant="ghost"
+                        onClick={() => setStep(dateMode === 'recurring' ? 4 : 3)}
+                    >
+                        ← Atrás
                     </Button>
                     <Button onClick={() => setStep(6)} disabled={invalid}>
-                        Siguiente
+                        Siguiente →
                     </Button>
                 </>
             }
         >
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--ra-space-4)' }}>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 'var(--ra-space-4)',
+                }}
+            >
                 <TextField
                     label="Hora de inicio"
                     type="time"
