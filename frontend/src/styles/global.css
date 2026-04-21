@@ -34,6 +34,27 @@
     padding: var(--ra-space-6) var(--ra-space-4);
 }
 
+/* Tablet and below: dial back the horizontal padding so the step frame
+ * has room to breathe, and soften the type scale a touch. */
+@media (max-width: 900px) {
+    #reservas-app {
+        padding: var(--ra-space-4) var(--ra-space-3);
+        --ra-font-size-2xl: 26px;
+        --ra-font-size-3xl: 30px;
+    }
+}
+
+/* Mobile: kill lateral padding entirely so the card can stretch edge to
+ * edge, and trim title sizes so they don't wrap awkwardly. */
+@media (max-width: 520px) {
+    #reservas-app {
+        padding: var(--ra-space-3) var(--ra-space-2);
+        --ra-font-size-2xl: 22px;
+        --ra-font-size-3xl: 26px;
+        --ra-font-size-xl: 20px;
+    }
+}
+
 #reservas-app *,
 #reservas-app *::before,
 #reservas-app *::after {

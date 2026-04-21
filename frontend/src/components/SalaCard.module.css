@@ -29,8 +29,12 @@
 }
 
 .selected:hover {
-    /* Keep the scale-down so the selected state stays distinguishable
-     * even when the cursor lingers on it. */
+    /* Selected cards must keep the brand blue border on hover — the
+     * base `.card:hover` rule otherwise flips border-color to the
+     * neutral gray `--ra-color-border-strong`. We also keep the
+     * scale-down and suppress the translateY lift so the selected card
+     * stays visually anchored. */
+    border-color: var(--ra-color-primary);
     transform: scale(0.97);
 }
 
@@ -94,12 +98,12 @@
 }
 
 .meta > div {
-    font-size: var(--ra-font-size-sm);
+    font-size: var(--ra-font-size-xs);
 }
 
 .meta dt {
     color: var(--ra-color-text-muted);
-    font-size: var(--ra-font-size-xs);
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -122,6 +126,6 @@
     padding: 2px var(--ra-space-2);
     background: var(--ra-color-bg-muted);
     border-radius: var(--ra-radius-pill);
-    font-size: var(--ra-font-size-xs);
+    font-size: 12px;
     color: var(--ra-color-text-muted);
 }

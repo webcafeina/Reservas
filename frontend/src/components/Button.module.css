@@ -2,16 +2,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--ra-space-3) var(--ra-space-5);
+    padding: var(--ra-space-2) var(--ra-space-4);
     border-radius: var(--ra-radius-md);
     border: 1px solid transparent;
     font-family: var(--ra-font-family-sans);
-    font-size: var(--ra-font-size-base);
+    font-size: var(--ra-font-size-sm);
     font-weight: var(--ra-font-weight-medium);
     cursor: pointer;
     transition: all var(--ra-duration-fast) var(--ra-ease);
     line-height: 1;
-    min-height: 44px;
+    min-height: 40px;
 }
 
 .btn:disabled {

@@ -8,6 +8,14 @@
     margin: 0 auto;
 }
 
+@media (max-width: 640px) {
+    .frame {
+        /* Tighter padding on mobile — the body padding of #reservas-app
+         * already gives the outer breathing room, so we don't double it. */
+        padding: var(--ra-space-4);
+    }
+}
+
 .header {
     margin-bottom: var(--ra-space-5);
 }
@@ -22,6 +30,7 @@
 .subtitle {
     color: var(--ra-color-text-muted);
     margin: 0;
+    font-size: var(--ra-font-size-sm);
 }
 
 .body {

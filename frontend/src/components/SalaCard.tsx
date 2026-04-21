@@ -29,10 +29,8 @@ export function SalaCard({ sala, selected, onSelect }: SalaCardProps): JSX.Eleme
                 {sala.excerpt !== '' && <p className={styles.excerpt}>{sala.excerpt}</p>}
                 <dl className={styles.meta}>
                     <div>
-                        <dt>Aforo</dt>
-                        <dd>
-                            {sala.aforo_min}–{sala.aforo_max}
-                        </dd>
+                        <dt>Aforo máx.</dt>
+                        <dd>{sala.aforo_max}</dd>
                     </div>
                     {sala.edificios.length > 0 && (
                         <div>

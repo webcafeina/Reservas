@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] — 2026-04-21
+
+### Changed
+
+- **Text scale rebalanced.** After bumping the form to px-based
+  tokens in 0.2.7/0.2.8 some elements felt bulky. Tuned down:
+  - StepFrame subtitle: sm (16px) instead of inheriting base (18px).
+  - Buttons (Atrás / Siguiente / Confirmar): sm + tighter padding +
+    min-height 40px (was 44px).
+  - Step 1 service chips: xs (14px).
+  - Sala card meta (Aforo / Edificio labels): xs + 12px for the
+    uppercase `dt`. Service tag pills inside sala cards: 12px.
+- **Sala cards now show "Aforo máx." with a single number** instead of
+  the `min–max` range.
+
+### Fixed
+
+- **Selected sala card flipped to the gray neutral border on hover.**
+  `.card:hover { border-color: --ra-color-border-strong }` was
+  overriding the selected state because `.selected:hover` only reset
+  transform. Added `border-color: var(--ra-color-primary)` to keep the
+  brand blue while hovering.
+- **Step 6 Perfil form was a hardcoded 2-column grid** via inline style,
+  so on tablet/phone the fields were cramped. Moved to a CSS module
+  with `@media (max-width: 700px)` collapsing to single column.
+- **Public form padding scales down on tablet/mobile** (`#reservas-app`
+  + StepFrame), and large titles (h2/h1) trim their size on narrow
+  viewports so they don't wrap awkwardly.
+
 ## [0.2.8] — 2026-04-21
 
 ### Changed

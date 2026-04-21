@@ -8,6 +8,8 @@ import { useProfile } from '../api/profile';
 import { useBookingStore } from '../store/bookingStore';
 import { isValidProfile, validateProfile } from '../hooks/profileValidation';
 
+import styles from './Step6Perfil.module.css';
+
 export function Step6Perfil(): JSX.Element {
     const profile = useBookingStore((s) => s.profile);
     const patchProfile = useBookingStore((s) => s.patchProfile);
@@ -44,13 +46,7 @@ export function Step6Perfil(): JSX.Element {
                 </>
             }
         >
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--ra-space-3)',
-                }}
-            >
+            <div className={styles.grid}>
                 <TextField
                     label="NIF"
                     value={profile.nif}
