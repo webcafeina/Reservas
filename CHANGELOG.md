@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] — 2026-04-21
+
+### Fixed
+
+- **"Añadir nueva" and taxonomy submenus missing under Reservas.** When
+  v0.2.1 nested the `sala` CPT under the plugin's top-level menu via
+  `show_in_menu => 'reservas-aldealab'`, WordPress's
+  `_add_post_type_submenus()` only contributed the "All items" submenu —
+  Add New and the Edificios / Servicios taxonomy admin pages are not
+  auto-registered in that scenario. Consequence: users could list salas
+  but not create them, and had no entry point to manage taxonomy terms.
+  Also caused a spurious "Has intentado editar un elemento que no
+  existe" error when navigating to the Add New flow from the admin bar.
+  `AdminMenu::registerMenus` now registers the three missing submenus
+  explicitly.
+
 ## [0.2.1] — 2026-04-21
 
 ### Fixed

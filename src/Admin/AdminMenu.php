@@ -9,6 +9,7 @@ namespace WebcafeinaReservas\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use WebcafeinaReservas\PostTypes\SalaCpt;
 use WebcafeinaReservas\Roles\RoleManager;
 
 /**
@@ -38,9 +39,6 @@ final class AdminMenu {
         );
 
         // Rename the auto-generated first submenu from "Reservas" to "Panel".
-        // The "Salas" submenu (plus Add New + taxonomies) is contributed
-        // automatically by the `sala` CPT because it declares
-        // `'show_in_menu' => 'reservas-aldealab'` in PostTypes\SalaCpt.
         add_submenu_page(
             self::SLUG,
             __( 'Panel', 'reservas-aldealab' ),
@@ -48,6 +46,32 @@ final class AdminMenu {
             RoleManager::CAP_MANAGE,
             self::SLUG,
             array( self::class, 'renderPage' )
+        );
+
+        // When a CPT uses `show_in_menu => '<parent-slug>'`, WP's
+        // `_add_post_type_submenus()` only contributes the "All items"
+        // submenu — Add New and taxonomy admin pages are NOT auto-registered.
+        // We add them explicitly to keep the menu complete.
+        add_submenu_page(
+            self::SLUG,
+            __( 'Añadir nueva sala', 'reservas-aldealab' ),
+            __( 'Añadir nueva', 'reservas-aldealab' ),
+            'edit_posts',
+            'post-new.php?post_type=' . SalaCpt::POST_TYPE
+        );
+        add_submenu_page(
+            self::SLUG,
+            __( 'Edificios', 'reservas-aldealab' ),
+            __( 'Edificios', 'reservas-aldealab' ),
+            'manage_categories',
+            'edit-tags.php?taxonomy=' . SalaCpt::TAX_EDIFICIO . '&post_type=' . SalaCpt::POST_TYPE
+        );
+        add_submenu_page(
+            self::SLUG,
+            __( 'Servicios', 'reservas-aldealab' ),
+            __( 'Servicios', 'reservas-aldealab' ),
+            'manage_categories',
+            'edit-tags.php?taxonomy=' . SalaCpt::TAX_SERVICIOS . '&post_type=' . SalaCpt::POST_TYPE
         );
     }
 
