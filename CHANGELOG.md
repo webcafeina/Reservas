@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] — 2026-04-21
+
+### Changed (BREAKING)
+
+- **Prefixed CPT and taxonomy slugs to avoid collisions with CPT UI and
+  other generic plugins**. Sites running CPT UI with a `sala` / `edificio`
+  / `servicios` post type or taxonomy were silently deleting the auto-draft
+  that WordPress creates when opening the new-sala editor, producing a
+  `rest_post_invalid_id` 404 and the "Has intentado editar un elemento
+  que no existe" notice. The plugin's internal names now are:
+  - `post_type`: `sala` → `aldealab_sala`
+  - `taxonomy` (hierarchical, edificios): `edificio` → `aldealab_edificio`
+  - `taxonomy` (flat, servicios): `servicios_sala` → `aldealab_servicio`
+  - REST base (CPT): `salas` → `aldealab-salas` (kebab for URLs)
+  - REST base + rewrite slug (taxonomies): `aldealab-edificios` /
+    `aldealab-edificio`, `aldealab-servicios` / `aldealab-servicio`.
+- Frontend `taxonomies.ts` updated to fetch from the new `rest_base` URLs.
+- Public REST param names on `/reservas/v1/spaces` (`edificio`,
+  `servicios`) and the JSON DTO property names (`edificios`,
+  `servicios`) are **unchanged** — they were never slugs, just API
+  conventions for the consumer.
+- No data migration is needed for this release: sites that hit the CPT
+  UI conflict couldn't create any salas in the first place. If you had
+  salas under the old `sala` post type from an earlier working install,
+  they'll need to be re-created or migrated at the DB layer
+  (`UPDATE wp_posts SET post_type='aldealab_sala' WHERE post_type='sala'
+  AND ...`); that scenario isn't automated here.
+
 ## [0.2.2] — 2026-04-21
 
 ### Fixed

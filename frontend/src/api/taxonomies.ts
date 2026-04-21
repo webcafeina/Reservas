@@ -52,16 +52,19 @@ async function fetchTerms(restBase: string): Promise<Term[]> {
     }));
 }
 
+// The URL segments below MUST match the `rest_base` declared for each
+// taxonomy in src/PostTypes/SalaCpt.php. They are prefixed with `aldealab-`
+// to avoid collisions with taxonomies registered elsewhere (e.g. via CPT UI).
 export function useServicios() {
     return useQuery({
-        queryKey: ['taxonomy', 'servicios'],
-        queryFn: () => fetchTerms('servicios'),
+        queryKey: ['taxonomy', 'aldealab-servicios'],
+        queryFn: () => fetchTerms('aldealab-servicios'),
     });
 }
 
 export function useEdificios() {
     return useQuery({
-        queryKey: ['taxonomy', 'edificios'],
-        queryFn: () => fetchTerms('edificios'),
+        queryKey: ['taxonomy', 'aldealab-edificios'],
+        queryFn: () => fetchTerms('aldealab-edificios'),
     });
 }

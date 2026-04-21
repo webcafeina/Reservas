@@ -18,10 +18,13 @@ defined( 'ABSPATH' ) || exit;
  */
 final class SalaCpt {
 
-    public const POST_TYPE        = 'sala';
-    public const TAX_EDIFICIO     = 'edificio';
-    public const TAX_SERVICIOS    = 'servicios_sala';
-    public const REST_BASE        = 'salas';
+    // Prefixed with `aldealab_` / `aldealab-` (for URL-facing) so they can't
+    // collide with generic CPTs registered via CPT UI or other plugins that
+    // happen to use short names like `sala` / `edificio` / `servicios`.
+    public const POST_TYPE        = 'aldealab_sala';
+    public const TAX_EDIFICIO     = 'aldealab_edificio';
+    public const TAX_SERVICIOS    = 'aldealab_servicio';
+    public const REST_BASE        = 'aldealab-salas';
 
     public static function register(): void {
         add_action( 'init', array( self::class, 'registerPostType' ), 10 );
@@ -110,8 +113,8 @@ final class SalaCpt {
                 'show_ui'           => true,
                 'show_admin_column' => true,
                 'show_in_rest'      => true,
-                'rest_base'         => 'edificios',
-                'rewrite'           => array( 'slug' => 'edificio' ),
+                'rest_base'         => 'aldealab-edificios',
+                'rewrite'           => array( 'slug' => 'aldealab-edificio' ),
             )
         );
 
@@ -135,8 +138,8 @@ final class SalaCpt {
                 'show_ui'           => true,
                 'show_admin_column' => true,
                 'show_in_rest'      => true,
-                'rest_base'         => 'servicios',
-                'rewrite'           => array( 'slug' => 'servicio' ),
+                'rest_base'         => 'aldealab-servicios',
+                'rewrite'           => array( 'slug' => 'aldealab-servicio' ),
             )
         );
     }
