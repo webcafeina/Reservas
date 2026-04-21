@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.14] — 2026-04-21
+
+### Changed
+
+- **Sala card meta ("Aforo máx." and "Edificio") now stack vertically**
+  instead of sharing a row. `SalaCard.module.css .meta` flipped from
+  `flex-direction: row + flex-wrap: wrap` to `flex-direction: column`.
+  Tighter `gap: --ra-space-2` keeps the block compact.
+
 ## [0.2.13] — 2026-04-21
 
 ### Changed
