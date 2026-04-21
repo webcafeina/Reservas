@@ -27,7 +27,10 @@
     gap: var(--ra-space-1);
 }
 
-.navLink {
+/* Selectors are nested under .nav to beat wp-admin's `.wrap a` rule
+ * (specificity 0,1,1) that otherwise forces the WP admin blue on our
+ * navigation links. CSS-module class names are hashed so this stays scoped. */
+.nav .navLink {
     padding: var(--ra-space-2) var(--ra-space-4);
     border-radius: var(--ra-radius-md);
     color: var(--ra-color-text-muted);
@@ -37,17 +40,17 @@
     transition: all var(--ra-duration-fast) var(--ra-ease);
 }
 
-.navLink:hover {
+.nav .navLink:hover {
     color: var(--ra-color-text);
     background: var(--ra-color-bg-muted);
 }
 
-.navActive {
+.nav .navActive {
     background: var(--ra-color-primary);
     color: var(--ra-color-primary-contrast);
 }
 
-.navActive:hover {
+.nav .navActive:hover {
     background: var(--ra-color-primary-hover);
     color: var(--ra-color-primary-contrast);
 }

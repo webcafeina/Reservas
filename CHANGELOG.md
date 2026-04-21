@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] — 2026-04-21
+
+### Fixed
+
+- **Clicking the "Reservas" top-level menu now loads the Panel, not
+  "Todas las salas".** WordPress uses the URL of the *first* submenu as
+  the parent menu's click target. WP's core `_add_post_type_submenus()`
+  runs on `admin_menu` at priority 10 and appends the CPT's "All items"
+  submenu; our `AdminMenu::register` also ran at priority 10, so the
+  CPT submenu landed first. Hooked our registration at priority 9 so
+  the Panel is registered before WP's CPT submenu.
+- **Admin nav active state ("Panel" / "Reservas" / "Ajustes") was
+  invisible** (blue text on blue background). wp-admin ships
+  `.wrap a { color: #2271b1 }` with specificity (0,1,1), which beat our
+  `.navActive` rule at (0,1,0). Nested under `.nav .navActive` so the
+  white `--ra-color-primary-contrast` wins.
+- **"Exportar CSV" button text was also blue** for the same reason.
+  Upgraded selectors to `a.exportLink` in both Dashboard.module.css and
+  BookingsList.module.css.
+
 ## [0.2.3] — 2026-04-21
 
 ### Changed (BREAKING)

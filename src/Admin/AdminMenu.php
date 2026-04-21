@@ -24,7 +24,11 @@ final class AdminMenu {
     public const SLUG = 'reservas-aldealab';
 
     public static function register(): void {
-        add_action( 'admin_menu', array( self::class, 'registerMenus' ) );
+        // Priority 9 (before WP's default 10) so our "Panel" submenu is
+        // registered BEFORE WP's `_add_post_type_submenus()` appends the
+        // CPT's "Todas las salas". WP uses the URL of the first submenu as
+        // the top-level menu's click target — we want Panel to be first.
+        add_action( 'admin_menu', array( self::class, 'registerMenus' ), 9 );
     }
 
     public static function registerMenus(): void {

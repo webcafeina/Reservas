@@ -29,7 +29,9 @@
     flex-wrap: wrap;
 }
 
-.exportLink {
+/* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't
+ * paint the text blue. */
+a.exportLink {
     margin-left: var(--ra-space-2);
     padding: var(--ra-space-2) var(--ra-space-4);
     background: var(--ra-color-accent);
@@ -41,7 +43,7 @@
     transition: background var(--ra-duration-fast) var(--ra-ease);
 }
 
-.exportLink:hover {
+a.exportLink:hover {
     background: var(--ra-color-accent-hover);
     text-decoration: none;
     color: var(--ra-color-text-inverted);
