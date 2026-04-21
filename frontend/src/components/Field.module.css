@@ -6,7 +6,7 @@
 
 .label {
     font-size: var(--ra-font-size-sm);
-    font-weight: var(--ra-font-weight-medium);
+    font-weight: var(--ra-font-weight-semibold);
     color: var(--ra-color-text);
 }
 

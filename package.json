@@ -1,7 +1,7 @@
 {
     "name": "reservas-aldealab",
     "private": true,
-    "version": "0.2.12",
+    "version": "0.2.13",
     "description": "Frontend SPA for the Reservas Aldealab WordPress plugin.",
     "type": "module",
     "scripts": {

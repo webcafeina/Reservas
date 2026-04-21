@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.13] — 2026-04-21
+
+### Changed
+
+- **Buttons and field labels in the public form now render at weight
+  600 (semibold)** instead of 500 (medium). Affects:
+  `Button.module.css`, `Field.module.css .label`, `Step1Aforo.module.css
+  .servicesLegend`, and `Step4Recurrencia.module.css .groupLabel`. The
+  back/next/confirm buttons, form field labels, and the "Servicios
+  necesarios" / "Días de la semana" / "Vista previa" legends all read
+  heavier now.
+
 ## [0.2.12] — 2026-04-21
 
 ### Changed

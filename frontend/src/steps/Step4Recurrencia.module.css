@@ -7,7 +7,7 @@
 .groupLabel {
     display: block;
     font-size: var(--ra-font-size-sm);
-    font-weight: var(--ra-font-weight-medium);
+    font-weight: var(--ra-font-weight-semibold);
     margin-bottom: var(--ra-space-2);
 }
 
