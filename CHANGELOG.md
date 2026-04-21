@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.10] — 2026-04-21
+
+### Changed
+
+- **Tighter, more consistent step layout spacing.** In `StepFrame`:
+  - Top action bar now leaves `2em` below itself before the body, giving
+    the Back/Next controls a clear visual separation from step content.
+  - Body's internal gap between sibling sections is `1em`
+    (`display: flex; flex-direction: column; gap: 1em`). Applies to every
+    step so e.g. the aforo block in Step 1 is cleanly separated from
+    the services fieldset, and every subsequent step inherits the same
+    rhythm without per-step tweaks.
+
 ## [0.2.9] — 2026-04-21
 
 ### Changed

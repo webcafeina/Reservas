@@ -36,11 +36,16 @@
 .body {
     display: flex;
     flex-direction: column;
-    gap: var(--ra-space-4);
+    /* 1em vertical gap between sections inside the body (e.g. aforo
+     * block vs. servicios block in Step 1). `em` so it scales with the
+     * body's own font-size. */
+    gap: 1em;
 }
 
 .actions {
-    margin-bottom: var(--ra-space-5);
+    /* 2em gap between the top action bar and the body — clients asked
+     * for a more visible breather between controls and content. */
+    margin-bottom: 2em;
     display: flex;
     justify-content: space-between;
     gap: var(--ra-space-3);
