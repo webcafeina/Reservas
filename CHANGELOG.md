@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] — 2026-04-21
+
+### Fixed
+
+- **Admin nav active state + "Exportar CSV" button text still blue
+  after v0.2.4.** The culprit turned out to be *our own*
+  `#reservas-admin-app a { color: primary }` rule in
+  `frontend/admin/styles/admin.css` — an ID selector with specificity
+  (1,0,1) that beat every class-based override (`.nav .navActive`,
+  `a.exportLink`, etc.). Wrapped the id in `:where()` so the default
+  link color rule has zero specificity and component-level rules can
+  win with normal class selectors. Generic prose links inside the admin
+  (e.g. the Cloudflare Turnstile link in Settings) now inherit
+  wp-admin's default link color instead of our primary, which is
+  visually identical.
+
 ## [0.2.4] — 2026-04-21
 
 ### Fixed

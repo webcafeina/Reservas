@@ -29,12 +29,17 @@
     color: inherit;
 }
 
-#reservas-admin-app a {
+/* `:where()` zeroes out the ID's specificity so component-level rules
+ * (.navActive, .exportLink, …) can override the default link color with
+ * normal class selectors. Without this, the ID selector's specificity
+ * (1,0,1) beat every class-based rule and dragged button text back to
+ * the primary blue, even on chips/pills where we need a contrast color. */
+:where(#reservas-admin-app) a {
     color: var(--ra-color-primary);
     text-decoration: none;
 }
 
-#reservas-admin-app a:hover {
+:where(#reservas-admin-app) a:hover {
     text-decoration: underline;
 }
 
