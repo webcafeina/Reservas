@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-04-21
+
+### Added
+
+- **Administradores pueden crear reservas manualmente desde el panel.**
+  Nuevo endpoint `POST /reservas/v1/admin/bookings` (gated por
+  `manage_reservas`) y una nueva página en el admin React (`#/bookings/new`)
+  con un botón de entrada desde BookingsList → "+ Crear reserva". La
+  reserva pasa por la misma `Services\BookingService::create` que el
+  formulario público, así que aparece idéntica en stats, listado, CSV
+  export y emails — no hay dos "mundos" de reservas.
+
+  La página admin soporta todo el flujo: selector de sala (mismas
+  `SalaCard` del público), fecha + horario, **recurrencia completa**
+  (freq / intervalo / byweekday / end con vista previa del calendario
+  de ocurrencias y exclusiones), datos del solicitante validados con
+  la misma `profileValidation` Zod.
+
+  Tres opciones específicas de admin:
+  - **Estado inicial** seleccionable (por defecto `confirmada`; también
+    `pendiente` o `cancelada`).
+  - **Forzar aunque haya solapamiento** — checkbox que salta la
+    comprobación de disponibilidad cuando el solape es intencional.
+  - **No notificar por email** — silencia el hook asíncrono de
+    notificaciones (útil si ya se ha avisado al usuario por otro
+    canal).
+  - Además: campo `nota_admin` se guarda en la reserva desde la misma
+    página.
+
+  Ni Turnstile ni rate-limit se aplican a este endpoint: el cap
+  `manage_reservas` es el gate.
+
+### Fixed
+
+- **Bug latente: `Booking::$notaAdmin` nunca se inicializaba en
+  `BookingService::create`.** Era una typed nullable property sin
+  default; en PHP 7.4+ habría lanzado `Typed property must not be
+  accessed before initialization` al leerla en `BookingRepository`.
+  Ahora se asigna explícitamente desde `BookingRequest::$notaAdmin`
+  (que el flujo público deja en `null`). El fix ya estaba requerido
+  para pasar la `nota_admin` desde el form admin.
+
 ## [0.2.14] — 2026-04-21
 
 ### Changed

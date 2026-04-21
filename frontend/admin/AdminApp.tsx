@@ -2,6 +2,7 @@ import { WebcafeinaFooter } from '../src/components/WebcafeinaFooter';
 
 import { Dashboard } from './pages/Dashboard';
 import { BookingsList } from './pages/BookingsList';
+import { BookingNew } from './pages/BookingNew';
 import { BookingDetail } from './pages/BookingDetail';
 import { SettingsPage } from './pages/Settings';
 import { useHashRoute, type AdminView } from './useHashRoute';
@@ -44,6 +45,7 @@ export function AdminApp(): JSX.Element {
             <main className={styles.main}>
                 {view.name === 'dashboard' && <Dashboard />}
                 {view.name === 'bookings' && <BookingsList />}
+                {view.name === 'bookings-new' && <BookingNew />}
                 {view.name === 'booking' && <BookingDetail id={view.id} />}
                 {view.name === 'settings' && <SettingsPage />}
             </main>

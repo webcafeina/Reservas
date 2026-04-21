@@ -69,6 +69,8 @@ async function request<T>(
 export const adminApi = {
     get: <T>(path: string, query?: Record<string, unknown>) =>
         request<T>('GET', path, query !== undefined ? { query } : {}),
+    post: <T>(path: string, body?: unknown) =>
+        request<T>('POST', path, body !== undefined ? { body } : {}),
     put: <T>(path: string, body?: unknown) =>
         request<T>('PUT', path, body !== undefined ? { body } : {}),
     patch: <T>(path: string, body?: unknown) =>

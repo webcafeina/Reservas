@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { adminApi } from './client';
 import type { Booking, BookingState } from '../../src/types/booking';
+import type { UserProfile } from '../../src/types/profile';
 
 export interface BookingListResponse {
     items: Booking[];
@@ -58,6 +59,38 @@ export function useDeleteBooking() {
             adminApi.delete<{ deleted: boolean; id: number }>(`/admin/bookings/${id}`),
         onSuccess: async () => {
             await qc.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+        },
+    });
+}
+
+/**
+ * Admin "manual" booking payload — same core shape as the public
+ * BookingPayload (sans turnstile_token) plus admin-only extras.
+ */
+export interface AdminBookingPayload {
+    sala_id: number;
+    hora_inicio: string;
+    hora_fin: string;
+    fecha_inicio: string;
+    fecha_fin_serie: string | null;
+    rrule: string | null;
+    fechas_excluidas: string[];
+    objeto_reserva: string;
+    profile: UserProfile;
+    estado?: BookingState;
+    force_override?: boolean;
+    suppress_notifications?: boolean;
+    nota_admin?: string;
+}
+
+export function useCreateAdminBooking() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: AdminBookingPayload) =>
+            adminApi.post<{ success: true; booking: Booking }>('/admin/bookings', payload),
+        onSuccess: async () => {
+            await qc.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'stats'] });
         },
     });
 }

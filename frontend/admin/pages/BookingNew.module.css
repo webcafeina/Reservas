@@ -1,0 +1,118 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-5);
+    max-width: 960px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--ra-space-3);
+    flex-wrap: wrap;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: var(--ra-font-size-xl);
+}
+
+.section {
+    background: var(--ra-color-bg);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    padding: var(--ra-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-3);
+}
+
+.section h3 {
+    margin: 0;
+    font-size: var(--ra-font-size-lg);
+    font-weight: var(--ra-font-weight-semibold);
+}
+
+.muted {
+    color: var(--ra-color-text-muted);
+    font-size: var(--ra-font-size-sm);
+    margin: 0;
+}
+
+.salaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--ra-space-3);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--ra-space-3);
+}
+
+.profileGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ra-space-3);
+}
+
+@media (max-width: 700px) {
+    .profileGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.checkboxRow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-2);
+}
+
+.checkbox {
+    display: flex;
+    gap: var(--ra-space-2);
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.checkbox input {
+    margin-top: 4px;
+}
+
+.checkbox small {
+    display: block;
+    color: var(--ra-color-text-muted);
+    margin-top: 2px;
+}
+
+.weekdays {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ra-space-2);
+}
+
+.weekday {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--ra-radius-md);
+    border: 1px solid var(--ra-color-border);
+    background: var(--ra-color-bg);
+    font-weight: var(--ra-font-weight-semibold);
+    cursor: pointer;
+}
+
+.weekdayActive {
+    background: var(--ra-color-primary);
+    border-color: var(--ra-color-primary);
+    color: var(--ra-color-primary-contrast);
+}
+
+.actions {
+    display: flex;
+    gap: var(--ra-space-3);
+    justify-content: flex-end;
+    border-top: 1px solid var(--ra-color-border);
+    padding-top: var(--ra-space-4);
+}

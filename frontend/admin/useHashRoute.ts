@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export type AdminView =
     | { name: 'dashboard' }
     | { name: 'bookings' }
+    | { name: 'bookings-new' }
     | { name: 'booking'; id: number }
     | { name: 'settings' };
 
@@ -16,6 +17,11 @@ function parse(hash: string): AdminView {
     }
     if (clean === 'bookings') {
         return { name: 'bookings' };
+    }
+    // Must come before the /(\d+)/ match below because `new` isn't a number
+    // but we still want a distinct view from the generic list.
+    if (clean === 'bookings/new') {
+        return { name: 'bookings-new' };
     }
     const bookingMatch = /^bookings\/(\d+)$/.exec(clean);
     if (bookingMatch) {

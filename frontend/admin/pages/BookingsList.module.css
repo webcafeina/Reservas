@@ -6,7 +6,10 @@
 
 .toolbar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--ra-space-3);
+    flex-wrap: wrap;
 }
 
 /* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't

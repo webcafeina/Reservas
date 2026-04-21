@@ -34,12 +34,12 @@ export function BookingsList(): JSX.Element {
         setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
     };
 
-    const totalPages =
-        data !== undefined ? Math.max(1, Math.ceil(data.total / data.per_page)) : 1;
+    const totalPages = data !== undefined ? Math.max(1, Math.ceil(data.total / data.per_page)) : 1;
 
     return (
         <div className={styles.wrapper}>
             <div className={styles.toolbar}>
+                <Button onClick={() => navigate('bookings/new')}>+ Crear reserva</Button>
                 <a
                     href={buildExportUrl({ ...filters, page: undefined, per_page: undefined })}
                     className={styles.exportLink}

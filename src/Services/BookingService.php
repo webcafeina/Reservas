@@ -93,18 +93,23 @@ final class BookingService {
         $profileId = $this->profiles->upsert( $request->profile );
 
         // 4. Availability check + insert under a single transaction.
+        //    Admin callers may set `forceOverride = true` on the request to
+        //    skip the slot-conflict check (still protected by the FOR
+        //    UPDATE semantics of the inserts themselves).
         $this->checker->beginTransaction();
         try {
-            $availability = $this->checker->checkAndLock(
-                $request->salaId,
-                $dates,
-                $request->horaInicio,
-                $request->horaFin
-            );
+            if ( ! $request->forceOverride ) {
+                $availability = $this->checker->checkAndLock(
+                    $request->salaId,
+                    $dates,
+                    $request->horaInicio,
+                    $request->horaFin
+                );
 
-            if ( ! $availability->available ) {
-                $this->checker->rollback();
-                return BookingResult::conflict( $availability );
+                if ( ! $availability->available ) {
+                    $this->checker->rollback();
+                    return BookingResult::conflict( $availability );
+                }
             }
 
             $booking               = new Booking();
@@ -112,13 +117,16 @@ final class BookingService {
             $booking->userId       = $request->userId;
             $booking->profileId    = $profileId;
             $booking->salaId       = $request->salaId;
-            $booking->estado       = BookingState::PENDIENTE;
+            $booking->estado       = $request->initialState ?? BookingState::PENDIENTE;
             $booking->horaInicio   = $this->normaliseTime( $request->horaInicio );
             $booking->horaFin      = $this->normaliseTime( $request->horaFin );
             $booking->rrule        = $request->rrule;
             $booking->fechaInicio  = $dates[0]->format( 'Y-m-d' );
             $booking->fechaFinSerie = end( $dates )->format( 'Y-m-d' );
             $booking->objetoReserva = $request->objetoReserva;
+            // Must be set explicitly — typed nullable property on Booking
+            // throws if left uninitialized when BookingRepository reads it.
+            $booking->notaAdmin    = $request->notaAdmin;
 
             $bookingId = $this->bookings->create( $booking, $dates );
             $booking->id = $bookingId;
@@ -136,7 +144,10 @@ final class BookingService {
         }
 
         // 5. Schedule async dispatch — non-blocking. Emails + PDF run later.
-        if ( function_exists( 'wp_schedule_single_event' ) ) {
+        //    Admin callers can set `suppressNotifications = true` to create
+        //    a booking silently (e.g. when the user was already contacted
+        //    through another channel).
+        if ( ! $request->suppressNotifications && function_exists( 'wp_schedule_single_event' ) ) {
             wp_schedule_single_event( time(), self::ASYNC_HOOK, array( $bookingId ) );
         }
 
