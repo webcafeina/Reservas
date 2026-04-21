@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12] — 2026-04-21
+
+### Changed
+
+- **Public form typography now uses Gotham** (the corporate font served
+  by the host site) so the booking form blends with the surrounding
+  WordPress page. Override lives in `global.css` scoped to `#reservas-app`
+  only — we override `--ra-font-family-sans` to `'Gotham', 'Gotham A',
+  'Gotham HTF', 'Inter', system-ui, …`. If the theme stops serving
+  Gotham on a given page, the stack falls back cleanly. Admin panel
+  keeps its original Inter/system stack.
+
 ## [0.2.11] — 2026-04-21
 
 ### Changed

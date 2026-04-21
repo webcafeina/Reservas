@@ -24,6 +24,15 @@
     --ra-color-primary: #05aae4;
     --ra-color-primary-hover: #048ec2;
 
+    /* The host site serves Gotham (Aldealab's corporate font). We prefer
+     * the same family in the booking form so it blends with the
+     * surrounding page. If the theme doesn't load Gotham on a given
+     * route, the stack gracefully falls back to Inter / system. The
+     * admin panel keeps the default sans stack. */
+    --ra-font-family-sans:
+        'Gotham', 'Gotham A', 'Gotham HTF', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto,
+        sans-serif;
+
     font-family: var(--ra-font-family-sans);
     font-size: var(--ra-font-size-base);
     line-height: var(--ra-line-height-base);
