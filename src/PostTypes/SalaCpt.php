@@ -36,7 +36,9 @@ final class SalaCpt {
         $labels = array(
             'name'                  => _x( 'Salas', 'post type general name', 'reservas-aldealab' ),
             'singular_name'         => _x( 'Sala', 'post type singular name', 'reservas-aldealab' ),
-            'menu_name'             => _x( 'Salas', 'admin menu', 'reservas-aldealab' ),
+            // Used by WP's `_add_post_type_submenus()` as the submenu title
+            // shown under the "Reservas" parent menu in the admin sidebar.
+            'menu_name'             => _x( 'Salas reservables', 'admin menu', 'reservas-aldealab' ),
             'name_admin_bar'        => _x( 'Sala', 'add new on admin bar', 'reservas-aldealab' ),
             'add_new'               => _x( 'Añadir nueva', 'sala', 'reservas-aldealab' ),
             'add_new_item'          => __( 'Añadir nueva sala', 'reservas-aldealab' ),

@@ -24,14 +24,20 @@ final class AdminMenu {
     public const SLUG = 'reservas-aldealab';
 
     public static function register(): void {
-        // Priority 9 (before WP's default 10) so our "Panel" submenu is
-        // registered BEFORE WP's `_add_post_type_submenus()` appends the
-        // CPT's "Todas las salas". WP uses the URL of the first submenu as
-        // the top-level menu's click target — we want Panel to be first.
-        add_action( 'admin_menu', array( self::class, 'registerMenus' ), 9 );
+        // Order of submenus under "Reservas" is enforced via hook priority:
+        //   Priority 9  — we add the top-level menu + "Panel de control".
+        //   Priority 10 — WP core's `_add_post_type_submenus()` appends the
+        //                 CPT's own submenu ("Salas reservables", label set
+        //                 in SalaCpt labels.menu_name).
+        //   Priority 11 — we append the taxonomy submenus (Edificios,
+        //                 Servicios).
+        // Result in the sidebar: Panel de control → Salas reservables →
+        // Edificios → Servicios, which is what the client asked for.
+        add_action( 'admin_menu', array( self::class, 'registerPanel' ), 9 );
+        add_action( 'admin_menu', array( self::class, 'registerTaxonomySubmenus' ), 11 );
     }
 
-    public static function registerMenus(): void {
+    public static function registerPanel(): void {
         add_menu_page(
             __( 'Reservas', 'reservas-aldealab' ),
             __( 'Reservas', 'reservas-aldealab' ),
@@ -42,27 +48,23 @@ final class AdminMenu {
             25
         );
 
-        // Rename the auto-generated first submenu from "Reservas" to "Panel".
+        // Rename the auto-generated first submenu from "Reservas" to
+        // "Panel de control". Because this add_submenu_page uses the parent
+        // slug as its own slug, WP merges it with the auto-generated entry.
         add_submenu_page(
             self::SLUG,
-            __( 'Panel', 'reservas-aldealab' ),
-            __( 'Panel', 'reservas-aldealab' ),
+            __( 'Panel de control', 'reservas-aldealab' ),
+            __( 'Panel de control', 'reservas-aldealab' ),
             RoleManager::CAP_MANAGE,
             self::SLUG,
             array( self::class, 'renderPage' )
         );
+    }
 
-        // When a CPT uses `show_in_menu => '<parent-slug>'`, WP's
-        // `_add_post_type_submenus()` only contributes the "All items"
-        // submenu — Add New and taxonomy admin pages are NOT auto-registered.
-        // We add them explicitly to keep the menu complete.
-        add_submenu_page(
-            self::SLUG,
-            __( 'Añadir nueva sala', 'reservas-aldealab' ),
-            __( 'Añadir nueva', 'reservas-aldealab' ),
-            'edit_posts',
-            'post-new.php?post_type=' . SalaCpt::POST_TYPE
-        );
+    public static function registerTaxonomySubmenus(): void {
+        // WP's `_add_post_type_submenus()` only contributes the CPT's "All
+        // items" submenu when `show_in_menu` is a parent slug — taxonomy
+        // admin pages are NOT auto-registered. We add them explicitly.
         add_submenu_page(
             self::SLUG,
             __( 'Edificios', 'reservas-aldealab' ),

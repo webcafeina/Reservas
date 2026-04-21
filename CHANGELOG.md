@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] — 2026-04-21
+
+### Changed
+
+- **Admin submenu reorganization** (under the "Reservas" top-level menu):
+  - "Panel" renamed to **"Panel de control"**.
+  - "Todas las salas" renamed to **"Salas reservables"** (via the CPT's
+    `labels.menu_name`, which is what WP's `_add_post_type_submenus()`
+    actually shows in the sidebar).
+  - **"Añadir nueva" submenu removed.** New salas are created from the
+    "Add New" button WP renders on the salas list page by default — the
+    dedicated submenu was redundant.
+  - Final order: **Panel de control → Salas reservables → Edificios →
+    Servicios**. Enforced by splitting `AdminMenu::register` into two
+    `admin_menu` hooks: priority 9 registers Panel (so it wins the
+    parent-link click), WP core at priority 10 appends Salas reservables,
+    priority 11 appends the taxonomy submenus.
+
 ## [0.2.5] — 2026-04-21
 
 ### Fixed
