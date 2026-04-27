@@ -8,8 +8,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
 
+import { SelectField } from '../../src/components/Field';
+import { useSpaces } from '../../src/api/spaces';
 import { useCalendarEvents } from '../api/hooks';
 import { navigate } from '../useHashRoute';
+import type { BookingState } from '../../src/types/booking';
 
 import styles from './Calendar.module.css';
 
@@ -38,7 +41,21 @@ function toIsoDate(d: Date): string {
 
 export function Calendar(): JSX.Element {
     const [range, setRange] = useState<{ from: string; to: string } | null>(null);
-    const { data, isLoading, isError } = useCalendarEvents(range?.from ?? null, range?.to ?? null);
+    const [salaFilter, setSalaFilter] = useState<number | null>(null);
+    const [estadoFilter, setEstadoFilter] = useState<BookingState | ''>('');
+
+    const { data: salasData } = useSpaces({ per_page: 100 });
+    const salaOptions = useMemo(() => {
+        const items = salasData?.items ?? [];
+        return [{ value: '', label: 'Todas las salas' }].concat(
+            items.map((s) => ({ value: String(s.id), label: s.title })),
+        );
+    }, [salasData]);
+
+    const { data, isLoading, isError } = useCalendarEvents(range?.from ?? null, range?.to ?? null, {
+        salaId: salaFilter,
+        estado: estadoFilter === '' ? null : estadoFilter,
+    });
 
     const events = useMemo(() => data?.events ?? [], [data]);
 
@@ -64,6 +81,30 @@ export function Calendar(): JSX.Element {
 
     return (
         <div className={styles.wrapper}>
+            <div className={styles.toolbar}>
+                <SelectField
+                    label="Sala"
+                    value={salaFilter === null ? '' : String(salaFilter)}
+                    onChange={(e) => {
+                        const v = e.target.value;
+                        setSalaFilter(v === '' ? null : Number(v));
+                    }}
+                    options={salaOptions}
+                />
+                <SelectField
+                    label="Estado"
+                    value={estadoFilter}
+                    onChange={(e) => setEstadoFilter(e.target.value as BookingState | '')}
+                    options={[
+                        { value: '', label: 'Todos los estados' },
+                        { value: 'pendiente', label: 'Pendiente' },
+                        { value: 'confirmada', label: 'Confirmada' },
+                        { value: 'cancelada', label: 'Cancelada' },
+                        { value: 'finalizada', label: 'Finalizada' },
+                    ]}
+                />
+            </div>
+
             <div className={styles.legend}>
                 <span>Estados:</span>
                 {(['pendiente', 'confirmada', 'cancelada', 'finalizada'] as const).map((s) => (

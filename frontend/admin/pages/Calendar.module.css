@@ -4,6 +4,17 @@
     gap: var(--ra-space-3, 12px);
 }
 
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ra-space-3, 12px);
+    align-items: end;
+}
+
+.toolbar > * {
+    min-width: 180px;
+}
+
 .legend {
     display: flex;
     flex-wrap: wrap;

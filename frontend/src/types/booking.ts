@@ -1,3 +1,5 @@
+import type { UserProfile } from './profile';
+
 export type BookingState = 'pendiente' | 'confirmada' | 'cancelada' | 'finalizada';
 
 export interface BookingConflict {
@@ -22,7 +24,7 @@ export interface BookingPayload {
     rrule: string | null;
     fechas_excluidas: string[];
     objeto_reserva: string;
-    profile: import('./profile').UserProfile;
+    profile: UserProfile;
     turnstile_token: string | null;
     cpa_items?: Array<{ item_type: string; item_label: string }>;
 }
@@ -33,6 +35,8 @@ export interface Booking {
     user_id: number | null;
     profile_id: number | null;
     sala_id: number;
+    /** Set by admin endpoints that JOIN posts; null on public payloads. */
+    sala_title?: string | null;
     estado: BookingState;
     hora_inicio: string;
     hora_fin: string;
@@ -44,4 +48,6 @@ export interface Booking {
     created_at: string | null;
     updated_at: string | null;
     fechas: string[];
+    /** Set by admin endpoints that JOIN user_profiles; null otherwise. */
+    profile?: UserProfile | null;
 }

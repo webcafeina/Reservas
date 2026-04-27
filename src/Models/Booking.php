@@ -37,6 +37,15 @@ final class Booking {
     public array $fechas = array();
 
     /**
+     * Optional denormalised display data set by Repository methods that
+     * JOIN posts / user_profiles. Allows the admin list and detail
+     * endpoints to render the sala name and solicitante section without
+     * extra round-trips.
+     */
+    public ?string $salaTitle = null;
+    public ?UserProfile $profile = null;
+
+    /**
      * @param array<string, mixed> $data
      */
     public static function fromArray( array $data ): self {
@@ -80,6 +89,7 @@ final class Booking {
             'user_id'         => $this->userId,
             'profile_id'      => $this->profileId,
             'sala_id'         => $this->salaId,
+            'sala_title'      => $this->salaTitle,
             'estado'          => $this->estado,
             'hora_inicio'     => $this->horaInicio,
             'hora_fin'        => $this->horaFin,
@@ -91,6 +101,7 @@ final class Booking {
             'created_at'      => $this->createdAt,
             'updated_at'      => $this->updatedAt,
             'fechas'          => $this->fechas,
+            'profile'         => $this->profile !== null ? $this->profile->toArray() : null,
         );
     }
 }

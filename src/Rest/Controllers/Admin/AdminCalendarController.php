@@ -74,9 +74,21 @@ final class AdminCalendarController {
             );
         }
 
+        $salaIdRaw = $request->get_param( 'sala_id' );
+        $salaId    = $salaIdRaw !== null && (int) $salaIdRaw > 0 ? (int) $salaIdRaw : null;
+
+        $estadoRaw = $request->get_param( 'estado' );
+        $estado    = null;
+        if ( $estadoRaw !== null && $estadoRaw !== '' ) {
+            $estadoCandidate = sanitize_text_field( (string) $estadoRaw );
+            if ( BookingState::isValid( $estadoCandidate ) ) {
+                $estado = $estadoCandidate;
+            }
+        }
+
         global $wpdb;
         $repo = new BookingRepository( $wpdb );
-        $rows = $repo->findEventsBetween( $from, $to );
+        $rows = $repo->findEventsBetween( $from, $to, $salaId, $estado );
 
         $events = array();
         foreach ( $rows as $row ) {
