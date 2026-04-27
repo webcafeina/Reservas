@@ -41,10 +41,12 @@ use WebcafeinaReservas\Services\Sms\SmsProviderFactory;
 final class EmailNotifier {
 
     public const HOOK_ASYNC     = 'reservas_aldealab_send_notifications';
+    public const HOOK_CONFIRMED = 'reservas_aldealab_booking_confirmed';
     public const HOOK_CANCELLED = 'reservas_aldealab_booking_cancelled';
 
     public static function register(): void {
         add_action( self::HOOK_ASYNC, array( self::class, 'handleAsync' ), 10, 1 );
+        add_action( self::HOOK_CONFIRMED, array( self::class, 'handleConfirmed' ), 10, 1 );
         add_action( self::HOOK_CANCELLED, array( self::class, 'handleCancelled' ), 10, 1 );
     }
 
@@ -87,6 +89,46 @@ final class EmailNotifier {
                 $ctx['profile'],
                 $ctx['sala'],
                 'confirmation'
+            );
+        } finally {
+            if ( $pdfPath !== null && is_file( $pdfPath ) ) {
+                @unlink( $pdfPath );
+            }
+        }
+    }
+
+    /**
+     * Hook target: `reservas_aldealab_booking_confirmed`. Fired when a
+     * pending booking is accepted by an admin (panel PATCH or magic-link
+     * "Aceptar" from email). Mirrors handleAsync — generates the PDF (if
+     * applicable) and sends a single "Reserva aceptada" email to the
+     * solicitante. Async (cron) so the admin's response isn't blocked
+     * by PDF generation.
+     */
+    public static function handleConfirmed( int $bookingId ): void {
+        $ctx = self::loadContext( $bookingId );
+        if ( $ctx === null ) {
+            return;
+        }
+
+        $attachPdf = self::shouldAttachPdf( $ctx['booking'], $ctx['sala'] );
+        $pdfPath   = null;
+        if ( $attachPdf ) {
+            $pdfPath = self::tryGeneratePdfFile(
+                $ctx['booking'],
+                $ctx['profile'],
+                $ctx['sala'],
+                $ctx['log']
+            );
+        }
+
+        try {
+            ( new self() )->sendUserAccepted(
+                $ctx['booking'],
+                $ctx['profile'],
+                $ctx['sala'],
+                $pdfPath,
+                $attachPdf
             );
         } finally {
             if ( $pdfPath !== null && is_file( $pdfPath ) ) {
@@ -228,6 +270,36 @@ final class EmailNotifier {
         foreach ( $recipients as $to ) {
             self::send( $to, $title, $html, 'admin', $booking->id, $attachments );
         }
+    }
+
+    public function sendUserAccepted(
+        Booking $booking,
+        UserProfile $profile,
+        Sala $sala,
+        ?string $pdfPath,
+        bool $includeSedeInstructions
+    ): void {
+        $title         = __( 'Tu reserva en Aldealab ha sido confirmada', 'reservas-aldealab' );
+        $fechas_humano = self::formatDatesHuman( $booking );
+        $header_url    = self::headerImageUrl();
+
+        $incluye_sede = $includeSedeInstructions;
+
+        $content_html = self::renderTemplate(
+            'accepted-user',
+            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede' )
+        );
+        $html = self::renderLayout( $title, $content_html, $header_url );
+
+        $attachments = $pdfPath !== null ? array( $pdfPath ) : array();
+        self::send(
+            $profile->email,
+            $title,
+            $html,
+            'usuario-aceptada',
+            $booking->id,
+            $attachments
+        );
     }
 
     public function sendCancellation(
