@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-04-27
+
+### Added
+
+- **Email al solicitante cuando un admin confirma su reserva.**
+  Hasta ahora la transición a estado `confirmada` no notificaba a
+  nadie — el solicitante recibía solo el email de "reserva
+  pendiente" en la creación y luego nunca se enteraba de que se la
+  habían aceptado. Nuevo hook `reservas_aldealab_booking_confirmed`
+  disparado tanto desde el PATCH del panel
+  (`AdminBookingsController::update`) como desde el botón "Aceptar"
+  del email del admin (`BookingActionHandler`). El handler genera
+  el PDF oficial (con el mismo flujo que la creación — saltado para
+  los `usuario_alojado` que no necesitan tramitarlo en sede) y
+  manda al solicitante un correo "Tu reserva ha sido confirmada"
+  con el PDF adjunto. Plantilla nueva
+  `src/Emails/templates/accepted-user.php`.
+
+  El despacho es asíncrono (`wp_schedule_single_event`) para no
+  bloquear la respuesta del PATCH ni el render de la página de
+  confirmación que ve el admin tras pulsar "Sí, aceptar reserva".
+
+  Idempotencia: el panel solo dispara el hook si el estado
+  realmente cambia (re-guardar la misma reserva en `confirmada` no
+  re-envía el email). El flujo del magic-link ya tenía esa
+  protección — solo opera sobre reservas en `pendiente`.
+
+  El admin no recibe copia (acaba de hacer la acción él mismo).
+
 ## [0.6.0] — 2026-04-27
 
 ### Added

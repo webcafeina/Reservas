@@ -19,6 +19,7 @@ use WebcafeinaReservas\Rest\RestApi;
 use WebcafeinaReservas\Services\AvailabilityChecker;
 use WebcafeinaReservas\Services\BookingRequest;
 use WebcafeinaReservas\Services\BookingService;
+use WebcafeinaReservas\Services\EmailNotifier;
 use WebcafeinaReservas\Services\RecurrenceExpander;
 
 /**
@@ -167,9 +168,22 @@ final class AdminBookingsController {
                     400
                 );
             }
+            $previousEstado = $booking->estado;
             $repo->updateState( $id, $estado );
-            if ( $estado === BookingState::CANCELADA ) {
-                do_action( 'reservas_aldealab_booking_cancelled', $id );
+
+            // Idempotency guard: only fire transition hooks when the
+            // estado actually changes — re-saving the same state from
+            // the panel must not re-send notifications.
+            if ( $estado !== $previousEstado ) {
+                if ( $estado === BookingState::CANCELADA ) {
+                    do_action( 'reservas_aldealab_booking_cancelled', $id );
+                }
+                if ( $estado === BookingState::CONFIRMADA && function_exists( 'wp_schedule_single_event' ) ) {
+                    // Async (cron) — PDF generation can take a few
+                    // seconds and we don't want to block the admin's
+                    // PATCH response.
+                    wp_schedule_single_event( time(), EmailNotifier::HOOK_CONFIRMED, array( $id ) );
+                }
             }
         }
 

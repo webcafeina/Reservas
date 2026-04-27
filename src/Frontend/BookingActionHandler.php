@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use WebcafeinaReservas\Models\BookingState;
 use WebcafeinaReservas\Repositories\BookingRepository;
 use WebcafeinaReservas\Services\BookingActionToken;
+use WebcafeinaReservas\Services\EmailNotifier;
 use WebcafeinaReservas\Services\PdfGenerator;
 
 /**
@@ -95,6 +96,12 @@ final class BookingActionHandler {
 
             if ( $newState === BookingState::CANCELADA ) {
                 do_action( 'reservas_aldealab_booking_cancelled', $booking->id );
+            }
+            if ( $newState === BookingState::CONFIRMADA && function_exists( 'wp_schedule_single_event' ) ) {
+                // Async (cron) — PDF generation should not block the
+                // confirmation page render that the admin sees right
+                // after pressing "Sí, aceptar reserva".
+                wp_schedule_single_event( time(), EmailNotifier::HOOK_CONFIRMED, array( $booking->id ) );
             }
 
             self::renderSuccess(
