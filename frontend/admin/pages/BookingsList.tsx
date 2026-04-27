@@ -4,8 +4,9 @@ import { Button } from '../../src/components/Button';
 import { SelectField, TextField } from '../../src/components/Field';
 import { buildExportUrl, useAdminBookings, type BookingFilters } from '../api/hooks';
 import { navigate } from '../useHashRoute';
-import type { BookingState } from '../../src/types/booking';
+import type { Booking, BookingState } from '../../src/types/booking';
 import { formatDateEs } from '../../src/utils/dateFormat';
+import { humanizeRawRrule } from '../../src/store/humanizeRrule';
 
 import styles from './BookingsList.module.css';
 
@@ -26,6 +27,7 @@ const STATE_LABEL: Record<BookingState | '', string> = {
 
 export function BookingsList(): JSX.Element {
     const [filters, setFilters] = useState<BookingFilters>({ page: 1, per_page: 20 });
+    const [expanded, setExpanded] = useState<Set<number>>(new Set());
     const { data, isLoading, isError } = useAdminBookings(filters);
 
     const updateFilter = <K extends keyof BookingFilters>(
@@ -33,6 +35,18 @@ export function BookingsList(): JSX.Element {
         value: BookingFilters[K],
     ): void => {
         setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
+    };
+
+    const toggleExpanded = (id: number): void => {
+        setExpanded((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
     };
 
     const totalPages = data !== undefined ? Math.max(1, Math.ceil(data.total / data.per_page)) : 1;
@@ -90,7 +104,7 @@ export function BookingsList(): JSX.Element {
                                 <th>Estado</th>
                                 <th>Sala</th>
                                 <th>Solicitante</th>
-                                <th>Fecha inicio</th>
+                                <th>Fechas</th>
                                 <th>Horario</th>
                                 <th>Objeto</th>
                                 <th></th>
@@ -115,9 +129,21 @@ export function BookingsList(): JSX.Element {
                                               .filter((s) => s !== null && s !== '')
                                               .join(' ')
                                         : '';
+                                const isRecurrent = b.rrule !== null && b.rrule !== '';
                                 return (
                                     <tr key={b.id}>
-                                        <td>{b.id}</td>
+                                        <td>
+                                            {b.id}
+                                            {isRecurrent && (
+                                                <span
+                                                    className={styles.recurrentBadge}
+                                                    title="Reserva recurrente"
+                                                    aria-label="Reserva recurrente"
+                                                >
+                                                    🔁
+                                                </span>
+                                            )}
+                                        </td>
                                         <td>
                                             <span
                                                 className={`${styles.badge} ${STATE_BADGE[b.estado] ?? ''}`}
@@ -150,7 +176,13 @@ export function BookingsList(): JSX.Element {
                                                 '—'
                                             )}
                                         </td>
-                                        <td>{formatDateEs(b.fecha_inicio)}</td>
+                                        <td>
+                                            <FechasCell
+                                                booking={b}
+                                                expanded={expanded.has(b.id)}
+                                                onToggle={() => toggleExpanded(b.id)}
+                                            />
+                                        </td>
                                         <td>
                                             {b.hora_inicio.slice(0, 5)} – {b.hora_fin.slice(0, 5)}
                                         </td>
@@ -201,6 +233,54 @@ export function BookingsList(): JSX.Element {
                         </div>
                     </footer>
                 </>
+            )}
+        </div>
+    );
+}
+
+interface FechasCellProps {
+    booking: Booking;
+    expanded: boolean;
+    onToggle: () => void;
+}
+
+/**
+ * "Fechas" cell renderer. For one-off bookings just shows the start
+ * date. For recurring ones it shows a single-line summary
+ * (range · count · cadence) with a ▸/▾ toggle that expands an
+ * inline `<ul>` of every individual fecha.
+ */
+function FechasCell({ booking, expanded, onToggle }: FechasCellProps): JSX.Element {
+    const isRecurrent = booking.rrule !== null && booking.rrule !== '';
+
+    if (!isRecurrent) {
+        return <>{formatDateEs(booking.fecha_inicio)}</>;
+    }
+
+    const fechas = booking.fechas;
+    const last = fechas.length > 0 ? fechas[fechas.length - 1] : booking.fecha_inicio;
+    const cadence = humanizeRawRrule(booking.rrule ?? '');
+    const summary = `${formatDateEs(booking.fecha_inicio)} → ${formatDateEs(last)} · ${fechas.length} fecha${fechas.length === 1 ? '' : 's'} · ${cadence.toLowerCase()}`;
+
+    return (
+        <div>
+            <button
+                type="button"
+                className={styles.recurrentToggleBtn}
+                onClick={onToggle}
+                aria-expanded={expanded}
+            >
+                <span className={styles.recurrentChevron} aria-hidden="true">
+                    {expanded ? '▾' : '▸'}
+                </span>
+                <span className={styles.recurrentSummary}>{summary}</span>
+            </button>
+            {expanded && fechas.length > 0 && (
+                <ul className={styles.recurrentDates}>
+                    {fechas.map((iso) => (
+                        <li key={iso}>{formatDateEs(iso)}</li>
+                    ))}
+                </ul>
             )}
         </div>
     );
