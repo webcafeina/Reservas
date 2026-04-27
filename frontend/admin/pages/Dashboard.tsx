@@ -71,11 +71,24 @@ export function Dashboard(): JSX.Element {
     );
 }
 
+type ExportPreset =
+    | 'last-month'
+    | 'last-quarter'
+    | 'last-year'
+    | 'next-month'
+    | 'next-quarter'
+    | 'next-year'
+    | 'all';
+
 function ExportCsvModule(): JSX.Element {
     const [from, setFrom] = useState<string>(monthsAgo(1));
     const [to, setTo] = useState<string>(today());
     const [salaId, setSalaId] = useState<number | null>(null);
     const [estado, setEstado] = useState<BookingState | ''>('');
+    // Tracks which preset button is currently "selected". Cleared whenever
+    // the user manually edits any of the four filter fields, so the
+    // highlight only stays on while the values actually match the preset.
+    const [activePreset, setActivePreset] = useState<ExportPreset | null>(null);
 
     const { data: salasData } = useSpaces({ per_page: 100 });
     const salaOptions = useMemo(() => {
@@ -85,9 +98,10 @@ function ExportCsvModule(): JSX.Element {
         );
     }, [salasData]);
 
-    const applyRange = (rangeFrom: string, rangeTo: string): void => {
+    const applyPreset = (id: ExportPreset, rangeFrom: string, rangeTo: string): void => {
         setFrom(rangeFrom);
         setTo(rangeTo);
+        setActivePreset(id);
     };
 
     const resetAll = (): void => {
@@ -95,6 +109,24 @@ function ExportCsvModule(): JSX.Element {
         setTo('');
         setSalaId(null);
         setEstado('');
+        setActivePreset('all');
+    };
+
+    const onFromChange = (v: string): void => {
+        setFrom(v);
+        setActivePreset(null);
+    };
+    const onToChange = (v: string): void => {
+        setTo(v);
+        setActivePreset(null);
+    };
+    const onSalaChange = (v: string): void => {
+        setSalaId(v === '' ? null : Number(v));
+        setActivePreset(null);
+    };
+    const onEstadoChange = (v: string): void => {
+        setEstado(v as BookingState | '');
+        setActivePreset(null);
     };
 
     const exportUrl = buildExportUrl({
@@ -103,6 +135,9 @@ function ExportCsvModule(): JSX.Element {
         sala_id: salaId ?? undefined,
         estado: estado === '' ? undefined : estado,
     });
+
+    const presetClass = (id: ExportPreset): string =>
+        `${styles.presetBtn} ${activePreset === id ? styles.presetBtnActive : ''}`;
 
     return (
         <section className={styles.module}>
@@ -113,27 +148,24 @@ function ExportCsvModule(): JSX.Element {
                     label="Desde"
                     type="date"
                     value={from}
-                    onChange={(e) => setFrom(e.target.value)}
+                    onChange={(e) => onFromChange(e.target.value)}
                 />
                 <TextField
                     label="Hasta"
                     type="date"
                     value={to}
-                    onChange={(e) => setTo(e.target.value)}
+                    onChange={(e) => onToChange(e.target.value)}
                 />
                 <SelectField
                     label="Sala"
                     value={salaId === null ? '' : String(salaId)}
-                    onChange={(e) => {
-                        const v = e.target.value;
-                        setSalaId(v === '' ? null : Number(v));
-                    }}
+                    onChange={(e) => onSalaChange(e.target.value)}
                     options={salaOptions}
                 />
                 <SelectField
                     label="Estado"
                     value={estado}
-                    onChange={(e) => setEstado(e.target.value as BookingState | '')}
+                    onChange={(e) => onEstadoChange(e.target.value)}
                     options={[
                         { value: '', label: 'Todos los estados' },
                         { value: 'pendiente', label: 'Pendiente' },
@@ -143,37 +175,71 @@ function ExportCsvModule(): JSX.Element {
                     ]}
                 />
             </div>
-            <div className={styles.exportPresets}>
-                <span className={styles.presetGroupLabel}>Pasado:</span>
-                <Button variant="ghost" onClick={() => applyRange(monthsAgo(1), today())}>
-                    Último mes
-                </Button>
-                <Button variant="ghost" onClick={() => applyRange(monthsAgo(3), today())}>
-                    Último trimestre
-                </Button>
-                <Button variant="ghost" onClick={() => applyRange(monthsAgo(12), today())}>
-                    Último año
-                </Button>
-                <span className={styles.presetGroupLabel}>Futuro:</span>
-                <Button variant="ghost" onClick={() => applyRange(today(), monthsAhead(1))}>
-                    Mes siguiente
-                </Button>
-                <Button variant="ghost" onClick={() => applyRange(today(), monthsAhead(3))}>
-                    Trimestre siguiente
-                </Button>
-                <Button variant="ghost" onClick={() => applyRange(today(), monthsAhead(12))}>
-                    Año siguiente
-                </Button>
-                <Button variant="secondary" onClick={resetAll}>
-                    Todas las reservas
-                </Button>
-                <a
-                    href={exportUrl}
-                    className={styles.exportLink}
-                    title="Descargar CSV con las reservas que cumplen los filtros actuales"
-                >
-                    Exportar CSV
-                </a>
+            <div className={styles.exportActions}>
+                <fieldset className={styles.presetGroup}>
+                    <legend className={styles.presetGroupLabel}>Pasado</legend>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('last-month')}
+                        onClick={() => applyPreset('last-month', monthsAgo(1), today())}
+                    >
+                        Último mes
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('last-quarter')}
+                        onClick={() => applyPreset('last-quarter', monthsAgo(3), today())}
+                    >
+                        Último trimestre
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('last-year')}
+                        onClick={() => applyPreset('last-year', monthsAgo(12), today())}
+                    >
+                        Último año
+                    </Button>
+                </fieldset>
+                <fieldset className={styles.presetGroup}>
+                    <legend className={styles.presetGroupLabel}>Futuro</legend>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('next-month')}
+                        onClick={() => applyPreset('next-month', today(), monthsAhead(1))}
+                    >
+                        Mes siguiente
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('next-quarter')}
+                        onClick={() => applyPreset('next-quarter', today(), monthsAhead(3))}
+                    >
+                        Trimestre siguiente
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className={presetClass('next-year')}
+                        onClick={() => applyPreset('next-year', today(), monthsAhead(12))}
+                    >
+                        Año siguiente
+                    </Button>
+                </fieldset>
+                <div className={styles.exportFinal}>
+                    <Button
+                        variant="secondary"
+                        className={`${styles.allBtn} ${activePreset === 'all' ? styles.allBtnActive : ''}`}
+                        onClick={resetAll}
+                    >
+                        Todas las reservas
+                    </Button>
+                    <a
+                        href={exportUrl}
+                        className={styles.exportLink}
+                        title="Descargar CSV con las reservas que cumplen los filtros actuales"
+                    >
+                        Exportar CSV
+                    </a>
+                </div>
             </div>
         </section>
     );

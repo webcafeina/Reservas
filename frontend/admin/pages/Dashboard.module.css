@@ -81,25 +81,97 @@
     margin-bottom: var(--ra-space-3);
 }
 
-.exportPresets {
+/*
+ * Bottom row of the CSV export module: two boxed preset groups
+ * (Pasado / Futuro) on the left, and the final actions ("Todas las
+ * reservas" + Exportar) on the right. Wraps cleanly on narrow screens.
+ */
+.exportActions {
     display: flex;
-    gap: var(--ra-space-1);
+    flex-wrap: wrap;
+    gap: var(--ra-space-3);
+    align-items: stretch;
+}
+
+.presetGroup {
+    display: inline-flex;
     align-items: center;
+    gap: var(--ra-space-1);
+    padding: var(--ra-space-2) var(--ra-space-3) var(--ra-space-2) var(--ra-space-3);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    background: var(--ra-color-bg);
+    margin: 0;
+    min-width: 0;
     flex-wrap: wrap;
 }
 
 .presetGroupLabel {
-    font-size: var(--ra-font-size-sm);
+    font-size: 11px;
     color: var(--ra-color-text-muted);
     font-weight: var(--ra-font-weight-semibold);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     padding: 0 var(--ra-space-1);
 }
 
-.presetGroupLabel + button + button + button + .presetGroupLabel,
-.presetGroupLabel:not(:first-child) {
-    margin-left: var(--ra-space-2);
+/*
+ * Override the ghost variant for preset buttons so they read as
+ * subtle pill buttons instead of plain text links. `.presetBtn` +
+ * `.presetBtnActive` together (specificity 0,2,0) beat the variant
+ * class `.ghost` (0,1,0) reliably regardless of import order.
+ */
+.presetBtn {
+    background: var(--ra-color-bg-muted);
+    color: var(--ra-color-text);
+    border: 1px solid var(--ra-color-border);
+    border-radius: var(--ra-radius-sm);
+    padding: var(--ra-space-1) var(--ra-space-3);
+    font-size: 13px;
+    transition:
+        background var(--ra-duration-fast) var(--ra-ease),
+        border-color var(--ra-duration-fast) var(--ra-ease);
+}
+
+.presetBtn:hover:not(:disabled) {
+    background: var(--ra-color-bg-hover, #eef0f3);
+    color: var(--ra-color-text);
+    border-color: var(--ra-color-text-muted);
+}
+
+.presetBtn.presetBtnActive {
+    background: var(--ra-color-primary);
+    color: var(--ra-color-text-inverted);
+    border-color: var(--ra-color-primary);
+}
+
+.presetBtn.presetBtnActive:hover:not(:disabled) {
+    background: var(--ra-color-primary);
+    color: var(--ra-color-text-inverted);
+    border-color: var(--ra-color-primary);
+}
+
+.exportFinal {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ra-space-2);
+    margin-left: auto;
+}
+
+/*
+ * "Todas las reservas" gets the same selected-state treatment so the
+ * user can tell at a glance that they pressed it.
+ */
+.allBtn.allBtnActive {
+    background: var(--ra-color-primary);
+    color: var(--ra-color-text-inverted);
+    border-color: var(--ra-color-primary);
+}
+
+.allBtn.allBtnActive:hover:not(:disabled) {
+    background: var(--ra-color-primary);
+    color: var(--ra-color-text-inverted);
+    border-color: var(--ra-color-primary);
 }
 
 /* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't
