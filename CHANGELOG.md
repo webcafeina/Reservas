@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] — 2026-04-27
+
+### Fixed
+
+- **Adjunto PDF en correos llegaba como `.tmp` en lugar de `.pdf`.**
+  `EmailNotifier::tryGeneratePdfFile` usaba `wp_tempnam()`, que
+  internamente arranca la extensión solicitada y fuerza `.tmp` al
+  archivo de destino — el cliente de correo mostraba entonces un
+  `.tmp` ilegible aunque por dentro era un PDF válido. Ahora se
+  escribe directamente con `file_put_contents` en `get_temp_dir()`
+  con un nombre significativo (`solicitud-aldealab-<id>-<rand>.pdf`
+  o `solicitud-cpa-…` cuando la sala es CPA). La limpieza posterior
+  (`@unlink` en el `finally` de `handleAsync`) sigue funcionando
+  igual.
+
+- **Falso positivo de "error de Cloudflare" al confirmar reserva.**
+  El widget de Turnstile pasaba a estado rojo en el momento exacto
+  de pulsar "Confirmar" porque Cloudflare reciclaba el challenge
+  cuando el token se consumía. Visualmente parecía un fallo, pero el
+  servidor verificaba el token (todavía válido) y creaba la reserva
+  con normalidad. Ahora `Step7Resumen` desmonta el widget mientras
+  la mutación está en vuelo — al usuario le aparece simplemente
+  "Enviando…" hasta llegar a la pantalla de confirmación. Si el
+  envío falla, el widget se remonta con un challenge fresco para
+  reintentar.
+
 ## [0.3.1] — 2026-04-27
 
 ### Fixed
