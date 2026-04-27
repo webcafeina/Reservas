@@ -182,19 +182,35 @@ export interface CalendarEvent {
     borderColor: string;
 }
 
+export interface CalendarFilters {
+    salaId?: number | null;
+    estado?: BookingState | null;
+}
+
 /**
  * Calendar events for the admin Calendario tab. The range is set by the
  * FullCalendar `datesSet` callback; we keep the query keyed on the range
- * so React Query caches per-view.
+ * AND the filters so React Query caches per-view + per-filter combo.
  */
-export function useCalendarEvents(from: string | null, to: string | null) {
+export function useCalendarEvents(
+    from: string | null,
+    to: string | null,
+    filters: CalendarFilters = {},
+) {
+    const params: Record<string, unknown> = {
+        from: from ?? '',
+        to: to ?? '',
+    };
+    if (filters.salaId !== null && filters.salaId !== undefined && filters.salaId > 0) {
+        params['sala_id'] = filters.salaId;
+    }
+    if (filters.estado !== null && filters.estado !== undefined) {
+        params['estado'] = filters.estado;
+    }
+
     return useQuery({
-        queryKey: ['admin', 'calendar', from, to],
-        queryFn: () =>
-            adminApi.get<{ events: CalendarEvent[] }>('/admin/calendar', {
-                from: from ?? '',
-                to: to ?? '',
-            }),
+        queryKey: ['admin', 'calendar', from, to, filters.salaId ?? null, filters.estado ?? null],
+        queryFn: () => adminApi.get<{ events: CalendarEvent[] }>('/admin/calendar', params),
         enabled: from !== null && to !== null,
         staleTime: 30_000,
     });

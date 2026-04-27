@@ -5,6 +5,7 @@ import { SelectField, TextField } from '../../src/components/Field';
 import { buildExportUrl, useAdminBookings, type BookingFilters } from '../api/hooks';
 import { navigate } from '../useHashRoute';
 import type { BookingState } from '../../src/types/booking';
+import { formatDateEs } from '../../src/utils/dateFormat';
 
 import styles from './BookingsList.module.css';
 
@@ -88,6 +89,7 @@ export function BookingsList(): JSX.Element {
                                 <th>#</th>
                                 <th>Estado</th>
                                 <th>Sala</th>
+                                <th>Solicitante</th>
                                 <th>Fecha inicio</th>
                                 <th>Horario</th>
                                 <th>Objeto</th>
@@ -97,37 +99,65 @@ export function BookingsList(): JSX.Element {
                         <tbody>
                             {data.items.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className={styles.empty}>
+                                    <td colSpan={8} className={styles.empty}>
                                         No hay reservas con estos filtros.
                                     </td>
                                 </tr>
                             )}
-                            {data.items.map((b) => (
-                                <tr key={b.id}>
-                                    <td>{b.id}</td>
-                                    <td>
-                                        <span
-                                            className={`${styles.badge} ${STATE_BADGE[b.estado] ?? ''}`}
-                                        >
-                                            {STATE_LABEL[b.estado]}
-                                        </span>
-                                    </td>
-                                    <td>#{b.sala_id}</td>
-                                    <td>{b.fecha_inicio}</td>
-                                    <td>
-                                        {b.hora_inicio.slice(0, 5)} – {b.hora_fin.slice(0, 5)}
-                                    </td>
-                                    <td className={styles.objeto}>{b.objeto_reserva}</td>
-                                    <td>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => navigate(`bookings/${b.id}`)}
-                                        >
-                                            Ver
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {data.items.map((b) => {
+                                const solicitante =
+                                    b.profile !== null && b.profile !== undefined
+                                        ? [
+                                              b.profile.nombre,
+                                              b.profile.primer_apellido,
+                                              b.profile.segundo_apellido,
+                                          ]
+                                              .filter((s) => s !== null && s !== '')
+                                              .join(' ')
+                                        : '';
+                                return (
+                                    <tr key={b.id}>
+                                        <td>{b.id}</td>
+                                        <td>
+                                            <span
+                                                className={`${styles.badge} ${STATE_BADGE[b.estado] ?? ''}`}
+                                            >
+                                                {STATE_LABEL[b.estado]}
+                                            </span>
+                                        </td>
+                                        <td>{b.sala_title ?? `#${b.sala_id}`}</td>
+                                        <td>
+                                            {solicitante !== '' ? (
+                                                <>
+                                                    <strong>{solicitante}</strong>
+                                                    {b.profile?.email !== undefined &&
+                                                        b.profile.email !== '' && (
+                                                            <>
+                                                                <br />
+                                                                <small>{b.profile.email}</small>
+                                                            </>
+                                                        )}
+                                                </>
+                                            ) : (
+                                                '—'
+                                            )}
+                                        </td>
+                                        <td>{formatDateEs(b.fecha_inicio)}</td>
+                                        <td>
+                                            {b.hora_inicio.slice(0, 5)} – {b.hora_fin.slice(0, 5)}
+                                        </td>
+                                        <td className={styles.objeto}>{b.objeto_reserva}</td>
+                                        <td>
+                                            <Button
+                                                variant="secondary"
+                                                onClick={() => navigate(`bookings/${b.id}`)}
+                                            >
+                                                Ver
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
 

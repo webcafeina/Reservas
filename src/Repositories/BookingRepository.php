@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use WebcafeinaReservas\Database\Schema;
 use WebcafeinaReservas\Models\Booking;
 use WebcafeinaReservas\Models\BookingState;
+use WebcafeinaReservas\Models\UserProfile;
 use wpdb;
 
 /**
@@ -85,16 +86,28 @@ final class BookingRepository {
         if ( $id <= 0 ) {
             return null;
         }
-        $table = Schema::bookings();
-        $row   = $this->wpdb->get_row(
+        global $wpdb;
+        $table_b  = Schema::bookings();
+        $table_up = Schema::userProfiles();
+        $table_p  = $wpdb->posts;
+
+        $sql = "SELECT b.*, p.post_title AS sala_title, "
+            . self::profileSelectColumns()
+            . "FROM {$table_b} b "
+            . "LEFT JOIN {$table_p} p ON p.ID = b.sala_id "
+            . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
+            . 'WHERE b.id = %d LIMIT 1';
+
+        $row = $this->wpdb->get_row(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $this->wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d LIMIT 1", $id ),
+            $this->wpdb->prepare( $sql, $id ),
             ARRAY_A
         );
         if ( ! is_array( $row ) ) {
             return null;
         }
-        $booking         = Booking::fromArray( $row );
+
+        $booking         = $this->hydrateBookingFromJoinedRow( $row );
         $booking->fechas = $this->loadDates( (int) $row['id'] );
         return $booking;
     }
@@ -135,8 +148,10 @@ final class BookingRepository {
         $page    = isset( $filters['page'] ) ? max( 1, (int) $filters['page'] ) : 1;
         $offset  = ( $page - 1 ) * $perPage;
 
-        $table_b = Schema::bookings();
-        $table_p = Schema::userProfiles();
+        global $wpdb;
+        $table_b   = Schema::bookings();
+        $table_up  = Schema::userProfiles();
+        $table_post = $wpdb->posts;
 
         $where  = array( '1=1' );
         $params = array();
@@ -158,7 +173,7 @@ final class BookingRepository {
             $params[] = (string) $filters['to'];
         }
         if ( isset( $filters['email'] ) && $filters['email'] !== null && $filters['email'] !== '' ) {
-            $where[]  = 'p.email = %s';
+            $where[]  = 'up.email = %s';
             $params[] = (string) $filters['email'];
         }
 
@@ -166,12 +181,15 @@ final class BookingRepository {
 
         $sql_count =
             "SELECT COUNT(*) FROM {$table_b} b "
-            . "LEFT JOIN {$table_p} p ON p.id = b.profile_id "
+            . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
             . "WHERE {$where_sql}";
 
         $sql_items =
-            "SELECT b.* FROM {$table_b} b "
-            . "LEFT JOIN {$table_p} p ON p.id = b.profile_id "
+            'SELECT b.*, p.post_title AS sala_title, '
+            . self::profileSelectColumns()
+            . "FROM {$table_b} b "
+            . "LEFT JOIN {$table_post} p ON p.ID = b.sala_id "
+            . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
             . "WHERE {$where_sql} "
             . 'ORDER BY b.created_at DESC '
             . 'LIMIT %d OFFSET %d';
@@ -196,7 +214,7 @@ final class BookingRepository {
             if ( ! is_array( $row ) ) {
                 continue;
             }
-            $booking         = Booking::fromArray( $row );
+            $booking         = $this->hydrateBookingFromJoinedRow( $row );
             $booking->fechas = $this->loadDates( (int) $row['id'] );
             $items[]         = $booking;
         }
@@ -249,6 +267,10 @@ final class BookingRepository {
      * the booking, sala (post title) and profile so the controller can build
      * FullCalendar events without N+1 queries.
      *
+     * Optional filters:
+     *   - $salaId: restrict to a single sala.
+     *   - $estado: restrict to a single booking estado.
+     *
      * Result shape — array<int, array{
      *   booking_id: int,
      *   fecha: string,           // YYYY-MM-DD
@@ -263,15 +285,38 @@ final class BookingRepository {
      *
      * @return array<int, array<string, mixed>>
      */
-    public function findEventsBetween( string $from, string $to ): array {
+    public function findEventsBetween(
+        string $from,
+        string $to,
+        ?int $salaId = null,
+        ?string $estado = null
+    ): array {
         global $wpdb;
         $table_b  = Schema::bookings();
         $table_d  = Schema::bookingDates();
         $table_up = Schema::userProfiles();
         $table_p  = $wpdb->posts;
 
+        $where  = array(
+            'bd.fecha >= %s',
+            'bd.fecha <= %s',
+            "bd.estado_fecha = 'activa'",
+        );
+        $params = array( $from, $to );
+
+        if ( $salaId !== null && $salaId > 0 ) {
+            $where[]  = 'b.sala_id = %d';
+            $params[] = $salaId;
+        }
+        if ( $estado !== null && $estado !== '' && BookingState::isValid( $estado ) ) {
+            $where[]  = 'b.estado = %s';
+            $params[] = $estado;
+        }
+
+        $where_sql = implode( ' AND ', $where );
+
         $sql =
-            "SELECT bd.booking_id, bd.fecha, b.estado, b.hora_inicio, b.hora_fin, "
+            'SELECT bd.booking_id, bd.fecha, b.estado, b.hora_inicio, b.hora_fin, '
             . 'b.objeto_reserva, b.sala_id, '
             . 'p.post_title AS sala_title, '
             . 'up.nombre, up.primer_apellido, up.segundo_apellido '
@@ -279,12 +324,12 @@ final class BookingRepository {
             . "INNER JOIN {$table_b} b ON b.id = bd.booking_id "
             . "LEFT JOIN {$table_p} p ON p.ID = b.sala_id "
             . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
-            . "WHERE bd.fecha >= %s AND bd.fecha <= %s AND bd.estado_fecha = 'activa' "
+            . "WHERE {$where_sql} "
             . 'ORDER BY bd.fecha ASC, b.hora_inicio ASC';
 
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         $rows = (array) $this->wpdb->get_results(
-            $this->wpdb->prepare( $sql, $from, $to ),
+            $this->wpdb->prepare( $sql, $params ),
             ARRAY_A
         );
 
@@ -311,6 +356,53 @@ final class BookingRepository {
             );
         }
         return $out;
+    }
+
+    /**
+     * Aliased SELECT columns for the user_profiles JOIN. Prefixes every
+     * column with `up_` so we can disambiguate booking vs profile rows
+     * after the JOIN (e.g. both have `id`, `created_at`, `updated_at`).
+     */
+    private static function profileSelectColumns(): string {
+        $cols = array(
+            'id', 'user_id', 'nif', 'nombre', 'primer_apellido', 'segundo_apellido',
+            'via', 'numero', 'letra', 'escalera', 'piso', 'puerta',
+            'municipio', 'provincia', 'codigo_postal',
+            'telefono_fijo', 'movil', 'email',
+        );
+        $aliased = array();
+        foreach ( $cols as $c ) {
+            $aliased[] = "up.{$c} AS up_{$c}";
+        }
+        return implode( ', ', $aliased ) . ' ';
+    }
+
+    /**
+     * Build a Booking out of a row that JOINed posts (`sala_title`) and
+     * user_profiles (columns prefixed `up_*`). Sets `salaTitle` and the
+     * full `profile` so the controller can serialise everything in a
+     * single response.
+     *
+     * @param array<string, mixed> $row
+     */
+    private function hydrateBookingFromJoinedRow( array $row ): Booking {
+        $booking = Booking::fromArray( $row );
+
+        if ( isset( $row['sala_title'] ) && $row['sala_title'] !== '' ) {
+            $booking->salaTitle = (string) $row['sala_title'];
+        }
+
+        if ( isset( $row['up_id'] ) && $row['up_id'] !== null && $row['up_id'] !== '' ) {
+            $profileData = array();
+            foreach ( $row as $k => $v ) {
+                if ( is_string( $k ) && strpos( $k, 'up_' ) === 0 ) {
+                    $profileData[ substr( $k, 3 ) ] = $v;
+                }
+            }
+            $booking->profile = UserProfile::fromArray( $profileData );
+        }
+
+        return $booking;
     }
 
     /**
