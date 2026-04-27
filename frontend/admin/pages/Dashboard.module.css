@@ -4,57 +4,6 @@
     gap: var(--ra-space-6);
 }
 
-.rangeBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: var(--ra-space-3);
-    padding: var(--ra-space-4);
-    background: var(--ra-color-bg);
-    border: 1px solid var(--ra-color-border);
-    border-radius: var(--ra-radius-md);
-    flex-wrap: wrap;
-}
-
-.rangeFields {
-    display: flex;
-    gap: var(--ra-space-3);
-    align-items: flex-end;
-}
-
-.rangePresets {
-    display: flex;
-    gap: var(--ra-space-1);
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't
- * paint the text blue. */
-a.exportLink {
-    margin-left: var(--ra-space-2);
-    padding: var(--ra-space-2) var(--ra-space-4);
-    background: var(--ra-color-accent);
-    color: var(--ra-color-text-inverted);
-    border-radius: var(--ra-radius-md);
-    font-size: var(--ra-font-size-sm);
-    font-weight: var(--ra-font-weight-medium);
-    text-decoration: none;
-    transition: background var(--ra-duration-fast) var(--ra-ease);
-}
-
-a.exportLink:hover {
-    background: var(--ra-color-accent-hover);
-    text-decoration: none;
-    color: var(--ra-color-text-inverted);
-}
-
-.section h2 small {
-    font-weight: normal;
-    color: var(--ra-color-text-muted);
-    font-size: var(--ra-font-size-sm);
-}
-
 .kpis {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -101,36 +50,68 @@ a.exportLink:hover {
     border-left: 4px solid var(--ra-color-primary);
 }
 
-.section {
+/*
+ * "Module" wrapper used for the calendar block and the CSV export
+ * block — both stacked under the KPIs.
+ */
+.module {
     background: var(--ra-color-bg);
     border: 1px solid var(--ra-color-border);
     border-radius: var(--ra-radius-md);
     padding: var(--ra-space-5);
 }
 
-.section h2 {
+.module h2 {
     margin: 0 0 var(--ra-space-3) 0;
     font-size: var(--ra-font-size-lg);
     font-weight: var(--ra-font-weight-semibold);
 }
 
-.ranking {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--ra-space-2);
+.module h2 small {
+    font-weight: normal;
+    color: var(--ra-color-text-muted);
+    font-size: var(--ra-font-size-sm);
+    margin-left: var(--ra-space-2);
 }
 
-.ranking li {
+.exportRow {
     display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--ra-space-3);
     justify-content: space-between;
-    padding: var(--ra-space-2) var(--ra-space-3);
-    background: var(--ra-color-bg-muted);
-    border-radius: var(--ra-radius-sm);
 }
 
-.ranking strong {
-    font-variant-numeric: tabular-nums;
+.exportFields {
+    display: flex;
+    gap: var(--ra-space-3);
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.exportPresets {
+    display: flex;
+    gap: var(--ra-space-1);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't
+ * paint the text blue. */
+a.exportLink {
+    margin-left: var(--ra-space-2);
+    padding: var(--ra-space-2) var(--ra-space-4);
+    background: var(--ra-color-accent);
+    color: var(--ra-color-text-inverted);
+    border-radius: var(--ra-radius-md);
+    font-size: var(--ra-font-size-sm);
+    font-weight: var(--ra-font-weight-medium);
+    text-decoration: none;
+    transition: background var(--ra-duration-fast) var(--ra-ease);
+}
+
+a.exportLink:hover {
+    background: var(--ra-color-accent-hover);
+    text-decoration: none;
+    color: var(--ra-color-text-inverted);
 }

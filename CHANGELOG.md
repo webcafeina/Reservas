@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] — 2026-04-27
+
+### Changed
+
+- **"Panel" y "Calendario" unificados en una sola pantalla.** La
+  pestaña "Calendario" desaparece de la barra de navegación; su
+  contenido (filtros sala/estado, leyenda, vistas año/mes/semana/día/
+  lista) se renderiza ahora dentro de "Panel" en una sección entre
+  los KPIs y el módulo de export. La barra queda **Panel · Reservas
+  · Ajustes · Estado**.
+
+  Los URL antiguos `#/calendar` se redirigen al nuevo `#/dashboard`
+  para no romper enlaces guardados.
+
+- **KPIs ahora son globales (pasado + futuro), no filtrados por
+  rango.** Los seis numerales grandes — Pendientes / Confirmadas /
+  Canceladas / Finalizadas / Esta semana / Confirmadas próximos 7
+  días — siempre cuentan todas las reservas en BD. Antes los cuatro
+  por estado se filtraban por el rango Desde/Hasta del Dashboard, lo
+  que provocaba la sensación de "faltar reservas" cuando solo se
+  estaba mirando un sub-rango.
+
+- **Módulo de export CSV separado abajo del todo**, con sus propios
+  controles `Desde` / `Hasta` y los presets Último mes / Último
+  trimestre / Último año. El rango ya no contamina los KPIs — solo
+  filtra qué reservas entran en el CSV descargado.
+
+### Removed
+
+- **Sección "Salas más reservadas"**. El campo `per_sala` desaparece
+  del response de `/admin/stats`.
+
+- **Parámetros `from`/`to` del endpoint `/admin/stats`**. Ya no
+  tienen efecto: los KPIs son globales por diseño. La exportación
+  CSV mantiene su `from`/`to` propios en `/admin/bookings/export`.
+
 ## [0.9.1] — 2026-04-27
 
 ### Changed
