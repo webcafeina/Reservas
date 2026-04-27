@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-04-27
+
+### Added
+
+- **Filtros de sala y estado en la pestaña Calendario.** Dos
+  desplegables encima del calendario permiten acotar la vista a una
+  sala concreta o a un estado de reserva (pendiente / confirmada /
+  cancelada / finalizada). Los filtros se aplican vía
+  `?sala_id=&estado=` en `GET /admin/calendar` y la query de React
+  Query se cachea por combinación de rango + filtros.
+
+- **Columna "Solicitante" en el listado de reservas.** Muestra
+  nombre completo + email del que hizo la reserva. El nombre de la
+  sala sustituye al `#ID` (queda como fallback solo si la sala se
+  ha eliminado).
+
+- **Tarjeta "Datos del solicitante" en el detalle de reserva.**
+  Sección nueva con NIF, email (clicable mailto:), móvil (clicable
+  tel:), teléfono fijo (si existe), dirección y localidad. Los
+  datos se obtienen del JOIN con `user_profiles`, sin round-trip
+  extra.
+
+### Changed
+
+- **Sala con nombre + ID en el detalle.** El campo "Sala" ahora
+  muestra `Nombre de la sala (#123)` en lugar de solo `#123`.
+
+- **Fechas en formato español DD-MM-YYYY en toda la UI admin.**
+  Listado y detalle de reservas usan `formatDateEs`; los
+  timestamps (`created_at`, etc.) usan `formatDateTimeEs`. El
+  almacenamiento interno y los payloads REST siguen siendo ISO
+  YYYY-MM-DD — solo cambia la presentación.
+
+- **`GET /admin/bookings` y `GET /admin/bookings/{id}` enriquecidos.**
+  Las respuestas ahora incluyen `sala_title` y `profile` (UserProfile
+  completo) sin queries extra: `BookingRepository::find()` y
+  `searchForAdmin()` hacen JOIN con `wp_posts` y `user_profiles`.
+
 ## [0.5.0] — 2026-04-27
 
 ### Added
