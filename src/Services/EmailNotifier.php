@@ -299,6 +299,10 @@ final class EmailNotifier {
      * (which takes file paths, not byte strings). Returns the path or null
      * on failure — a missing pdftk binary is not fatal; the email goes
      * without the PDF and we log the error.
+     *
+     * Note: we deliberately avoid wp_tempnam() here because it strips the
+     * extension from the requested filename and forces ".tmp", which makes
+     * mail clients show the attachment as ".tmp" instead of ".pdf".
      */
     private static function tryGeneratePdfFile(
         Booking $booking,
@@ -313,11 +317,18 @@ final class EmailNotifier {
             $generator = new PdfGenerator( $filler );
             $bytes    = $generator->generateForBooking( $booking, $profile, $sala );
 
-            $path = wp_tempnam( 'reservas-aldealab-booking-' . ( $booking->id ?? 0 ) . '.pdf' );
-            if ( ! is_string( $path ) || $path === '' ) {
-                throw new \RuntimeException( 'No se pudo crear archivo temporal.' );
+            $tempDir  = get_temp_dir();
+            $prefix   = $sala->esCpa ? 'solicitud-cpa' : 'solicitud-aldealab';
+            $basename = sprintf(
+                '%s-%d-%s.pdf',
+                $prefix,
+                $booking->id ?? 0,
+                wp_generate_password( 8, false )
+            );
+            $path = $tempDir . $basename;
+            if ( file_put_contents( $path, $bytes ) === false ) {
+                throw new \RuntimeException( 'No se pudo escribir PDF temporal en ' . $path );
             }
-            file_put_contents( $path, $bytes );
             return $path;
         } catch ( Throwable $e ) {
             $log->record(
