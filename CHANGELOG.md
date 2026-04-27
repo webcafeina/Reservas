@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] — 2026-04-27
+
+### Changed
+
+- **Renombrado del plugin a "Gestor de reservas de AldeaLab".** El
+  cliente lo posiciona como un *gestor de reservas* (no solo
+  "Reservas Aldealab") porque el nombre nuevo comunica mejor qué
+  hace. Cambios visibles:
+  - Cabecera oficial del plugin (lo que ves en `wp-admin → Plugins`).
+  - H1 del Panel de control (`AdminApp.tsx`).
+  - Notices de activación incompatible (PHP/WP) en `Activator.php`.
+  - Notices internas de "manifest no encontrado" en
+    `AssetLoader.php` y `AdminAssetLoader.php`.
+  - iCal exportado: `PRODID` y `ORGANIZER;CN` en `IcalGenerator.php`.
+
+  **No se cambia** el menú lateral de wp-admin (sigue como "Reservas"
+  por brevedad, decisión explícita), ni los identificadores estables
+  internos (slug `reservas-aldealab`, text domain, REST namespace
+  `reservas/v1`, constantes `RESERVAS_ALDEALAB_*`, nombres de
+  tablas).
+
+- **Módulo de exportación CSV ampliado.**
+  - Subtítulo en línea aparte: "Filtra por fecha, sala o estado"
+    (antes era un `<small>` inline al lado del título).
+  - **Nuevos filtros**: dropdown de Sala (cargado desde `/spaces`,
+    con opción "Todas las salas") y dropdown de Estado (Pendiente /
+    Confirmada / Cancelada / Finalizada / Todos los estados).
+  - **Nuevos presets de futuro**: Mes siguiente / Trimestre
+    siguiente / Año siguiente con la misma semántica rolling que
+    los presets de pasado (hoy → hoy + 30/90/365 días).
+  - **Botón "Todas las reservas"**: limpia los 4 campos de filtro
+    de un toque para que el siguiente clic en "Exportar CSV"
+    descargue absolutamente todo (hasta el cap de 10 000 filas que
+    impone el backend).
+  - Los filtros se combinan con AND: sala + estado + rango de
+    fechas se acumulan. El backend ya aceptaba estos parámetros en
+    `/admin/bookings/export`, así que no hay cambios de PHP.
+
 ## [0.10.0] — 2026-04-27
 
 ### Changed

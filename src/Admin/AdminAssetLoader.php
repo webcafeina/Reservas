@@ -141,7 +141,7 @@ final class AdminAssetLoader {
                 if ( ! current_user_can( 'manage_options' ) ) {
                     return;
                 }
-                echo '<div class="notice notice-error"><p><strong>Reservas Aldealab:</strong> ';
+                echo '<div class="notice notice-error"><p><strong>Gestor de reservas de AldeaLab:</strong> ';
                 esc_html_e(
                     'No se encontró assets/dist/manifest.json. El panel no puede cargar. Instala el ZIP oficial de la release (no uses "Download ZIP" del repo) o ejecuta `npm run build`.',
                     'reservas-aldealab'

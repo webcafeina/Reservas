@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Reservas Aldealab
+ * Plugin Name:       Gestor de reservas de AldeaLab
  * Plugin URI:        https://webcafeina.com
  * Description:       Sistema autónomo de reservas de salas para Aldealab (Cáceres). Recurrencias RFC 5545, PDF oficial y notificaciones.
- * Version:           0.10.0
+ * Version:           0.11.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Webcafeína
@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RESERVAS_ALDEALAB_VERSION', '0.10.0' );
+define( 'RESERVAS_ALDEALAB_VERSION', '0.11.0' );
 define( 'RESERVAS_ALDEALAB_FILE', __FILE__ );
 define( 'RESERVAS_ALDEALAB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RESERVAS_ALDEALAB_URL', plugin_dir_url( __FILE__ ) );
@@ -40,7 +40,7 @@ if ( ! file_exists( $reservas_aldealab_autoload ) ) {
             if ( ! current_user_can( 'activate_plugins' ) ) {
                 return;
             }
-            echo '<div class="notice notice-error"><p><strong>Reservas Aldealab:</strong> ';
+            echo '<div class="notice notice-error"><p><strong>Gestor de reservas de AldeaLab:</strong> ';
             esc_html_e(
                 'Faltan dependencias de Composer. Ejecuta `composer install --no-dev --optimize-autoloader` en el directorio del plugin, o descarga el ZIP oficial de la release que ya las incluye.',
                 'reservas-aldealab'

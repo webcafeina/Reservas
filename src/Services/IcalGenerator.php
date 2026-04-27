@@ -23,7 +23,7 @@ use WebcafeinaReservas\Models\UserProfile;
  */
 final class IcalGenerator {
 
-    public const PROD_ID = '-//Webcafeína//Reservas Aldealab//ES';
+    public const PROD_ID = '-//Webcafeína//Gestor de reservas de AldeaLab//ES';
 
     public function build( Booking $booking, UserProfile $profile, Sala $sala ): string {
         $now = ( new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ) )->format( 'Ymd\THis\Z' );
@@ -57,7 +57,7 @@ final class IcalGenerator {
             $lines[] = 'LOCATION:' . $this->escape( $location );
             $lines[] = 'DESCRIPTION:' . $description;
             $lines[] = 'STATUS:' . ( $booking->estado === 'cancelada' ? 'CANCELLED' : 'CONFIRMED' );
-            $lines[] = 'ORGANIZER;CN=Reservas Aldealab:mailto:' . $this->escape( $profile->email );
+            $lines[] = 'ORGANIZER;CN=Gestor de reservas de AldeaLab:mailto:' . $this->escape( $profile->email );
             $lines[] = 'END:VEVENT';
         }
 
