@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 export type AdminView =
     | { name: 'dashboard' }
     | { name: 'health' }
-    | { name: 'calendar' }
     | { name: 'bookings' }
     | { name: 'bookings-new' }
     | { name: 'booking'; id: number }
@@ -11,14 +10,13 @@ export type AdminView =
 
 function parse(hash: string): AdminView {
     const clean = hash.replace(/^#\/?/, '').trim();
-    if (clean === '' || clean === 'dashboard') {
+    // `#/calendar` is kept as a retro-compat alias for the old standalone
+    // tab. The calendar lives inside the unified `dashboard` page now.
+    if (clean === '' || clean === 'dashboard' || clean === 'calendar') {
         return { name: 'dashboard' };
     }
     if (clean === 'health') {
         return { name: 'health' };
-    }
-    if (clean === 'calendar') {
-        return { name: 'calendar' };
     }
     if (clean === 'settings') {
         return { name: 'settings' };

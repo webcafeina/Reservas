@@ -96,22 +96,18 @@ export function useCreateAdminBooking() {
 }
 
 export interface AdminStats {
+    /** Lifetime count per estado, past + future. Not date-filtered. */
     by_state: Record<BookingState, number>;
+    /** Bookings whose fecha_inicio falls in the current ISO week. */
     this_week: number;
+    /** Confirmed bookings in the next 7 days from today. */
     upcoming: number;
-    per_sala: Array<{ sala_id: number; title: string; total: number }>;
-    range: { from: string; to: string };
 }
 
-export interface StatsRange {
-    from?: string;
-    to?: string;
-}
-
-export function useAdminStats(range: StatsRange = {}) {
+export function useAdminStats() {
     return useQuery({
-        queryKey: ['admin', 'stats', range],
-        queryFn: () => adminApi.get<AdminStats>('/admin/stats', range as Record<string, unknown>),
+        queryKey: ['admin', 'stats'],
+        queryFn: () => adminApi.get<AdminStats>('/admin/stats'),
         staleTime: 60_000,
     });
 }

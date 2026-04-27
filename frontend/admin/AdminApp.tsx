@@ -2,7 +2,6 @@ import { WebcafeinaFooter } from '../src/components/WebcafeinaFooter';
 
 import { Dashboard } from './pages/Dashboard';
 import { Health } from './pages/Health';
-import { Calendar } from './pages/Calendar';
 import { BookingsList } from './pages/BookingsList';
 import { BookingNew } from './pages/BookingNew';
 import { BookingDetail } from './pages/BookingDetail';
@@ -13,7 +12,6 @@ import styles from './AdminApp.module.css';
 
 const NAV = [
     { path: 'dashboard', label: 'Panel' },
-    { path: 'calendar', label: 'Calendario' },
     { path: 'bookings', label: 'Reservas' },
     { path: 'settings', label: 'Ajustes' },
     { path: 'health', label: 'Estado' },
@@ -49,7 +47,6 @@ export function AdminApp(): JSX.Element {
             <main className={styles.main}>
                 {view.name === 'dashboard' && <Dashboard />}
                 {view.name === 'health' && <Health />}
-                {view.name === 'calendar' && <Calendar />}
                 {view.name === 'bookings' && <BookingsList />}
                 {view.name === 'bookings-new' && <BookingNew />}
                 {view.name === 'booking' && <BookingDetail id={view.id} />}
