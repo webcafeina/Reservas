@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] — 2026-04-27
+
+### Added
+
+- **Pestaña "Estado" en el panel admin** con un health check completo
+  de las dependencias del plugin. Comprobaciones agrupadas por
+  categoría:
+  - **Sistema**: PHP ≥ 7.4 (warn si < 8.0), WordPress ≥ 6.0,
+    `shell_exec` no deshabilitado.
+  - **Base de datos**: las 5 tablas existen (`SHOW TABLES LIKE`),
+    versión del esquema coincide con la última migración disponible.
+  - **Sistema de archivos**: manifiesto de Vite presente, plantillas
+    PDF empaquetadas (`solicitud-espacios-aldealab.pdf`,
+    `solicitud-cpa.pdf`), carpeta de uploads escribible,
+    `get_temp_dir()` escribible.
+  - **PDF**: binario `pdftk` localizable (reutiliza
+    `PdfFillerPdftk::isAvailable()`), Java runtime detectado.
+  - **Notificaciones**: al menos un email admin configurado, tokens
+    HMAC firmables (`wp_salt('auth')` no vacío).
+  - **Anti-spam**: Turnstile siteKey + secret configurados y
+    **siteverify alcanzable** — POST real al endpoint de Cloudflare
+    con timeout 5s para detectar secrets caducados o problemas de
+    red.
+  - **SMS**: provider configurado (`'none'` se marca info; `twilio`
+    sin credenciales se marca error). Si Twilio está activo, ping
+    real a `GET /Accounts/{SID}.json` con basic auth para validar
+    creds.
+  - **Roles**: capability `manage_reservas` asignada a al menos un
+    rol.
+
+  Las comprobaciones de servicios externos hacen llamadas HTTP reales
+  (1-3 s en total). Sin caching: cada visita re-ejecuta. Botón
+  "Actualizar" manual para refresh bajo demanda. Los fallos enlazan
+  directamente a la pestaña de Ajustes con texto "Arreglar →".
+
+  Severidades: `ok` (verde), `warn` (amber), `error` (rojo), `info`
+  (gris — feature deshabilitada intencionalmente). Si todo está en
+  verde se muestra un banner "Todos los servicios funcionan
+  correctamente".
+
+  Nuevos archivos:
+  - `src/Rest/Controllers/Admin/AdminHealthController.php`
+  - `frontend/admin/pages/Health.tsx`
+  - `frontend/admin/pages/Health.module.css`
+
+### Changed
+
+- **`EmailNotifier::adminRecipients()` ahora es público.** Sigue
+  devolviendo la misma lista validada y deduplicada — solo cambia
+  la visibilidad para que el health controller pueda reutilizarlo
+  sin re-implementar la lógica de parseo.
+
 ## [0.8.0] — 2026-04-27
 
 ### Added
