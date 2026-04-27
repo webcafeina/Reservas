@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-04-27
+
+### Added
+
+- **Email al solicitante cuando un admin revierte una reserva a
+  pendiente.** Cierra la simetría de transiciones: si el admin
+  pasa una reserva de `confirmada` o `cancelada` (o `finalizada`)
+  de vuelta a `pendiente`, el solicitante recibe un correo "Tu
+  reserva está nuevamente en revisión" para que sepa que su
+  decisión previa ya no está en pie y se está revisando otra vez.
+
+  Nuevo hook `reservas_aldealab_booking_reverted_to_pending`
+  disparado desde `AdminBookingsController::update` (asíncrono via
+  `wp_schedule_single_event`, sin PDF — la reserva no es aún un
+  compromiso formal en este estado). Idempotencia: solo dispara
+  cuando el estado realmente cambia, así que re-guardar una
+  reserva pendiente no re-envía el email.
+
+  Plantilla nueva `src/Emails/templates/reverted-to-pending-user.php`.
+
+### Changed
+
+- **Etiquetas del select de estado en el detalle de reserva.**
+  Las tres opciones que ahora disparan email
+  ("Pendiente / Confirmada / Cancelada") muestran el sufijo
+  `(se notificará al solicitante)` para que el admin sepa que
+  guardar el cambio mandará un correo. "Finalizada" sigue sin
+  sufijo (no notifica). Sustituye al texto previo
+  "Cancelada (dispara email al usuario)".
+
 ## [0.7.0] — 2026-04-27
 
 ### Added
