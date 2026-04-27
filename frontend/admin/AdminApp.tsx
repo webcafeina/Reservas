@@ -13,10 +13,10 @@ import styles from './AdminApp.module.css';
 
 const NAV = [
     { path: 'dashboard', label: 'Panel' },
-    { path: 'health', label: 'Estado' },
     { path: 'calendar', label: 'Calendario' },
     { path: 'bookings', label: 'Reservas' },
     { path: 'settings', label: 'Ajustes' },
+    { path: 'health', label: 'Estado' },
 ];
 
 function isActive(view: AdminView, path: string): boolean {
