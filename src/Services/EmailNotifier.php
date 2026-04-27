@@ -19,6 +19,7 @@ use WebcafeinaReservas\Repositories\BookingRepository;
 use WebcafeinaReservas\Repositories\EmailLogRepository;
 use WebcafeinaReservas\Repositories\UserProfileRepository;
 use WebcafeinaReservas\Roles\RoleManager;
+use WebcafeinaReservas\Services\BookingActionToken;
 use WebcafeinaReservas\Services\Sms\SmsProviderFactory;
 
 /**
@@ -208,16 +209,18 @@ final class EmailNotifier {
 
         $title         = sprintf(
             /* translators: %s sala title */
-            __( 'Nueva reserva: %s', 'reservas-aldealab' ),
+            __( 'Nueva reserva pendiente: %s', 'reservas-aldealab' ),
             $sala->title
         );
         $fechas_humano = self::formatDatesHuman( $booking );
         $admin_url     = self::adminDeepLink( $booking->id ?? 0 );
+        $accept_url    = self::actionLink( $booking->id ?? 0, BookingActionToken::ACTION_ACCEPT );
+        $reject_url    = self::actionLink( $booking->id ?? 0, BookingActionToken::ACTION_REJECT );
         $header_url    = self::headerImageUrl();
 
         $content_html = self::renderTemplate(
             'confirmation-admin',
-            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'admin_url' )
+            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'admin_url', 'accept_url', 'reject_url' )
         );
         $html = self::renderLayout( $title, $content_html, $header_url );
 
@@ -396,6 +399,22 @@ final class EmailNotifier {
 
     private static function adminDeepLink( int $bookingId ): string {
         return admin_url( 'admin.php?page=reservas-aldealab&booking=' . $bookingId );
+    }
+
+    /**
+     * Build a magic-link URL for a one-click accept/reject action from the
+     * admin notification email. The token is HMAC-signed with wp_salt('auth')
+     * and lives 7 days; see BookingActionToken.
+     */
+    private static function actionLink( int $bookingId, string $action ): string {
+        $token = BookingActionToken::generate( $bookingId, $action );
+        return add_query_arg(
+            array(
+                'reservas_action' => $action,
+                'token'           => $token,
+            ),
+            home_url( '/' )
+        );
     }
 
     private static function headerImageUrl(): string {

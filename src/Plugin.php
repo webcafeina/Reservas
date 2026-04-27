@@ -54,6 +54,9 @@ final class Plugin {
         // Frontend: shortcode + Vite assets.
         Frontend\FormShortcode::register();
         Frontend\AssetLoader::register();
+        // Public handler for admin-action magic links from email
+        // (?reservas_action=accept|reject&token=...).
+        Frontend\BookingActionHandler::register();
 
         // Email handlers: async confirmation + admin cancellation hook.
         Services\EmailNotifier::register();
