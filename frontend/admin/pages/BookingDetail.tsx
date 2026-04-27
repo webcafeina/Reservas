@@ -8,6 +8,7 @@ import { navigate } from '../useHashRoute';
 import type { BookingState } from '../../src/types/booking';
 import type { UserProfile } from '../../src/types/profile';
 import { formatDateEs, formatDateTimeEs } from '../../src/utils/dateFormat';
+import { humanizeRawRrule } from '../../src/store/humanizeRrule';
 
 import styles from './BookingDetail.module.css';
 
@@ -92,7 +93,9 @@ export function BookingDetail({ id }: BookingDetailProps): JSX.Element {
                         <div>
                             <dt>Recurrencia</dt>
                             <dd>
-                                <code>{data.rrule ?? 'No recurrente'}</code>
+                                {data.rrule !== null && data.rrule !== ''
+                                    ? humanizeRawRrule(data.rrule)
+                                    : 'No recurrente'}
                             </dd>
                         </div>
                         <div>
