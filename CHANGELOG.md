@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] — 2026-04-27
+
+### Added
+
+- **Campo opcional "Empresa" en los datos del solicitante.**
+  Aparece tanto en el formulario público (Step 6) como en el de
+  creación manual del admin, y se propaga a todos los sitios donde
+  se muestran datos del solicitante:
+  - Detalle de reserva → tarjeta "Datos del solicitante" (solo si
+    está rellena).
+  - Listado de reservas → bajo el email en la columna Solicitante.
+  - Email de notificación al admin (`confirmation-admin.php`) → fila
+    nueva "Empresa" cuando hay valor.
+  - Export CSV → nueva columna `empresa`.
+
+  El PDF oficial **no** se modifica de momento porque el AcroForm de
+  las plantillas empaquetadas no tiene un campo `empresa`. Cuando
+  subáis un PDF actualizado lo cableamos.
+
+  Migración nueva `002_add_empresa_to_profiles.php` que añade la
+  columna `empresa VARCHAR(255) NULL` a la tabla
+  `wp_*_reservas_user_profiles`. Es idempotente: comprueba la
+  existencia de la columna antes de hacer `ALTER TABLE` para no
+  fallar si se re-ejecuta. Se aplicará automáticamente al cargar
+  cualquier página de admin tras instalar el plugin.
+
 ## [0.11.1] — 2026-04-27
 
 ### Changed
