@@ -25,8 +25,13 @@ final class Booking {
     public ?string $fechaFinSerie;
     public string $objetoReserva;
     public ?string $notaAdmin;
-    public ?string $createdAt;
-    public ?string $updatedAt;
+    // createdAt / updatedAt are populated by the DB on INSERT and only
+    // read back when loading via Repository::fromArray. The create flow
+    // never sets them, so we default to null to avoid PHP 7.4+'s
+    // "Typed property must not be accessed before initialization" fatal
+    // when toArray() is called on a freshly-built Booking.
+    public ?string $createdAt = null;
+    public ?string $updatedAt = null;
 
     /** @var array<int, string> ISO date strings (YYYY-MM-DD) */
     public array $fechas = array();
