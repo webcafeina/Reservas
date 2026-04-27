@@ -43,8 +43,9 @@ final class AdminBookingsExportController {
     public function export( WP_REST_Request $request ): WP_REST_Response {
         global $wpdb;
 
-        $table_b = Schema::bookings();
-        $table_p = Schema::userProfiles();
+        $table_b  = Schema::bookings();
+        $table_p  = Schema::userProfiles();
+        $table_bd = Schema::bookingDates();
 
         $where  = array( '1=1' );
         $params = array();
@@ -64,15 +65,25 @@ final class AdminBookingsExportController {
             $where[]  = 'p.email = %s';
             $params[] = sanitize_email( $email );
         }
-        $from = (string) $request->get_param( 'from' );
-        if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) === 1 ) {
-            $where[]  = 'b.fecha_inicio >= %s';
-            $params[] = $from;
-        }
-        $to = (string) $request->get_param( 'to' );
-        if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) === 1 ) {
-            $where[]  = 'b.fecha_inicio <= %s';
-            $params[] = $to;
+        // Date filter operates on `booking_dates` (any active session falling
+        // in the range), not just `fecha_inicio`. Mirrors the listing
+        // semantics in BookingRepository::searchForAdmin so the CSV reflects
+        // exactly what the admin sees in the panel.
+        $from        = (string) $request->get_param( 'from' );
+        $to          = (string) $request->get_param( 'to' );
+        $hasFromDate = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) === 1;
+        $hasToDate   = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) === 1;
+        if ( $hasFromDate || $hasToDate ) {
+            $bd_conds = array( 'bd.booking_id = b.id', "bd.estado_fecha = 'activa'" );
+            if ( $hasFromDate ) {
+                $bd_conds[] = 'bd.fecha >= %s';
+                $params[]   = $from;
+            }
+            if ( $hasToDate ) {
+                $bd_conds[] = 'bd.fecha <= %s';
+                $params[]   = $to;
+            }
+            $where[] = 'EXISTS (SELECT 1 FROM ' . $table_bd . ' bd WHERE ' . implode( ' AND ', $bd_conds ) . ')';
         }
 
         $where_sql = implode( ' AND ', $where );

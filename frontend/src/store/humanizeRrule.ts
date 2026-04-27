@@ -64,6 +64,83 @@ export function humanizeRrule(input: RruleInput): string {
     return humanizeFreq(input);
 }
 
+/**
+ * Same output shape as `humanizeRrule`, but accepts the raw RFC 5545
+ * RRULE string the backend stores. Returns "Recurrente" if the rule
+ * can't be parsed (defensive — we control the producer in
+ * `buildRrule()`, but a third party could insert custom rules later).
+ *
+ * Recognised parts: FREQ, INTERVAL, BYDAY, BYMONTHDAY, BYSETPOS.
+ * UNTIL/COUNT are intentionally ignored — the listing already shows
+ * the explicit fechas count + range, so the recurrence summary
+ * focuses on cadence.
+ */
+export function humanizeRawRrule(rule: string): string {
+    if (rule === '') return 'Recurrente';
+    const parts: Record<string, string> = {};
+    for (const segment of rule.split(';')) {
+        const eq = segment.indexOf('=');
+        if (eq === -1) continue;
+        parts[segment.slice(0, eq).trim().toUpperCase()] = segment.slice(eq + 1).trim();
+    }
+
+    const freqRaw = parts['FREQ'];
+    const isFreq = (v: string | undefined): v is RruleInput['freq'] =>
+        v === 'DAILY' || v === 'WEEKLY' || v === 'MONTHLY' || v === 'YEARLY';
+    if (!isFreq(freqRaw)) return 'Recurrente';
+
+    const intervalRaw = parts['INTERVAL'];
+    const interval =
+        intervalRaw !== undefined && /^\d+$/.test(intervalRaw)
+            ? Math.max(1, Number(intervalRaw))
+            : 1;
+
+    const isWeekday = (v: string): v is Weekday =>
+        v === 'MO' ||
+        v === 'TU' ||
+        v === 'WE' ||
+        v === 'TH' ||
+        v === 'FR' ||
+        v === 'SA' ||
+        v === 'SU';
+
+    const input: RruleInput = {
+        freq: freqRaw,
+        interval,
+        end: { kind: 'never' },
+    };
+
+    if (freqRaw === 'WEEKLY' && parts['BYDAY'] !== undefined) {
+        const days = parts['BYDAY'].split(',').map((d) => d.trim());
+        const valid: Weekday[] = [];
+        for (const d of days) {
+            if (isWeekday(d)) valid.push(d);
+        }
+        if (valid.length > 0) input.byweekday = valid;
+    }
+
+    if (freqRaw === 'MONTHLY') {
+        if (parts['BYMONTHDAY'] !== undefined && /^\d+$/.test(parts['BYMONTHDAY'])) {
+            const day = Number(parts['BYMONTHDAY']);
+            if (day >= 1 && day <= 31) {
+                input.monthly = { mode: 'day-of-month', day };
+            }
+        } else if (
+            parts['BYDAY'] !== undefined &&
+            parts['BYSETPOS'] !== undefined &&
+            isWeekday(parts['BYDAY'])
+        ) {
+            const nthRaw = parts['BYSETPOS'];
+            const nth = nthRaw === '-1' ? -1 : Number(nthRaw);
+            if (nth === -1 || nth === 1 || nth === 2 || nth === 3 || nth === 4) {
+                input.monthly = { mode: 'nth-weekday', nth, weekday: parts['BYDAY'] };
+            }
+        }
+    }
+
+    return humanizeFreq(input);
+}
+
 /** Human-readable summary of the end condition. */
 export function humanizeRruleEnd(end: RruleInput['end']): string {
     switch (end.kind) {

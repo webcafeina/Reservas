@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] — 2026-04-27
+
+### Changed
+
+- **Listado de reservas: visualización mejorada de las
+  recurrentes.** La columna "Fecha inicio" pasa a llamarse "Fechas".
+  Para reservas puntuales sigue mostrando la única fecha. Para las
+  recurrentes muestra un resumen en una línea —
+  `27-04-2026 → 14-07-2026 · 12 fechas · semanal, los martes` —
+  con un botón `▸` que despliega in-line una mini-lista con todas
+  las fechas individuales (con scroll si la serie supera ~14
+  sesiones). Junto al `#id` aparece un badge `🔁` para distinguir
+  de un vistazo recurrente vs puntual.
+
+  Añadido `humanizeRawRrule()` en `frontend/src/store/humanizeRrule.ts`
+  para parsear la RRULE cruda del backend (FREQ, INTERVAL, BYDAY,
+  BYMONTHDAY, BYSETPOS) y reutilizar el humanizador existente.
+
+- **Filtro `Desde / Hasta` (lista + CSV) ahora considera todas las
+  fechas de la reserva, no solo `fecha_inicio`.** Una recurrencia
+  que va de marzo a junio aparece cuando filtras "Desde mayo"
+  porque tiene sesiones en mayo. Antes desaparecía porque su
+  primera fecha era anterior al filtro. Implementación: subquery
+  `EXISTS` sobre `booking_dates` en
+  `BookingRepository::searchForAdmin()` y en
+  `AdminBookingsExportController::export()` — el listado y el CSV
+  exportado mantienen exactamente la misma semántica.
+
+  Si necesitas el comportamiento anterior ("reservas que empezaron
+  en este rango"), abre la reserva en el detalle: el campo "Fecha
+  inicio" sigue mostrando esa fecha tal cual.
+
 ## [0.12.0] — 2026-04-27
 
 ### Added

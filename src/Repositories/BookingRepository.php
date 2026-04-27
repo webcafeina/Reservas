@@ -149,8 +149,9 @@ final class BookingRepository {
         $offset  = ( $page - 1 ) * $perPage;
 
         global $wpdb;
-        $table_b   = Schema::bookings();
-        $table_up  = Schema::userProfiles();
+        $table_b    = Schema::bookings();
+        $table_up   = Schema::userProfiles();
+        $table_bd   = Schema::bookingDates();
         $table_post = $wpdb->posts;
 
         $where  = array( '1=1' );
@@ -164,13 +165,25 @@ final class BookingRepository {
             $where[]  = 'b.sala_id = %d';
             $params[] = (int) $filters['sala_id'];
         }
-        if ( isset( $filters['from'] ) && $filters['from'] !== null && $filters['from'] !== '' ) {
-            $where[]  = 'b.fecha_inicio >= %s';
-            $params[] = (string) $filters['from'];
-        }
-        if ( isset( $filters['to'] ) && $filters['to'] !== null && $filters['to'] !== '' ) {
-            $where[]  = 'b.fecha_inicio <= %s';
-            $params[] = (string) $filters['to'];
+        // Date filters apply against the expanded `booking_dates` rather than
+        // `b.fecha_inicio`. That way a recurring reservation that started in
+        // March but has sessions through June still shows up when the admin
+        // filters "Desde mayo" — the natural question is "what's happening
+        // in May?", not "what started in May?". Same EXISTS pattern used by
+        // the CSV export so both stay in sync.
+        $hasFrom = isset( $filters['from'] ) && $filters['from'] !== null && $filters['from'] !== '';
+        $hasTo   = isset( $filters['to'] ) && $filters['to'] !== null && $filters['to'] !== '';
+        if ( $hasFrom || $hasTo ) {
+            $bd_conds  = array( 'bd.booking_id = b.id', "bd.estado_fecha = 'activa'" );
+            if ( $hasFrom ) {
+                $bd_conds[] = 'bd.fecha >= %s';
+                $params[]   = (string) $filters['from'];
+            }
+            if ( $hasTo ) {
+                $bd_conds[] = 'bd.fecha <= %s';
+                $params[]   = (string) $filters['to'];
+            }
+            $where[] = 'EXISTS (SELECT 1 FROM ' . $table_bd . ' bd WHERE ' . implode( ' AND ', $bd_conds ) . ')';
         }
         if ( isset( $filters['email'] ) && $filters['email'] !== null && $filters['email'] !== '' ) {
             $where[]  = 'up.email = %s';
