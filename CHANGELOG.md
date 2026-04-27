@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.2] — 2026-04-27
+
+### Added
+
+- **Botón de eliminar por fila en el listado de reservas.** Cada
+  fila incluye ahora un icono de papelera junto al botón "Ver".
+  Al pulsarlo, `window.confirm` pide confirmación
+  ("¿Eliminar la reserva #N de forma permanente?") y, tras aceptar,
+  dispara `DELETE /admin/bookings/{id}` (mismo endpoint que el botón
+  Eliminar del detalle). React Query invalida la caché y la fila
+  desaparece sin recargar. El icono es discreto en reposo y vira a
+  rojo al pasar el ratón.
+
+- **Columna `fechas` en el CSV exportado.** Para reservas
+  recurrentes incluye todas las sesiones activas separadas por `;`
+  (`2026-04-27;2026-05-04;2026-05-11;…`). Se obtiene con un
+  `GROUP_CONCAT` sobre `booking_dates` filtrado por
+  `estado_fecha = 'activa'`. Para reservas puntuales contiene una
+  sola fecha. Se eleva temporalmente
+  `group_concat_max_len = 65535` por sesión MySQL para que series
+  largas no se trunquen silenciosamente.
+
+### Changed
+
+- **Triángulo del desplegable de fechas más grande**: 16px → 22px.
+  Más visible y fácil de pulsar en pantallas táctiles.
+
 ## [0.13.1] — 2026-04-27
 
 ### Changed

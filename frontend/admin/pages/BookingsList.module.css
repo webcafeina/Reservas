@@ -181,6 +181,44 @@ a.exportLink:hover {
 }
 
 /*
+ * Per-row actions: "Ver" pill + papelera icon button. The icon button
+ * is intentionally subtle by default and turns danger-red on hover so
+ * it doesn't draw attention at rest but is unmistakable when sought.
+ */
+.rowActions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.deleteIconBtn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--ra-radius-sm, 4px);
+    padding: 6px;
+    cursor: pointer;
+    color: var(--ra-color-text-muted, #5f6368);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        color var(--ra-duration-fast, 0.15s) var(--ra-ease, ease),
+        background var(--ra-duration-fast, 0.15s) var(--ra-ease, ease),
+        border-color var(--ra-duration-fast, 0.15s) var(--ra-ease, ease);
+}
+
+.deleteIconBtn:hover:not(:disabled) {
+    color: var(--ra-color-danger, #b3261e);
+    background: rgba(179, 38, 30, 0.08);
+    border-color: rgba(179, 38, 30, 0.25);
+}
+
+.deleteIconBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/*
  * Recurring "Fechas" cell — toggle button that expands the list of
  * individual sessions.
  */
@@ -205,9 +243,9 @@ a.exportLink:hover {
 
 .recurrentChevron {
     color: var(--ra-color-text-muted);
-    font-size: 16px;
+    font-size: 22px;
     line-height: 1;
-    width: 16px;
+    width: 22px;
     text-align: center;
     display: inline-block;
 }

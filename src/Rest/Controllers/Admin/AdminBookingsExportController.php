@@ -88,10 +88,21 @@ final class AdminBookingsExportController {
 
         $where_sql = implode( ' AND ', $where );
 
+        // GROUP_CONCAT collapses every active session date into a single
+        // semicolon-separated cell so a recurring reservation lists all of
+        // its sessions inline (e.g. "2026-04-27;2026-05-04;2026-05-11"). The
+        // ORDER BY inside guarantees chronological output. Default
+        // group_concat_max_len is 1024 chars on most MySQL builds; we raise
+        // it for the duration of this query so a 100+ session series isn't
+        // truncated silently.
+        $wpdb->query( 'SET SESSION group_concat_max_len = 65535' );
+
         $sql =
             'SELECT b.id, b.uuid, b.estado, b.sala_id, b.fecha_inicio, b.fecha_fin_serie, '
             . 'b.hora_inicio, b.hora_fin, b.rrule, b.objeto_reserva, b.created_at, '
-            . "p.email AS email, p.nombre, p.primer_apellido, p.segundo_apellido, p.movil, p.empresa "
+            . "p.email AS email, p.nombre, p.primer_apellido, p.segundo_apellido, p.movil, p.empresa, "
+            . "(SELECT GROUP_CONCAT(bd.fecha ORDER BY bd.fecha ASC SEPARATOR ';') "
+            . "FROM {$table_bd} bd WHERE bd.booking_id = b.id AND bd.estado_fecha = 'activa') AS fechas "
             . "FROM {$table_b} b LEFT JOIN {$table_p} p ON p.id = b.profile_id "
             . "WHERE {$where_sql} "
             . 'ORDER BY b.created_at DESC '
@@ -131,7 +142,8 @@ final class AdminBookingsExportController {
     private static function toCsv( array $rows ): string {
         $headers = array(
             'id', 'uuid', 'estado', 'sala_id',
-            'fecha_inicio', 'fecha_fin_serie', 'hora_inicio', 'hora_fin', 'rrule',
+            'fecha_inicio', 'fecha_fin_serie', 'fechas',
+            'hora_inicio', 'hora_fin', 'rrule',
             'objeto_reserva',
             'email', 'nombre', 'primer_apellido', 'segundo_apellido', 'movil', 'empresa',
             'created_at',
