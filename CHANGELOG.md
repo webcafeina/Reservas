@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-04-27
+
+### Fixed
+
+- **Compatibilidad con PHP 7.4 / 8.0 en `PdfTemplateStorage`.**
+  Se reemplaza el literal octal `0o644` (sintaxis introducida en
+  PHP 8.1) por `0644`. En servidores con PHP < 8.1 el archivo
+  producía un `ParseError` al cargarse vía autoloader, lo que
+  hacía que la pestaña "Plantillas PDF" del panel de admin
+  devolviese un `500` con cuerpo vacío (el error de parseo ocurre
+  antes de que WP pueda registrarlo en `debug.log`). Ambos
+  literales tienen el mismo valor; solo cambia la sintaxis.
+
 ## [0.3.0] — 2026-04-21
 
 ### Added

@@ -128,7 +128,7 @@ final class PdfTemplateStorage {
         }
 
         // Lock down permissions (best effort).
-        @chmod( $target, 0o644 );
+        @chmod( $target, 0644 );
 
         return $target;
     }
