@@ -101,7 +101,7 @@ final class ProfileController {
             'nif', 'nombre', 'primer_apellido', 'segundo_apellido',
             'via', 'numero', 'letra', 'escalera', 'piso', 'puerta',
             'municipio', 'provincia', 'codigo_postal',
-            'telefono_fijo', 'movil',
+            'telefono_fijo', 'movil', 'empresa',
         ) as $k ) {
             $sanitized[ $k ] = isset( $raw[ $k ] ) ? sanitize_text_field( (string) $raw[ $k ] ) : '';
         }

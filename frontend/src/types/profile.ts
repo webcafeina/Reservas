@@ -17,6 +17,8 @@ export interface UserProfile {
     telefono_fijo: string | null;
     movil: string;
     email: string;
+    /** Optional company name. Null = not provided. */
+    empresa: string | null;
 }
 
 export const emptyProfile = (): UserProfile => ({
@@ -36,4 +38,5 @@ export const emptyProfile = (): UserProfile => ({
     telefono_fijo: null,
     movil: '',
     email: '',
+    empresa: null,
 });

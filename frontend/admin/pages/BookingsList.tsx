@@ -137,6 +137,14 @@ export function BookingsList(): JSX.Element {
                                                                 <small>{b.profile.email}</small>
                                                             </>
                                                         )}
+                                                    {b.profile?.empresa !== undefined &&
+                                                        b.profile?.empresa !== null &&
+                                                        b.profile.empresa !== '' && (
+                                                            <>
+                                                                <br />
+                                                                <small>{b.profile.empresa}</small>
+                                                            </>
+                                                        )}
                                                 </>
                                             ) : (
                                                 '—'
