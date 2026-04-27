@@ -100,6 +100,9 @@ final class AdminBookingsController {
             'to'       => $request->get_param( 'to' ) !== null
                 ? sanitize_text_field( (string) $request->get_param( 'to' ) )
                 : null,
+            'sort'     => $request->get_param( 'sort' ) !== null
+                ? sanitize_text_field( (string) $request->get_param( 'sort' ) )
+                : null,
             'per_page' => $request->get_param( 'per_page' ) !== null ? (int) $request->get_param( 'per_page' ) : 20,
             'page'     => $request->get_param( 'page' ) !== null ? (int) $request->get_param( 'page' ) : 1,
         );

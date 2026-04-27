@@ -11,12 +11,15 @@ export interface BookingListResponse {
     per_page: number;
 }
 
+export type BookingSort = 'created_desc' | 'start_desc' | 'start_asc';
+
 export interface BookingFilters {
     estado?: BookingState | '' | undefined;
     sala_id?: number | undefined;
     email?: string | undefined;
     from?: string | undefined;
     to?: string | undefined;
+    sort?: BookingSort | undefined;
     page?: number | undefined;
     per_page?: number | undefined;
 }
