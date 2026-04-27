@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-04-27
+
+### Added
+
+- **Vista Calendario en el panel de admin.** Nueva pestaña
+  "Calendario" (entre "Panel" y "Reservas") con vistas año, mes,
+  semana, día y lista — basada en
+  [FullCalendar](https://fullcalendar.io) (`@fullcalendar/react`,
+  MIT). Cada reserva se pinta como evento coloreado por estado
+  (pendiente: amber, confirmada: verde, cancelada: gris tachado,
+  finalizada: azul). Las recurrencias se expanden automáticamente:
+  el endpoint `GET /admin/calendar` devuelve un evento por cada
+  fila de `booking_dates` activa dentro del rango visible, así que
+  una reserva con RRULE de 10 sesiones aparece en sus 10 fechas
+  sin renderizado extra en frontend.
+
+  Click en un evento → navega al detalle de la reserva
+  (`#/bookings/<id>`). La pestaña "Reservas" sigue como lista
+  filtrable + buscador + acciones masivas — ambas conviven; el
+  calendario es el panorama, la lista es la herramienta de gestión.
+
+  Localización: español de fábrica vía `@fullcalendar/core/locales/es`.
+
+  Nuevos archivos:
+  - `src/Repositories/BookingRepository.php` —
+    `findEventsBetween()` (single SQL join con bookings +
+    booking_dates + posts + user_profiles).
+  - `src/Rest/Controllers/Admin/AdminCalendarController.php` —
+    endpoint REST con cap de 1500 eventos por respuesta.
+  - `frontend/admin/pages/Calendar.tsx` + `.module.css` — UI.
+
+  Coste en bundle admin: ~70 KB gzipped (FullCalendar core +
+  plugins). Solo se carga en el bundle admin, no afecta al público.
+
 ## [0.4.0] — 2026-04-27
 
 ### Added
