@@ -165,6 +165,11 @@ a.exportLink:hover {
     font: inherit;
     font-weight: inherit;
     text-align: left;
+    /* `<button>` resets text-transform/letter-spacing in most browsers,
+     * so we re-inherit them to match the surrounding `<th>` styling
+     * (uppercase + 0.04em letter-spacing). */
+    text-transform: inherit;
+    letter-spacing: inherit;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -197,12 +202,11 @@ a.exportLink:hover {
     border-radius: var(--ra-radius-sm, 4px);
     padding: 6px;
     cursor: pointer;
-    color: var(--ra-color-text-muted, #5f6368);
+    color: var(--ra-color-danger, #b3261e);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition:
-        color var(--ra-duration-fast, 0.15s) var(--ra-ease, ease),
         background var(--ra-duration-fast, 0.15s) var(--ra-ease, ease),
         border-color var(--ra-duration-fast, 0.15s) var(--ra-ease, ease);
 }
