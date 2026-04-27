@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-04-27
+
+### Added
+
+- **Botones de aceptar/rechazar reserva desde el email del admin.**
+  El correo de notificación al administrador ahora incluye dos
+  botones — "✓ Aceptar reserva" y "✗ Rechazar reserva" — además del
+  habitual "Revisar en el panel". Los botones llevan un token HMAC
+  firmado con `wp_salt('auth')` y caducan a los 7 días. Para evitar
+  que los pre-fetchers de algunos clientes de correo (Outlook,
+  Defender, antivirus) ejecuten la acción al escanear el enlace, el
+  flujo es de dos pasos: el GET muestra una página de confirmación
+  con un resumen de la reserva y un botón "Sí, aceptar/rechazar";
+  solo el POST mutado por el clic real cambia el estado. Si la
+  reserva ya está procesada, se muestra un mensaje informativo en
+  lugar de re-acción. La acción de "Rechazar" dispara el hook
+  `reservas_aldealab_booking_cancelled`, así que el solicitante
+  recibe el email de cancelación habitual.
+
+  Nuevos archivos:
+  - `src/Services/BookingActionToken.php` — firma/verificación HMAC.
+  - `src/Frontend/BookingActionHandler.php` — handler público
+    (hooked en `init`) que renderiza la página de confirmación / éxito
+    / error.
+
+### Changed
+
+- **Email del admin con CTA reforzado.** Asunto cambia de "Nueva
+  reserva: X" a "Nueva reserva pendiente: X". El cuerpo añade un
+  banner amarillo con el texto "Acción requerida: revisa los datos
+  y decide si la aceptas o la rechazas" para que el admin entienda
+  de un vistazo que la reserva está en pendiente y depende de su
+  decisión.
+
 ## [0.3.3] — 2026-04-27
 
 ### Fixed
