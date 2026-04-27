@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] — 2026-04-27
+
+### Changed
+
+- **Presets de exportación CSV con apariencia agrupada y estado
+  seleccionado.** Los seis presets de fecha quedan ahora dentro de
+  dos `fieldset` con borde sutil + esquinas redondeadas, separando
+  visualmente "Pasado" de "Futuro". Cada preset tiene apariencia de
+  pill button (fondo gris claro, borde, hover oscurecido) en lugar
+  del estilo "ghost" anterior que parecía un link de texto.
+
+  Al pulsar un preset queda **visualmente seleccionado** (fondo
+  azul corporativo, texto blanco). La selección se mantiene mientras
+  el usuario no toque manualmente ningún campo de filtro: si edita
+  Desde, Hasta, Sala o Estado, el resaltado se quita
+  automáticamente porque los valores ya no coinciden con el preset.
+
+  El botón **"Todas las reservas" se mueve a la derecha**, justo a
+  la izquierda de "Exportar CSV", y también recibe el mismo
+  tratamiento de selección visual cuando se pulsa.
+
 ## [0.11.0] — 2026-04-27
 
 ### Changed
