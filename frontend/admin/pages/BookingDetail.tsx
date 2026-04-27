@@ -16,9 +16,9 @@ interface BookingDetailProps {
 }
 
 const STATES: Array<{ value: BookingState; label: string }> = [
-    { value: 'pendiente', label: 'Pendiente' },
-    { value: 'confirmada', label: 'Confirmada' },
-    { value: 'cancelada', label: 'Cancelada (dispara email al usuario)' },
+    { value: 'pendiente', label: 'Pendiente (se notificará al solicitante)' },
+    { value: 'confirmada', label: 'Confirmada (se notificará al solicitante)' },
+    { value: 'cancelada', label: 'Cancelada (se notificará al solicitante)' },
     { value: 'finalizada', label: 'Finalizada' },
 ];
 
