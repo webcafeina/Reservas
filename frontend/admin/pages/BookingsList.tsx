@@ -5,6 +5,7 @@ import { SelectField, TextField } from '../../src/components/Field';
 import {
     buildExportUrl,
     useAdminBookings,
+    useDeleteBooking,
     type BookingFilters,
     type BookingSort,
 } from '../api/hooks';
@@ -33,6 +34,18 @@ export function BookingsList(): JSX.Element {
     const [filters, setFilters] = useState<BookingFilters>({ page: 1, per_page: 20 });
     const [expanded, setExpanded] = useState<Set<number>>(new Set());
     const { data, isLoading, isError } = useAdminBookings(filters);
+    const deleteMutation = useDeleteBooking();
+
+    const removeBooking = (id: number, label: string): void => {
+        if (
+            !window.confirm(
+                `¿Eliminar la reserva ${label} de forma permanente? Esta acción no se puede deshacer.`,
+            )
+        ) {
+            return;
+        }
+        deleteMutation.mutate(id);
+    };
 
     const updateFilter = <K extends keyof BookingFilters>(
         key: K,
@@ -222,12 +235,27 @@ export function BookingsList(): JSX.Element {
                                         </td>
                                         <td className={styles.objeto}>{b.objeto_reserva}</td>
                                         <td>
-                                            <Button
-                                                variant="secondary"
-                                                onClick={() => navigate(`bookings/${b.id}`)}
-                                            >
-                                                Ver
-                                            </Button>
+                                            <div className={styles.rowActions}>
+                                                <Button
+                                                    variant="secondary"
+                                                    onClick={() => navigate(`bookings/${b.id}`)}
+                                                >
+                                                    Ver
+                                                </Button>
+                                                <button
+                                                    type="button"
+                                                    className={styles.deleteIconBtn}
+                                                    title="Eliminar reserva"
+                                                    aria-label={`Eliminar reserva #${b.id}`}
+                                                    onClick={() => removeBooking(b.id, `#${b.id}`)}
+                                                    disabled={
+                                                        deleteMutation.isPending &&
+                                                        deleteMutation.variables === b.id
+                                                    }
+                                                >
+                                                    <TrashIcon />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -269,6 +297,32 @@ export function BookingsList(): JSX.Element {
                 </>
             )}
         </div>
+    );
+}
+
+/**
+ * Inline trash-bin icon used by the per-row "Eliminar" action. Stroke
+ * uses `currentColor` so colour comes from the wrapping button's CSS.
+ */
+function TrashIcon(): JSX.Element {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        </svg>
     );
 }
 
