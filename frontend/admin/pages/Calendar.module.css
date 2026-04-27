@@ -1,0 +1,91 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ra-space-3, 12px);
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ra-space-3, 12px);
+    font-size: 13px;
+    color: var(--ra-color-text-muted, #5f6368);
+    align-items: center;
+}
+
+.legendItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legendDot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.calendarHost {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: var(--ra-space-3, 12px);
+    border: 1px solid var(--ra-color-border, #e5e7eb);
+}
+
+/*
+ * FullCalendar styles are global (the lib injects them itself). We tweak
+ * a few things to match the rest of the admin: tighter event padding,
+ * Aldealab-friendly weekday header colour, and a subtle hover.
+ */
+.calendarHost :global(.fc) {
+    --fc-border-color: var(--ra-color-border, #e5e7eb);
+    --fc-page-bg-color: #ffffff;
+    --fc-today-bg-color: rgba(11, 83, 148, 0.06);
+    font-family: inherit;
+}
+
+.calendarHost :global(.fc .fc-toolbar-title) {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.calendarHost :global(.fc .fc-button) {
+    background: var(--ra-color-primary, #0b5394);
+    border-color: var(--ra-color-primary, #0b5394);
+    text-transform: none;
+    font-weight: 500;
+}
+
+.calendarHost :global(.fc .fc-button:hover) {
+    background: #094277;
+    border-color: #094277;
+}
+
+.calendarHost :global(.fc .fc-button-primary:disabled) {
+    opacity: 0.5;
+}
+
+.calendarHost :global(.fc .fc-event) {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 12px;
+}
+
+.calendarHost :global(.fc .fc-daygrid-event-dot) {
+    margin-right: 4px;
+}
+
+.calendarHost :global(.fc-event-cancelada),
+.calendarHost :global(.fc-event[data-state='cancelada']) {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.empty {
+    text-align: center;
+    color: var(--ra-color-text-muted, #5f6368);
+    padding: var(--ra-space-4, 16px) 0;
+    font-size: 13px;
+}
