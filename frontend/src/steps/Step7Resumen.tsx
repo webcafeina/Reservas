@@ -155,7 +155,16 @@ export function Step7Resumen(): JSX.Element {
                 </div>
             </dl>
 
-            {requiresTurnstile && (
+            {/*
+              The widget is unmounted while the create request is in flight.
+              Otherwise Cloudflare cycles the challenge as soon as the token
+              is consumed by submit and the recuadro flashes red — confusing
+              users into thinking the booking failed when in fact the server
+              has already verified the (still-fresh) token and created the
+              booking. On error we remount and the user gets a fresh challenge
+              to retry.
+            */}
+            {requiresTurnstile && !createBooking.isPending && (
                 <div className={styles.turnstileSlot}>
                     <TurnstileWidget
                         siteKey={turnstileSiteKey}
