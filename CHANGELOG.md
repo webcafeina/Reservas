@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.3] — 2026-04-27
+
+### Changed
+
+- **Cabecera "Fechas" en mayúsculas** como el resto de las
+  columnas. El `<button>` interno del header ordenable no heredaba
+  `text-transform: uppercase` ni `letter-spacing` del `<th>`
+  contenedor; ahora se fuerzan vía `text-transform: inherit` +
+  `letter-spacing: inherit` en `.sortHeaderBtn`.
+- **Botón papelera siempre en rojo** (color `--ra-color-danger`)
+  en estado de reposo. Antes era gris en reposo y se ponía rojo
+  solo al hacer hover. El hover sigue oscureciendo ligeramente el
+  fondo + borde para feedback visual.
+- **Detalle de reserva: campo "Recurrencia" humanizado.** Antes
+  mostraba la regla RRULE cruda
+  (`<code>FREQ=WEEKLY;BYDAY=TU;COUNT=12</code>`); ahora muestra el
+  resumen humano (`Semanal, los martes`), igual que el formulario
+  público en el paso de resumen previo a confirmar. Internamente
+  la BD sigue almacenando el RRULE; solo cambia la presentación.
+  Se reutiliza `humanizeRawRrule()` añadido en `v0.13.0`.
+
 ## [0.13.2] — 2026-04-27
 
 ### Added
