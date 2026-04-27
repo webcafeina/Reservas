@@ -368,7 +368,7 @@ final class BookingRepository {
             'id', 'user_id', 'nif', 'nombre', 'primer_apellido', 'segundo_apellido',
             'via', 'numero', 'letra', 'escalera', 'piso', 'puerta',
             'municipio', 'provincia', 'codigo_postal',
-            'telefono_fijo', 'movil', 'email',
+            'telefono_fijo', 'movil', 'email', 'empresa',
         );
         $aliased = array();
         foreach ( $cols as $c ) {

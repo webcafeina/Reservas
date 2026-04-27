@@ -223,6 +223,12 @@ function SolicitanteCard({ profile }: { profile: UserProfile }): JSX.Element {
                         <dd>{profile.telefono_fijo}</dd>
                     </div>
                 )}
+                {profile.empresa !== null && profile.empresa !== '' && (
+                    <div>
+                        <dt>Empresa</dt>
+                        <dd>{profile.empresa}</dd>
+                    </div>
+                )}
                 <div>
                     <dt>Dirección</dt>
                     <dd>{direccion !== '' ? direccion : '—'}</dd>

@@ -93,6 +93,7 @@ final class UserProfileRepository {
             'telefono_fijo'    => $profile->telefonoFijo,
             'movil'            => $profile->movil,
             'email'            => $profile->email,
+            'empresa'          => $profile->empresa,
         );
 
         $table = Schema::userProfiles();

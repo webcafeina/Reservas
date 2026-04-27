@@ -80,7 +80,7 @@ final class AdminBookingsExportController {
         $sql =
             'SELECT b.id, b.uuid, b.estado, b.sala_id, b.fecha_inicio, b.fecha_fin_serie, '
             . 'b.hora_inicio, b.hora_fin, b.rrule, b.objeto_reserva, b.created_at, '
-            . "p.email AS email, p.nombre, p.primer_apellido, p.segundo_apellido, p.movil "
+            . "p.email AS email, p.nombre, p.primer_apellido, p.segundo_apellido, p.movil, p.empresa "
             . "FROM {$table_b} b LEFT JOIN {$table_p} p ON p.id = b.profile_id "
             . "WHERE {$where_sql} "
             . 'ORDER BY b.created_at DESC '
@@ -122,7 +122,7 @@ final class AdminBookingsExportController {
             'id', 'uuid', 'estado', 'sala_id',
             'fecha_inicio', 'fecha_fin_serie', 'hora_inicio', 'hora_fin', 'rrule',
             'objeto_reserva',
-            'email', 'nombre', 'primer_apellido', 'segundo_apellido', 'movil',
+            'email', 'nombre', 'primer_apellido', 'segundo_apellido', 'movil', 'empresa',
             'created_at',
         );
 

@@ -32,6 +32,7 @@ final class UserProfile {
     public ?string $telefonoFijo;
     public string $movil;
     public string $email;
+    public ?string $empresa = null;
 
     /**
      * @param array<string, mixed> $data
@@ -60,6 +61,7 @@ final class UserProfile {
         $p->telefonoFijo    = self::nullableString( $data, 'telefono_fijo' );
         $p->movil           = (string) ( $data['movil'] ?? '' );
         $p->email           = (string) ( $data['email'] ?? '' );
+        $p->empresa         = self::nullableString( $data, 'empresa' );
         return $p;
     }
 
@@ -86,6 +88,7 @@ final class UserProfile {
             'telefono_fijo'    => $this->telefonoFijo,
             'movil'            => $this->movil,
             'email'            => $this->email,
+            'empresa'          => $this->empresa,
         );
     }
 

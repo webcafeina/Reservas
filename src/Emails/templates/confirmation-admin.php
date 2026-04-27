@@ -64,6 +64,12 @@ ob_start();
         <td style="padding:10px 12px;"><strong><?php esc_html_e( 'Móvil', 'reservas-aldealab' ); ?></strong></td>
         <td style="padding:10px 12px;"><?php echo esc_html( $profile->movil ); ?></td>
     </tr>
+    <?php if ( $profile->empresa !== null && $profile->empresa !== '' ) : ?>
+    <tr>
+        <td style="padding:10px 12px;background:#f5f6f8;"><strong><?php esc_html_e( 'Empresa', 'reservas-aldealab' ); ?></strong></td>
+        <td style="padding:10px 12px;background:#f5f6f8;"><?php echo esc_html( $profile->empresa ); ?></td>
+    </tr>
+    <?php endif; ?>
     <tr>
         <td style="padding:10px 12px;background:#f5f6f8;"><strong><?php esc_html_e( 'Fecha(s)', 'reservas-aldealab' ); ?></strong></td>
         <td style="padding:10px 12px;background:#f5f6f8;"><?php echo esc_html( $fechas_humano ); ?></td>
