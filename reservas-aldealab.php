@@ -3,7 +3,7 @@
  * Plugin Name:       Reservas Aldealab
  * Plugin URI:        https://webcafeina.com
  * Description:       Sistema autónomo de reservas de salas para Aldealab (Cáceres). Recurrencias RFC 5545, PDF oficial y notificaciones.
- * Version:           0.8.0
+ * Version:           0.9.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Webcafeína
@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RESERVAS_ALDEALAB_VERSION', '0.8.0' );
+define( 'RESERVAS_ALDEALAB_VERSION', '0.9.0' );
 define( 'RESERVAS_ALDEALAB_FILE', __FILE__ );
 define( 'RESERVAS_ALDEALAB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RESERVAS_ALDEALAB_URL', plugin_dir_url( __FILE__ ) );
