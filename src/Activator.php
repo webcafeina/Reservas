@@ -38,12 +38,12 @@ final class Activator {
                 esc_html(
                     sprintf(
                         /* translators: %1$s current PHP version, %2$s required PHP version */
-                        __( 'Reservas Aldealab requiere PHP %2$s o superior. Tienes %1$s.', 'reservas-aldealab' ),
+                        __( 'Gestor de reservas de AldeaLab requiere PHP %2$s o superior. Tienes %1$s.', 'reservas-aldealab' ),
                         PHP_VERSION,
                         RESERVAS_ALDEALAB_MIN_PHP
                     )
                 ),
-                esc_html__( 'Reservas Aldealab: PHP incompatible', 'reservas-aldealab' ),
+                esc_html__( 'Gestor de reservas de AldeaLab: PHP incompatible', 'reservas-aldealab' ),
                 array( 'back_link' => true )
             );
         }
@@ -54,12 +54,12 @@ final class Activator {
                 esc_html(
                     sprintf(
                         /* translators: %1$s current WP version, %2$s required WP version */
-                        __( 'Reservas Aldealab requiere WordPress %2$s o superior. Tienes %1$s.', 'reservas-aldealab' ),
+                        __( 'Gestor de reservas de AldeaLab requiere WordPress %2$s o superior. Tienes %1$s.', 'reservas-aldealab' ),
                         $wp_version,
                         RESERVAS_ALDEALAB_MIN_WP
                     )
                 ),
-                esc_html__( 'Reservas Aldealab: WordPress incompatible', 'reservas-aldealab' ),
+                esc_html__( 'Gestor de reservas de AldeaLab: WordPress incompatible', 'reservas-aldealab' ),
                 array( 'back_link' => true )
             );
         }

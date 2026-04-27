@@ -67,26 +67,18 @@
     font-weight: var(--ra-font-weight-semibold);
 }
 
-.module h2 small {
-    font-weight: normal;
+.moduleSubtitle {
+    margin: calc(var(--ra-space-2) * -1) 0 var(--ra-space-3) 0;
     color: var(--ra-color-text-muted);
     font-size: var(--ra-font-size-sm);
-    margin-left: var(--ra-space-2);
-}
-
-.exportRow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--ra-space-3);
-    justify-content: space-between;
 }
 
 .exportFields {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--ra-space-3);
     align-items: flex-end;
-    flex-wrap: wrap;
+    margin-bottom: var(--ra-space-3);
 }
 
 .exportPresets {
@@ -94,6 +86,20 @@
     gap: var(--ra-space-1);
     align-items: center;
     flex-wrap: wrap;
+}
+
+.presetGroupLabel {
+    font-size: var(--ra-font-size-sm);
+    color: var(--ra-color-text-muted);
+    font-weight: var(--ra-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0 var(--ra-space-1);
+}
+
+.presetGroupLabel + button + button + button + .presetGroupLabel,
+.presetGroupLabel:not(:first-child) {
+    margin-left: var(--ra-space-2);
 }
 
 /* `a.exportLink` (specificity 0,1,1) so wp-admin's `.wrap a` doesn't

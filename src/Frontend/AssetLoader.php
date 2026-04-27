@@ -101,7 +101,7 @@ final class AssetLoader {
                 add_action(
                     'wp_footer',
                     static function (): void {
-                        echo '<!-- Reservas Aldealab: assets/dist/manifest.json no encontrado. Ejecuta `npm run build`. -->';
+                        echo '<!-- Gestor de reservas de AldeaLab: assets/dist/manifest.json no encontrado. Ejecuta `npm run build`. -->';
                     }
                 );
             }

@@ -30,7 +30,7 @@ export function AdminApp(): JSX.Element {
     return (
         <div className={styles.wrapper}>
             <header className={styles.header}>
-                <h1>Reservas Aldealab</h1>
+                <h1>Gestor de reservas de AldeaLab</h1>
                 <nav className={styles.nav}>
                     {NAV.map((item) => (
                         <a
