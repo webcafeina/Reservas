@@ -40,14 +40,16 @@ use WebcafeinaReservas\Services\Sms\SmsProviderFactory;
  */
 final class EmailNotifier {
 
-    public const HOOK_ASYNC     = 'reservas_aldealab_send_notifications';
-    public const HOOK_CONFIRMED = 'reservas_aldealab_booking_confirmed';
-    public const HOOK_CANCELLED = 'reservas_aldealab_booking_cancelled';
+    public const HOOK_ASYNC               = 'reservas_aldealab_send_notifications';
+    public const HOOK_CONFIRMED           = 'reservas_aldealab_booking_confirmed';
+    public const HOOK_CANCELLED           = 'reservas_aldealab_booking_cancelled';
+    public const HOOK_REVERTED_TO_PENDING = 'reservas_aldealab_booking_reverted_to_pending';
 
     public static function register(): void {
         add_action( self::HOOK_ASYNC, array( self::class, 'handleAsync' ), 10, 1 );
         add_action( self::HOOK_CONFIRMED, array( self::class, 'handleConfirmed' ), 10, 1 );
         add_action( self::HOOK_CANCELLED, array( self::class, 'handleCancelled' ), 10, 1 );
+        add_action( self::HOOK_REVERTED_TO_PENDING, array( self::class, 'handleRevertedToPending' ), 10, 1 );
     }
 
     /**
@@ -135,6 +137,26 @@ final class EmailNotifier {
                 @unlink( $pdfPath );
             }
         }
+    }
+
+    /**
+     * Hook target: `reservas_aldealab_booking_reverted_to_pending`. Fired
+     * when an admin moves a booking back to `pendiente` from any other
+     * estado (e.g. confirmada → pendiente if they realised they need
+     * more info, or cancelada → pendiente if they un-cancelled by
+     * mistake). No PDF is attached because the booking is not yet a
+     * formal commitment in this state.
+     */
+    public static function handleRevertedToPending( int $bookingId ): void {
+        $ctx = self::loadContext( $bookingId );
+        if ( $ctx === null ) {
+            return;
+        }
+        ( new self() )->sendUserRevertedToPending(
+            $ctx['booking'],
+            $ctx['profile'],
+            $ctx['sala']
+        );
     }
 
     /**
@@ -299,6 +321,31 @@ final class EmailNotifier {
             'usuario-aceptada',
             $booking->id,
             $attachments
+        );
+    }
+
+    public function sendUserRevertedToPending(
+        Booking $booking,
+        UserProfile $profile,
+        Sala $sala
+    ): void {
+        $title         = __( 'Tu reserva está nuevamente en revisión', 'reservas-aldealab' );
+        $fechas_humano = self::formatDatesHuman( $booking );
+        $header_url    = self::headerImageUrl();
+
+        $content_html = self::renderTemplate(
+            'reverted-to-pending-user',
+            compact( 'booking', 'profile', 'sala', 'fechas_humano' )
+        );
+        $html = self::renderLayout( $title, $content_html, $header_url );
+
+        self::send(
+            $profile->email,
+            $title,
+            $html,
+            'usuario-revertida',
+            $booking->id,
+            array()
         );
     }
 

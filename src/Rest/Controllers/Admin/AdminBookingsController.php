@@ -184,6 +184,12 @@ final class AdminBookingsController {
                     // PATCH response.
                     wp_schedule_single_event( time(), EmailNotifier::HOOK_CONFIRMED, array( $id ) );
                 }
+                if ( $estado === BookingState::PENDIENTE && function_exists( 'wp_schedule_single_event' ) ) {
+                    // Reverted from a non-pending state (confirmada /
+                    // cancelada / finalizada) → notify the solicitante
+                    // that their reservation is being re-reviewed.
+                    wp_schedule_single_event( time(), EmailNotifier::HOOK_REVERTED_TO_PENDING, array( $id ) );
+                }
             }
         }
 
