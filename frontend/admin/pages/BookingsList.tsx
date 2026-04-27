@@ -2,11 +2,15 @@ import { useState } from 'react';
 
 import { Button } from '../../src/components/Button';
 import { SelectField, TextField } from '../../src/components/Field';
-import { buildExportUrl, useAdminBookings, type BookingFilters } from '../api/hooks';
+import {
+    buildExportUrl,
+    useAdminBookings,
+    type BookingFilters,
+    type BookingSort,
+} from '../api/hooks';
 import { navigate } from '../useHashRoute';
 import type { Booking, BookingState } from '../../src/types/booking';
 import { formatDateEs } from '../../src/utils/dateFormat';
-import { humanizeRawRrule } from '../../src/store/humanizeRrule';
 
 import styles from './BookingsList.module.css';
 
@@ -48,6 +52,30 @@ export function BookingsList(): JSX.Element {
             return next;
         });
     };
+
+    const sortMode: BookingSort = filters.sort ?? 'created_desc';
+
+    const cycleFechasSort = (): void => {
+        setFilters((prev) => {
+            const current: BookingSort = prev.sort ?? 'created_desc';
+            const next: BookingSort =
+                current === 'created_desc'
+                    ? 'start_desc'
+                    : current === 'start_desc'
+                      ? 'start_asc'
+                      : 'created_desc';
+            return { ...prev, sort: next, page: 1 };
+        });
+    };
+
+    const fechasSortIndicator =
+        sortMode === 'start_desc' ? '↓' : sortMode === 'start_asc' ? '↑' : '↕';
+    const fechasSortTitle =
+        sortMode === 'start_desc'
+            ? 'Ordenado por fecha de inicio (más reciente primero). Click para fecha más lejana primero.'
+            : sortMode === 'start_asc'
+              ? 'Ordenado por fecha de inicio (más lejana primero). Click para volver al orden por defecto.'
+              : 'Ordenado por orden de registro. Click para fecha más reciente primero.';
 
     const totalPages = data !== undefined ? Math.max(1, Math.ceil(data.total / data.per_page)) : 1;
 
@@ -104,7 +132,19 @@ export function BookingsList(): JSX.Element {
                                 <th>Estado</th>
                                 <th>Sala</th>
                                 <th>Solicitante</th>
-                                <th>Fechas</th>
+                                <th>
+                                    <button
+                                        type="button"
+                                        className={styles.sortHeaderBtn}
+                                        onClick={cycleFechasSort}
+                                        title={fechasSortTitle}
+                                    >
+                                        Fechas{' '}
+                                        <span className={styles.sortIndicator} aria-hidden="true">
+                                            {fechasSortIndicator}
+                                        </span>
+                                    </button>
+                                </th>
                                 <th>Horario</th>
                                 <th>Objeto</th>
                                 <th></th>
@@ -133,16 +173,10 @@ export function BookingsList(): JSX.Element {
                                 return (
                                     <tr key={b.id}>
                                         <td>
-                                            {b.id}
-                                            {isRecurrent && (
-                                                <span
-                                                    className={styles.recurrentBadge}
-                                                    title="Reserva recurrente"
-                                                    aria-label="Reserva recurrente"
-                                                >
-                                                    🔁
-                                                </span>
-                                            )}
+                                            <span className={styles.idCell}>
+                                                {b.id}
+                                                {isRecurrent && <RecurrentIcon />}
+                                            </span>
                                         </td>
                                         <td>
                                             <span
@@ -238,6 +272,38 @@ export function BookingsList(): JSX.Element {
     );
 }
 
+/**
+ * Inline "loop" icon (Lucide / Feather "repeat" shape) to flag a
+ * recurring reservation next to its #id in the listing. Uses
+ * `currentColor` so the surrounding text/badge styling controls hue.
+ */
+function RecurrentIcon(): JSX.Element {
+    return (
+        <span
+            className={styles.recurrentBadge}
+            title="Reserva recurrente"
+            aria-label="Reserva recurrente"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+            >
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+            </svg>
+        </span>
+    );
+}
+
 interface FechasCellProps {
     booking: Booking;
     expanded: boolean;
@@ -259,8 +325,7 @@ function FechasCell({ booking, expanded, onToggle }: FechasCellProps): JSX.Eleme
 
     const fechas = booking.fechas;
     const last = fechas.length > 0 ? fechas[fechas.length - 1] : booking.fecha_inicio;
-    const cadence = humanizeRawRrule(booking.rrule ?? '');
-    const summary = `${formatDateEs(booking.fecha_inicio)} → ${formatDateEs(last)} · ${fechas.length} fecha${fechas.length === 1 ? '' : 's'} · ${cadence.toLowerCase()}`;
+    const summary = `${formatDateEs(booking.fecha_inicio)} → ${formatDateEs(last)} · ${fechas.length} fecha${fechas.length === 1 ? '' : 's'}`;
 
     return (
         <div>

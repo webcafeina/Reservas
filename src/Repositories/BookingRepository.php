@@ -137,6 +137,7 @@ final class BookingRepository {
      *     email?: string|null,
      *     from?: string|null,
      *     to?: string|null,
+     *     sort?: string|null,
      *     per_page?: int,
      *     page?: int,
      * } $filters
@@ -197,6 +198,22 @@ final class BookingRepository {
             . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
             . "WHERE {$where_sql}";
 
+        // Sortable by start date in either direction; defaults to creation
+        // order so the panel shows latest registered bookings first
+        // (matches the admin's "what came in?" mental model).
+        $sortKey = isset( $filters['sort'] ) ? (string) $filters['sort'] : '';
+        switch ( $sortKey ) {
+            case 'start_desc':
+                $order_by = 'b.fecha_inicio DESC, b.created_at DESC';
+                break;
+            case 'start_asc':
+                $order_by = 'b.fecha_inicio ASC, b.created_at ASC';
+                break;
+            case 'created_desc':
+            default:
+                $order_by = 'b.created_at DESC';
+        }
+
         $sql_items =
             'SELECT b.*, p.post_title AS sala_title, '
             . self::profileSelectColumns()
@@ -204,7 +221,7 @@ final class BookingRepository {
             . "LEFT JOIN {$table_post} p ON p.ID = b.sala_id "
             . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
             . "WHERE {$where_sql} "
-            . 'ORDER BY b.created_at DESC '
+            . 'ORDER BY ' . $order_by . ' '
             . 'LIMIT %d OFFSET %d';
 
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared

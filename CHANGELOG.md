@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.1] — 2026-04-27
+
+### Changed
+
+- **Listado de reservas — pulido visual y ordenación.**
+  - El resumen de la celda Fechas en recurrentes deja de mostrar
+    la cadencia ("semanal", "cada 2 días"). Queda solo
+    `27-04-2026 → 27-05-2026 · 5 fechas`. La cadencia sigue
+    visible en el detalle de la reserva.
+  - El triángulo `▸` / `▾` que despliega las fechas pasa a 16px
+    (antes 11px) — más legible y clicable.
+  - El badge de "reserva recurrente" deja de ser el emoji 🔁 y
+    pasa a ser un icono SVG de "loop" coloreado con el color
+    primario del plugin, dentro de un círculo gris claro.
+    Centrado horizontalmente con el `#id` mediante `inline-flex`,
+    así no queda colgando debajo a la derecha.
+  - **Columna "Fechas" ordenable**: click en el header cicla entre
+    tres modos: orden por defecto (registro / `created_at` DESC) →
+    fecha de inicio más reciente primero (↓) → fecha de inicio más
+    lejana primero (↑) → de vuelta al inicio. Indicador visual ↕ /
+    ↓ / ↑ junto al título y tooltip describiendo la dirección
+    siguiente en el ciclo.
+
 ## [0.13.0] — 2026-04-27
 
 ### Changed
