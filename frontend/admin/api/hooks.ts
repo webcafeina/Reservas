@@ -216,6 +216,36 @@ export function useCalendarEvents(
     });
 }
 
+export type HealthSeverity = 'ok' | 'warn' | 'error' | 'info';
+
+export interface HealthCheck {
+    id: string;
+    category: string;
+    label: string;
+    severity: HealthSeverity;
+    message: string;
+    fix_url: string | null;
+}
+
+export interface HealthResponse {
+    summary: { ok: number; warn: number; error: number; info: number };
+    checks: HealthCheck[];
+}
+
+/**
+ * Health check status of every plugin dependency. Live HTTP probes happen
+ * server-side, so this query is potentially slow (1-3s); we keep it
+ * un-cached so each visit reflects the current state.
+ */
+export function useHealthChecks() {
+    return useQuery({
+        queryKey: ['admin', 'health'],
+        queryFn: () => adminApi.get<HealthResponse>('/admin/health'),
+        staleTime: 0,
+        refetchOnMount: true,
+    });
+}
+
 /**
  * Admin-specific URL builder for file downloads (CSV / iCal). We need
  * the absolute REST URL (including nonce in query string) because the

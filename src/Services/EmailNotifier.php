@@ -495,9 +495,14 @@ final class EmailNotifier {
     }
 
     /**
+     * Returns the configured admin notification recipients (validated +
+     * deduplicated). Public so the health-check controller can verify
+     * that at least one address is configured without re-implementing
+     * the same parsing.
+     *
      * @return array<int, string>
      */
-    private static function adminRecipients(): array {
+    public static function adminRecipients(): array {
         $settings = (array) get_option( 'reservas_aldealab_settings', array() );
         $list     = isset( $settings['admin_emails'] ) ? $settings['admin_emails'] : array();
         if ( is_string( $list ) ) {

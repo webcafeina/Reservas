@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 export type AdminView =
     | { name: 'dashboard' }
+    | { name: 'health' }
     | { name: 'calendar' }
     | { name: 'bookings' }
     | { name: 'bookings-new' }
@@ -12,6 +13,9 @@ function parse(hash: string): AdminView {
     const clean = hash.replace(/^#\/?/, '').trim();
     if (clean === '' || clean === 'dashboard') {
         return { name: 'dashboard' };
+    }
+    if (clean === 'health') {
+        return { name: 'health' };
     }
     if (clean === 'calendar') {
         return { name: 'calendar' };
