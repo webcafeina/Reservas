@@ -168,6 +168,38 @@ export function usePdfTemplates() {
     });
 }
 
+export interface CalendarEvent {
+    id: string;
+    booking_id: number;
+    title: string;
+    start: string;
+    end: string;
+    estado: BookingState;
+    sala_title: string;
+    solicitante: string;
+    objeto: string;
+    backgroundColor: string;
+    borderColor: string;
+}
+
+/**
+ * Calendar events for the admin Calendario tab. The range is set by the
+ * FullCalendar `datesSet` callback; we keep the query keyed on the range
+ * so React Query caches per-view.
+ */
+export function useCalendarEvents(from: string | null, to: string | null) {
+    return useQuery({
+        queryKey: ['admin', 'calendar', from, to],
+        queryFn: () =>
+            adminApi.get<{ events: CalendarEvent[] }>('/admin/calendar', {
+                from: from ?? '',
+                to: to ?? '',
+            }),
+        enabled: from !== null && to !== null,
+        staleTime: 30_000,
+    });
+}
+
 /**
  * Admin-specific URL builder for file downloads (CSV / iCal). We need
  * the absolute REST URL (including nonce in query string) because the

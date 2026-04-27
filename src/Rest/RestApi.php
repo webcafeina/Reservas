@@ -16,6 +16,7 @@ use WebcafeinaReservas\Rest\Controllers\ProfileController;
 use WebcafeinaReservas\Rest\Controllers\SpacesController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminBookingsController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminBookingsExportController;
+use WebcafeinaReservas\Rest\Controllers\Admin\AdminCalendarController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminPdfTemplatesController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminSettingsController;
 use WebcafeinaReservas\Rest\Controllers\Admin\AdminStatsController;
@@ -45,6 +46,7 @@ final class RestApi {
         ( new AdminSettingsController() )->register();
         ( new AdminPdfTemplatesController() )->register();
         ( new AdminBookingsExportController() )->register();
+        ( new AdminCalendarController() )->register();
     }
 
     /**

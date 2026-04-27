@@ -245,6 +245,75 @@ final class BookingRepository {
     }
 
     /**
+     * Calendar feed: one row per booking_date in [$from, $to]. Joined with
+     * the booking, sala (post title) and profile so the controller can build
+     * FullCalendar events without N+1 queries.
+     *
+     * Result shape — array<int, array{
+     *   booking_id: int,
+     *   fecha: string,           // YYYY-MM-DD
+     *   estado: string,
+     *   hora_inicio: string,
+     *   hora_fin: string,
+     *   sala_id: int,
+     *   sala_title: string,
+     *   solicitante: string,
+     *   objeto: string,
+     * }>
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function findEventsBetween( string $from, string $to ): array {
+        global $wpdb;
+        $table_b  = Schema::bookings();
+        $table_d  = Schema::bookingDates();
+        $table_up = Schema::userProfiles();
+        $table_p  = $wpdb->posts;
+
+        $sql =
+            "SELECT bd.booking_id, bd.fecha, b.estado, b.hora_inicio, b.hora_fin, "
+            . 'b.objeto_reserva, b.sala_id, '
+            . 'p.post_title AS sala_title, '
+            . 'up.nombre, up.primer_apellido, up.segundo_apellido '
+            . "FROM {$table_d} bd "
+            . "INNER JOIN {$table_b} b ON b.id = bd.booking_id "
+            . "LEFT JOIN {$table_p} p ON p.ID = b.sala_id "
+            . "LEFT JOIN {$table_up} up ON up.id = b.profile_id "
+            . "WHERE bd.fecha >= %s AND bd.fecha <= %s AND bd.estado_fecha = 'activa' "
+            . 'ORDER BY bd.fecha ASC, b.hora_inicio ASC';
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $rows = (array) $this->wpdb->get_results(
+            $this->wpdb->prepare( $sql, $from, $to ),
+            ARRAY_A
+        );
+
+        $out = array();
+        foreach ( $rows as $row ) {
+            if ( ! is_array( $row ) ) {
+                continue;
+            }
+            $solicitante = trim(
+                ( (string) ( $row['nombre'] ?? '' ) ) . ' '
+                . ( (string) ( $row['primer_apellido'] ?? '' ) ) . ' '
+                . ( (string) ( $row['segundo_apellido'] ?? '' ) )
+            );
+            $out[] = array(
+                'booking_id'  => (int) ( $row['booking_id'] ?? 0 ),
+                'fecha'       => (string) ( $row['fecha'] ?? '' ),
+                'estado'      => (string) ( $row['estado'] ?? '' ),
+                'hora_inicio' => (string) ( $row['hora_inicio'] ?? '' ),
+                'hora_fin'    => (string) ( $row['hora_fin'] ?? '' ),
+                'sala_id'     => (int) ( $row['sala_id'] ?? 0 ),
+                'sala_title'  => (string) ( $row['sala_title'] ?? '' ),
+                'solicitante' => $solicitante,
+                'objeto'      => (string) ( $row['objeto_reserva'] ?? '' ),
+            );
+        }
+        return $out;
+    }
+
+    /**
      * @return array<int, string>
      */
     private function loadDates( int $bookingId ): array {
