@@ -167,6 +167,7 @@ final class AdminAssetLoader {
             'nonce'      => wp_create_nonce( 'wp_rest' ),
             'locale'     => determine_locale(),
             'adminUrl'   => esc_url_raw( admin_url( 'admin.php?page=' . AdminMenu::SLUG ) ),
+            'logoUrl'    => self::resolveLogoUrl(),
         );
 
         wp_add_inline_script(
@@ -174,5 +175,22 @@ final class AdminAssetLoader {
             'window.ReservasAldealabAdmin = ' . wp_json_encode( $data ) . ';',
             'before'
         );
+    }
+
+    /**
+     * Resolves the URL of the customer-supplied admin logo, if present in
+     * `assets/admin/`. SVG wins over PNG when both are present, since
+     * vector scales cleanly across screen densities. Returns null when
+     * neither file exists — the React header then renders without a
+     * logo and the layout stays identical to the pre-feature state.
+     */
+    private static function resolveLogoUrl(): ?string {
+        foreach ( array( 'logo.svg', 'logo.png' ) as $candidate ) {
+            $path = RESERVAS_ALDEALAB_PATH . 'assets/admin/' . $candidate;
+            if ( is_file( $path ) ) {
+                return RESERVAS_ALDEALAB_URL . 'assets/admin/' . $candidate;
+            }
+        }
+        return null;
     }
 }

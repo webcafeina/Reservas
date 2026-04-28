@@ -26,22 +26,38 @@ function isActive(view: AdminView, path: string): boolean {
 
 export function AdminApp(): JSX.Element {
     const view = useHashRoute();
+    const logoUrl = window.ReservasAldealabAdmin?.logoUrl ?? null;
 
     return (
         <div className={styles.wrapper}>
             <header className={styles.header}>
-                <h1>Gestor de reservas de AldeaLab</h1>
-                <nav className={styles.nav}>
-                    {NAV.map((item) => (
-                        <a
-                            key={item.path}
-                            href={`#/${item.path}`}
-                            className={`${styles.navLink} ${isActive(view, item.path) ? styles.navActive : ''}`}
-                        >
-                            {item.label}
-                        </a>
-                    ))}
-                </nav>
+                <div className={styles.headerLeft}>
+                    <h1>Gestor de reservas de AldeaLab</h1>
+                    <nav className={styles.nav}>
+                        {NAV.map((item) => (
+                            <a
+                                key={item.path}
+                                href={`#/${item.path}`}
+                                className={`${styles.navLink} ${isActive(view, item.path) ? styles.navActive : ''}`}
+                            >
+                                {item.label}
+                            </a>
+                        ))}
+                    </nav>
+                </div>
+                {logoUrl !== null && logoUrl !== '' && (
+                    <img
+                        src={logoUrl}
+                        alt=""
+                        aria-hidden="true"
+                        className={styles.headerLogo}
+                        onError={(e) => {
+                            // If the file is missing or fails to load,
+                            // hide it instead of leaving a broken image.
+                            e.currentTarget.style.display = 'none';
+                        }}
+                    />
+                )}
             </header>
 
             <main className={styles.main}>
