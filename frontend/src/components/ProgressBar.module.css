@@ -73,6 +73,39 @@
     transition: width var(--ra-duration-base) var(--ra-ease);
 }
 
+/*
+ * Tablet (641–900 px): the grid `auto-fit` columns can wrap to two
+ * rows when the container can't fit eight 90px cells. That looks
+ * broken. We force a single horizontal row and let the user
+ * scroll. A subtle right-edge fade hints at the hidden content
+ * without showing a fat scrollbar — once they tap and drag the
+ * native momentum scroll takes over.
+ */
+@media (min-width: 641px) and (max-width: 900px) {
+    .steps {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: var(--ra-space-3);
+        padding-bottom: var(--ra-space-1);
+        /* Soft fade on the right edge so it reads as "there's more
+         * here, swipe to see it" instead of "labels got cut off". */
+        mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
+        -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
+    }
+    .step {
+        flex: 0 0 auto;
+        min-width: 90px;
+    }
+    .steps::-webkit-scrollbar {
+        height: 4px;
+    }
+    .steps::-webkit-scrollbar-thumb {
+        background: var(--ra-color-border);
+        border-radius: var(--ra-radius-pill);
+    }
+}
+
 @media (max-width: 640px) {
     /*
      * On mobile we collapse the bullet row to ONLY the active step. The

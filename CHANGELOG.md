@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.9] — 2026-04-28
+
+### Changed
+
+- **ProgressBar en tablet (641–900 px): scroll horizontal en lugar
+  de wrap a dos filas.** El grid `auto-fit` original podía dejar
+  uno o dos pasos sueltos en una segunda fila cuando el ancho no
+  cuadraba con cells de 90 px. En esa franja ahora se renderiza
+  como flex sin wrap con `overflow-x: auto`. Para que la
+  ocultación se sienta orgánica:
+  - **Fade derecho** vía `mask-image` (24 px de degradado a
+    transparente) que sugiere "hay más, desliza".
+  - Scrollbar muy fino (4 px) en navegadores WebKit, con el color
+    del borde del tema. Aparece solo cuando hay overflow real.
+  - El usuario puede deslizar con el dedo (momentum scroll
+    nativo) en pantallas táctiles.
+
+  Mobile (≤ 640) sigue mostrando solo el paso activo. Desktop
+  (> 900) sigue con el grid de antes.
+
 ## [0.15.8] — 2026-04-28
 
 ### Changed
