@@ -92,16 +92,16 @@
     .step.active {
         flex-direction: row;
         align-items: center;
-        gap: var(--ra-space-4, 16px);
+        gap: 1em;
     }
     .step.active .bullet {
-        width: 56px;
-        height: 56px;
-        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
     .label {
         display: inline;
-        font-size: 1.25rem;
+        font-size: 20px;
         font-weight: var(--ra-font-weight-semibold);
     }
 }

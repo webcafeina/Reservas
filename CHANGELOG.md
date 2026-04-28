@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.5] — 2026-04-28
+
+### Changed
+
+- **Ajuste fino del ProgressBar móvil**:
+  - Círculo del bullet pasa de 56×56 → **40×40 px**.
+  - Tipografía del número y del nombre de la fase: ambas a
+    **20 px** exactos.
+  - Separación entre círculo y label: **1em** (antes
+    `--ra-space-4` ≈ 16 px, similar pero ahora explícito en em
+    para escalar con el font-size de 20 px).
+
+  Tablet/desktop sin cambios.
+
 ## [0.15.4] — 2026-04-28
 
 ### Changed
