@@ -6,6 +6,7 @@ export type AdminView =
     | { name: 'bookings' }
     | { name: 'bookings-new' }
     | { name: 'booking'; id: number }
+    | { name: 'booking-edit'; id: number }
     | { name: 'settings' };
 
 function parse(hash: string): AdminView {
@@ -28,6 +29,12 @@ function parse(hash: string): AdminView {
     // but we still want a distinct view from the generic list.
     if (clean === 'bookings/new') {
         return { name: 'bookings-new' };
+    }
+    // Edit must be tested before the generic detail match — `(\d+)/edit`
+    // would otherwise be interpreted as `(\d+)` only.
+    const editMatch = /^bookings\/(\d+)\/edit$/.exec(clean);
+    if (editMatch) {
+        return { name: 'booking-edit', id: Number(editMatch[1]) };
     }
     const bookingMatch = /^bookings\/(\d+)$/.exec(clean);
     if (bookingMatch) {

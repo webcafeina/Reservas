@@ -44,12 +44,14 @@ final class EmailNotifier {
     public const HOOK_CONFIRMED           = 'reservas_aldealab_booking_confirmed';
     public const HOOK_CANCELLED           = 'reservas_aldealab_booking_cancelled';
     public const HOOK_REVERTED_TO_PENDING = 'reservas_aldealab_booking_reverted_to_pending';
+    public const HOOK_MODIFIED            = 'reservas_aldealab_booking_modified';
 
     public static function register(): void {
         add_action( self::HOOK_ASYNC, array( self::class, 'handleAsync' ), 10, 1 );
         add_action( self::HOOK_CONFIRMED, array( self::class, 'handleConfirmed' ), 10, 1 );
         add_action( self::HOOK_CANCELLED, array( self::class, 'handleCancelled' ), 10, 1 );
         add_action( self::HOOK_REVERTED_TO_PENDING, array( self::class, 'handleRevertedToPending' ), 10, 1 );
+        add_action( self::HOOK_MODIFIED, array( self::class, 'handleModified' ), 10, 2 );
     }
 
     /**
@@ -131,6 +133,57 @@ final class EmailNotifier {
                 $ctx['sala'],
                 $pdfPath,
                 $attachPdf
+            );
+        } finally {
+            if ( $pdfPath !== null && is_file( $pdfPath ) ) {
+                @unlink( $pdfPath );
+            }
+        }
+    }
+
+    /**
+     * Hook target: `reservas_aldealab_booking_modified`. Fired when an
+     * admin edits an existing booking via the panel. Receives the booking
+     * id and a snapshot (toArray) of the booking *before* the edit, so we
+     * can compute a field-by-field diff and surface "antes / ahora" rows
+     * in the user email.
+     *
+     * If the diff is empty (admin opened the form and saved without
+     * touching anything), no email goes out. PDF is regenerated with the
+     * current data when applicable, same gate as creation.
+     *
+     * @param array<string, mixed> $originalSnapshot Booking::toArray() before edit.
+     */
+    public static function handleModified( int $bookingId, array $originalSnapshot ): void {
+        $ctx = self::loadContext( $bookingId );
+        if ( $ctx === null ) {
+            return;
+        }
+
+        $diff = self::buildBookingDiff( $originalSnapshot, $ctx );
+        if ( $diff === array() ) {
+            return;
+        }
+
+        $attachPdf = self::shouldAttachPdf( $ctx['booking'], $ctx['sala'] );
+        $pdfPath   = null;
+        if ( $attachPdf ) {
+            $pdfPath = self::tryGeneratePdfFile(
+                $ctx['booking'],
+                $ctx['profile'],
+                $ctx['sala'],
+                $ctx['log']
+            );
+        }
+
+        try {
+            ( new self() )->sendUserModified(
+                $ctx['booking'],
+                $ctx['profile'],
+                $ctx['sala'],
+                $pdfPath,
+                $attachPdf,
+                $diff
             );
         } finally {
             if ( $pdfPath !== null && is_file( $pdfPath ) ) {
@@ -319,6 +372,41 @@ final class EmailNotifier {
             $title,
             $html,
             'usuario-aceptada',
+            $booking->id,
+            $attachments
+        );
+    }
+
+    /**
+     * @param array<string, array{label: string, before: string, after: string}> $diff
+     */
+    public function sendUserModified(
+        Booking $booking,
+        UserProfile $profile,
+        Sala $sala,
+        ?string $pdfPath,
+        bool $includeSedeInstructions,
+        array $diff
+    ): void {
+        $title         = __( 'Tu reserva ha sido modificada', 'reservas-aldealab' );
+        $fechas_humano = self::formatDatesHuman( $booking );
+        $header_url    = self::headerImageUrl();
+
+        $incluye_sede = $includeSedeInstructions;
+        $tiene_pdf    = $pdfPath !== null;
+
+        $content_html = self::renderTemplate(
+            'modified-user',
+            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede', 'tiene_pdf', 'diff' )
+        );
+        $html = self::renderLayout( $title, $content_html, $header_url );
+
+        $attachments = $pdfPath !== null ? array( $pdfPath ) : array();
+        self::send(
+            $profile->email,
+            $title,
+            $html,
+            'usuario-modificada',
             $booking->id,
             $attachments
         );
@@ -543,6 +631,136 @@ final class EmailNotifier {
 
     private static function headerImageUrl(): string {
         return RESERVAS_ALDEALAB_URL . 'assets/email/header.png';
+    }
+
+    /**
+     * Compares the booking before the edit (`Booking::toArray()`-shaped
+     * snapshot) with the post-edit context returned by `loadContext()` and
+     * produces a list of human-readable changes. Only fields that actually
+     * differ make it into the result; if nothing changed, the result is an
+     * empty array (the caller short-circuits without sending an email).
+     *
+     * @param array<string, mixed> $original Snapshot from before the edit.
+     * @param array{booking: Booking, profile: UserProfile, sala: Sala, log: \WebcafeinaReservas\Repositories\EmailLogRepository} $current
+     * @return array<string, array{label: string, before: string, after: string}>
+     */
+    private static function buildBookingDiff( array $original, array $current ): array {
+        $rows    = array();
+        $booking = $current['booking'];
+        $profile = $current['profile'];
+        $sala    = $current['sala'];
+
+        $afterSala  = (string) $sala->title;
+        $beforeSala = isset( $original['sala_title'] ) && $original['sala_title'] !== null && $original['sala_title'] !== ''
+            ? (string) $original['sala_title']
+            : '#' . (string) ( $original['sala_id'] ?? '' );
+        if ( $beforeSala !== $afterSala ) {
+            $rows['sala'] = array(
+                'label'  => __( 'Sala', 'reservas-aldealab' ),
+                'before' => $beforeSala,
+                'after'  => $afterSala,
+            );
+        }
+
+        $beforeRange = self::formatRangeForDiff( $original );
+        $afterRange  = self::formatRangeForDiff( $booking->toArray() );
+        if ( $beforeRange !== $afterRange ) {
+            $rows['fechas'] = array(
+                'label'  => __( 'Fecha(s)', 'reservas-aldealab' ),
+                'before' => $beforeRange,
+                'after'  => $afterRange,
+            );
+        }
+
+        $beforeHorario = self::formatHorario( (string) ( $original['hora_inicio'] ?? '' ), (string) ( $original['hora_fin'] ?? '' ) );
+        $afterHorario  = self::formatHorario( $booking->horaInicio, $booking->horaFin );
+        if ( $beforeHorario !== $afterHorario ) {
+            $rows['horario'] = array(
+                'label'  => __( 'Horario', 'reservas-aldealab' ),
+                'before' => $beforeHorario,
+                'after'  => $afterHorario,
+            );
+        }
+
+        $beforeRrule = (string) ( $original['rrule'] ?? '' );
+        $afterRrule  = (string) ( $booking->rrule ?? '' );
+        if ( $beforeRrule !== $afterRrule ) {
+            $rows['recurrencia'] = array(
+                'label'  => __( 'Recurrencia', 'reservas-aldealab' ),
+                'before' => $beforeRrule === '' ? __( 'No recurrente', 'reservas-aldealab' ) : $beforeRrule,
+                'after'  => $afterRrule === '' ? __( 'No recurrente', 'reservas-aldealab' ) : $afterRrule,
+            );
+        }
+
+        $beforeObj = (string) ( $original['objeto_reserva'] ?? '' );
+        $afterObj  = (string) $booking->objetoReserva;
+        if ( $beforeObj !== $afterObj ) {
+            $rows['objeto'] = array(
+                'label'  => __( 'Objeto', 'reservas-aldealab' ),
+                'before' => $beforeObj,
+                'after'  => $afterObj,
+            );
+        }
+
+        $beforeProfile = is_array( $original['profile'] ?? null ) ? $original['profile'] : array();
+        $beforeName    = trim(
+            (string) ( $beforeProfile['nombre'] ?? '' ) . ' '
+            . (string) ( $beforeProfile['primer_apellido'] ?? '' ) . ' '
+            . (string) ( $beforeProfile['segundo_apellido'] ?? '' )
+        );
+        $afterName = $profile->fullName();
+        if ( $beforeName !== $afterName ) {
+            $rows['solicitante'] = array(
+                'label'  => __( 'Solicitante', 'reservas-aldealab' ),
+                'before' => $beforeName === '' ? '—' : $beforeName,
+                'after'  => $afterName === '' ? '—' : $afterName,
+            );
+        }
+
+        $checks = array(
+            'email'   => array( __( 'Email del solicitante', 'reservas-aldealab' ), $profile->email ),
+            'movil'   => array( __( 'Móvil del solicitante', 'reservas-aldealab' ), $profile->movil ),
+            'empresa' => array( __( 'Empresa', 'reservas-aldealab' ), (string) ( $profile->empresa ?? '' ) ),
+        );
+        foreach ( $checks as $key => $info ) {
+            $before = (string) ( $beforeProfile[ $key ] ?? '' );
+            $after  = (string) $info[1];
+            if ( $before !== $after ) {
+                $rows[ 'profile_' . $key ] = array(
+                    'label'  => $info[0],
+                    'before' => $before === '' ? '—' : $before,
+                    'after'  => $after === '' ? '—' : $after,
+                );
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $bookingArray
+     */
+    private static function formatRangeForDiff( array $bookingArray ): string {
+        $fechas = isset( $bookingArray['fechas'] ) && is_array( $bookingArray['fechas'] )
+            ? array_map( 'strval', $bookingArray['fechas'] )
+            : array();
+        if ( $fechas === array() ) {
+            $start = (string) ( $bookingArray['fecha_inicio'] ?? '' );
+            return $start === '' ? '—' : PdfGenerator::isoToDdMmYyyy( $start );
+        }
+        if ( count( $fechas ) === 1 ) {
+            return PdfGenerator::isoToDdMmYyyy( $fechas[0] );
+        }
+        $first = PdfGenerator::isoToDdMmYyyy( reset( $fechas ) );
+        $last  = PdfGenerator::isoToDdMmYyyy( end( $fechas ) );
+        return sprintf( '%d fechas (%s → %s)', count( $fechas ), $first, $last );
+    }
+
+    private static function formatHorario( string $hi, string $hf ): string {
+        if ( $hi === '' || $hf === '' ) {
+            return '—';
+        }
+        return substr( $hi, 0, 5 ) . ' – ' . substr( $hf, 0, 5 );
     }
 
     private static function formatDatesHuman( Booking $booking ): string {

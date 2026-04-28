@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '../../src/components/Button';
 import { ErrorMessage } from '../../src/components/ErrorMessage';
@@ -9,11 +9,17 @@ import { useSpaces } from '../../src/api/spaces';
 import { ApiError } from '../../src/api/client';
 import { isValidProfile, validateProfile } from '../../src/hooks/profileValidation';
 import { buildRrule, type Freq, type RruleInput, type Weekday } from '../../src/store/buildRrule';
+import { parseRrule } from '../../src/store/humanizeRrule';
 import { expandOccurrences } from '../../src/store/expandOccurrences';
 import { emptyProfile, type UserProfile } from '../../src/types/profile';
 import type { BookingState } from '../../src/types/booking';
 
-import { useCreateAdminBooking, type AdminBookingPayload } from '../api/hooks';
+import {
+    useAdminBooking,
+    useCreateAdminBooking,
+    useUpdateAdminBooking,
+    type AdminBookingPayload,
+} from '../api/hooks';
 import { navigate } from '../useHashRoute';
 
 import styles from './BookingNew.module.css';
@@ -43,7 +49,19 @@ function defaultRrule(): RruleInput {
     };
 }
 
-export function BookingNew(): JSX.Element {
+interface BookingNewProps {
+    /**
+     * If set, the form switches to "edit existing booking" mode: it
+     * fetches the booking, pre-fills every field, calls PUT instead of
+     * POST on submit, and tweaks the headline + button label. Omit for
+     * the default "create new" mode.
+     */
+    editingId?: number;
+}
+
+export function BookingNew({ editingId }: BookingNewProps = {}): JSX.Element {
+    const isEdit = editingId !== undefined && editingId > 0;
+
     // — Sala —
     const { data: spaces, isLoading: loadingSpaces } = useSpaces({
         disponible: true,
@@ -75,7 +93,40 @@ export function BookingNew(): JSX.Element {
 
     // — Submit —
     const createBooking = useCreateAdminBooking();
+    const updateBooking = useUpdateAdminBooking();
     const [submitError, setSubmitError] = useState<string | null>(null);
+
+    // — Edit-mode pre-fill —
+    const editingBooking = useAdminBooking(isEdit ? editingId : null);
+    const prefilledRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (!isEdit) return;
+        const data = editingBooking.data;
+        if (data === undefined) return;
+        if (prefilledRef.current === data.id) return;
+        prefilledRef.current = data.id;
+
+        setSalaId(data.sala_id);
+        setFechaInicio(data.fecha_inicio);
+        setHoraInicio(data.hora_inicio.slice(0, 5));
+        setHoraFin(data.hora_fin.slice(0, 5));
+        setObjeto(data.objeto_reserva);
+        setEstado(data.estado);
+        setNotaAdmin(data.nota_admin ?? '');
+        if (data.profile !== null && data.profile !== undefined) {
+            setProfile(data.profile);
+        }
+        if (data.rrule !== null && data.rrule !== '') {
+            setRecurring(true);
+            setRrule(parseRrule(data.rrule));
+            setFechasExcluidas(data.fechas_excluidas ?? []);
+        } else {
+            setRecurring(false);
+            setRrule(defaultRrule());
+            setFechasExcluidas([]);
+        }
+    }, [isEdit, editingBooking.data]);
 
     const profileErrors = validateProfile(profile);
     const profileValid = isValidProfile(profile);
@@ -92,6 +143,7 @@ export function BookingNew(): JSX.Element {
         }
     }, [recurring, rrule, fechaInicio]);
 
+    const submitting = createBooking.isPending || updateBooking.isPending;
     const canSubmit =
         salaId !== null &&
         fechaInicio !== '' &&
@@ -100,7 +152,7 @@ export function BookingNew(): JSX.Element {
         horaInicio < horaFin &&
         objeto.trim() !== '' &&
         profileValid &&
-        !createBooking.isPending;
+        !submitting;
 
     const toggleWeekday = (wd: Weekday): void => {
         const current = rrule.byweekday ?? [];
@@ -150,24 +202,60 @@ export function BookingNew(): JSX.Element {
         };
 
         try {
-            const result = await createBooking.mutateAsync(payload);
-            navigate(`bookings/${result.booking.id}`);
+            if (isEdit && editingId !== undefined) {
+                // For edits, the backend reads `notify_user` (default true)
+                // rather than the inverse `suppress_notifications`. Send the
+                // explicit value so the toggle behaves the same as the rest
+                // of the admin UI.
+                const updatePayload = {
+                    ...payload,
+                    notify_user: !suppressNotifications,
+                };
+                const result = await updateBooking.mutateAsync({
+                    id: editingId,
+                    payload: updatePayload,
+                });
+                navigate(`bookings/${result.booking.id}`);
+            } else {
+                const result = await createBooking.mutateAsync(payload);
+                navigate(`bookings/${result.booking.id}`);
+            }
         } catch (err) {
             if (err instanceof ApiError) {
                 setSubmitError(err.message);
             } else if (err instanceof Error) {
                 setSubmitError(err.message);
             } else {
-                setSubmitError('Error desconocido al crear la reserva.');
+                setSubmitError(
+                    isEdit
+                        ? 'Error desconocido al guardar los cambios.'
+                        : 'Error desconocido al crear la reserva.',
+                );
             }
         }
     };
 
+    if (isEdit && editingBooking.isLoading) {
+        return <p>Cargando reserva…</p>;
+    }
+    if (isEdit && (editingBooking.isError || editingBooking.data === undefined)) {
+        return <ErrorMessage message="No se pudo cargar la reserva a editar." />;
+    }
+
+    const heading = isEdit ? `Editar reserva #${editingId ?? ''}` : 'Crear reserva manual';
+    const submitLabel = (() => {
+        if (submitting) {
+            return isEdit ? 'Guardando…' : 'Creando…';
+        }
+        return isEdit ? 'Guardar cambios' : 'Crear reserva';
+    })();
+    const cancelTarget = isEdit && editingId !== undefined ? `bookings/${editingId}` : 'bookings';
+
     return (
         <div className={styles.wrapper}>
             <header className={styles.header}>
-                <h2>Crear reserva manual</h2>
-                <Button variant="ghost" onClick={() => navigate('bookings')}>
+                <h2>{heading}</h2>
+                <Button variant="ghost" onClick={() => navigate(cancelTarget)}>
                     ← Cancelar
                 </Button>
             </header>
@@ -535,11 +623,14 @@ export function BookingNew(): JSX.Element {
             </section>
 
             {submitError !== null && (
-                <ErrorMessage title="No se pudo crear la reserva" message={submitError} />
+                <ErrorMessage
+                    title={isEdit ? 'No se pudo guardar' : 'No se pudo crear la reserva'}
+                    message={submitError}
+                />
             )}
 
             <footer className={styles.actions}>
-                <Button variant="ghost" onClick={() => navigate('bookings')}>
+                <Button variant="ghost" onClick={() => navigate(cancelTarget)}>
                     ← Cancelar
                 </Button>
                 <Button
@@ -548,7 +639,7 @@ export function BookingNew(): JSX.Element {
                     }}
                     disabled={!canSubmit}
                 >
-                    {createBooking.isPending ? 'Creando…' : 'Crear reserva'}
+                    {submitLabel}
                 </Button>
             </footer>
         </div>

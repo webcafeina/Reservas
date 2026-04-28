@@ -155,6 +155,93 @@ final class BookingService {
     }
 
     /**
+     * Updates an existing booking with the same shape of `$request` accepted
+     * by `create()`. Re-runs availability with `excludeBookingId` so the
+     * booking doesn't conflict with itself, replaces the `booking_dates`
+     * rows for the new expansion, and dispatches a "modified" async hook
+     * with a snapshot of the original booking so the email handler can
+     * build a diff for the solicitante.
+     *
+     * Turnstile is intentionally bypassed — admin endpoint.
+     */
+    public function update( int $bookingId, BookingRequest $request ): BookingResult {
+        $original = $this->bookings->find( $bookingId );
+        if ( $original === null ) {
+            return BookingResult::error( 'not-found', 'La reserva no existe.' );
+        }
+        $originalSnapshot = $original->toArray();
+
+        try {
+            $dates = $this->expandDates( $request );
+        } catch ( \InvalidArgumentException $e ) {
+            return BookingResult::error( 'invalid-recurrence', $e->getMessage() );
+        }
+        if ( $dates === array() ) {
+            return BookingResult::error(
+                'no-dates',
+                'La recurrencia no produce ninguna fecha válida.'
+            );
+        }
+
+        $profileId = $this->profiles->upsert( $request->profile );
+
+        $this->checker->beginTransaction();
+        try {
+            if ( ! $request->forceOverride ) {
+                $availability = $this->checker->checkAndLock(
+                    $request->salaId,
+                    $dates,
+                    $request->horaInicio,
+                    $request->horaFin,
+                    $bookingId
+                );
+                if ( ! $availability->available ) {
+                    $this->checker->rollback();
+                    return BookingResult::conflict( $availability );
+                }
+            }
+
+            $updated                 = new Booking();
+            $updated->id             = $bookingId;
+            $updated->uuid           = $original->uuid;
+            $updated->userId         = $original->userId;
+            $updated->profileId      = $profileId;
+            $updated->salaId         = $request->salaId;
+            $updated->estado         = $request->initialState ?? $original->estado;
+            $updated->horaInicio     = $this->normaliseTime( $request->horaInicio );
+            $updated->horaFin        = $this->normaliseTime( $request->horaFin );
+            $updated->rrule          = $request->rrule;
+            $updated->fechaInicio    = $dates[0]->format( 'Y-m-d' );
+            $updated->fechaFinSerie  = end( $dates )->format( 'Y-m-d' );
+            $updated->objetoReserva  = $request->objetoReserva;
+            $updated->notaAdmin      = $request->notaAdmin;
+
+            $this->bookings->updateFullBooking( $updated, $dates );
+            $updated->fechas = array_map(
+                static function ( DateTimeImmutable $d ): string {
+                    return $d->format( 'Y-m-d' );
+                },
+                $dates
+            );
+
+            $this->checker->commit();
+        } catch ( Throwable $e ) {
+            $this->checker->rollback();
+            return BookingResult::error( 'db-error', $e->getMessage() );
+        }
+
+        if ( ! $request->suppressNotifications && function_exists( 'wp_schedule_single_event' ) ) {
+            wp_schedule_single_event(
+                time(),
+                'reservas_aldealab_booking_modified',
+                array( $bookingId, $originalSnapshot )
+            );
+        }
+
+        return BookingResult::ok( $updated );
+    }
+
+    /**
      * @return array<int, DateTimeImmutable>
      */
     private function expandDates( BookingRequest $request ): array {

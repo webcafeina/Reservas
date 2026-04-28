@@ -131,6 +131,12 @@ export function BookingDetail({ id }: BookingDetailProps): JSX.Element {
 
                 <article className={styles.card}>
                     <h3>Gestión</h3>
+                    <Button
+                        variant="secondary"
+                        onClick={() => navigate(`bookings/${data.id}/edit`)}
+                    >
+                        Editar reserva
+                    </Button>
                     <SelectField
                         label="Estado"
                         value={estado}

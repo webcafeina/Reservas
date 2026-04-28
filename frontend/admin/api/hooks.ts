@@ -98,6 +98,29 @@ export function useCreateAdminBooking() {
     });
 }
 
+/**
+ * Full edit of an existing booking: PUT /admin/bookings/{id}. Same payload
+ * shape as create + an explicit `notify_user` flag (defaults to true on
+ * the backend) that controls whether the modified-booking email goes out.
+ */
+export interface AdminBookingUpdatePayload extends AdminBookingPayload {
+    notify_user?: boolean;
+}
+
+export function useUpdateAdminBooking() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, payload }: { id: number; payload: AdminBookingUpdatePayload }) =>
+            adminApi.put<{ success: true; booking: Booking }>(`/admin/bookings/${id}`, payload),
+        onSuccess: async (_data, vars) => {
+            await qc.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'bookings', vars.id] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'stats'] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'calendar'] });
+        },
+    });
+}
+
 export interface AdminStats {
     /** Lifetime count per estado, past + future. Not date-filtered. */
     by_state: Record<BookingState, number>;

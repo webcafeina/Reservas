@@ -48,6 +48,13 @@ export interface Booking {
     created_at: string | null;
     updated_at: string | null;
     fechas: string[];
+    /**
+     * Dates that the natural RRULE expansion would produce but were
+     * marked as excluded. Only set by `GET /admin/bookings/{id}` (the
+     * detail endpoint) so the edit form can pre-populate the exclusion
+     * picker. Empty for one-off bookings or when the field is absent.
+     */
+    fechas_excluidas?: string[] | null;
     /** Set by admin endpoints that JOIN user_profiles; null otherwise. */
     profile?: UserProfile | null;
 }

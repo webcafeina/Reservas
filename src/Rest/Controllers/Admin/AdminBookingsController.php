@@ -72,6 +72,11 @@ final class AdminBookingsController {
                     'permission_callback' => array( RestApi::class, 'currentUserCanManage' ),
                 ),
                 array(
+                    'methods'             => 'PUT',
+                    'callback'            => array( $this, 'fullUpdate' ),
+                    'permission_callback' => array( RestApi::class, 'currentUserCanManage' ),
+                ),
+                array(
                     'methods'             => 'DELETE',
                     'callback'            => array( $this, 'delete' ),
                     'permission_callback' => array( RestApi::class, 'currentUserCanManage' ),
@@ -140,7 +145,41 @@ final class AdminBookingsController {
                 404
             );
         }
-        return new WP_REST_Response( $booking->toArray(), 200 );
+        $payload = $booking->toArray();
+        // The form needs to know which dates were *excluded* from the
+        // natural RRULE expansion so it can re-render the exclusion picker
+        // when the admin opens the booking in edit mode. We don't store
+        // exclusions explicitly — they're the diff between the natural
+        // expansion and the actually-persisted dates.
+        $payload['fechas_excluidas'] = self::computeExcludedDates( $booking );
+        return new WP_REST_Response( $payload, 200 );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function computeExcludedDates( \WebcafeinaReservas\Models\Booking $booking ): array {
+        if ( $booking->rrule === null || $booking->rrule === '' ) {
+            return array();
+        }
+        try {
+            $expander = new RecurrenceExpander();
+            $start    = new \DateTimeImmutable( $booking->fechaInicio );
+            $bound    = $booking->fechaFinSerie !== null && $booking->fechaFinSerie !== ''
+                ? new \DateTimeImmutable( $booking->fechaFinSerie )
+                : null;
+            $natural  = $expander->expand( $booking->rrule, $start, $bound, array() );
+        } catch ( \Throwable $e ) {
+            return array();
+        }
+        $naturalIso = array_map(
+            static function ( \DateTimeImmutable $d ): string {
+                return $d->format( 'Y-m-d' );
+            },
+            $natural
+        );
+        $active = array_values( $booking->fechas );
+        return array_values( array_diff( $naturalIso, $active ) );
     }
 
     public function update( WP_REST_Request $request ): WP_REST_Response {
@@ -277,6 +316,85 @@ final class AdminBookingsController {
             array(
                 'code'    => 'rest_' . ( $result->errorCode ?? 'error' ),
                 'message' => $result->errorMessage ?? __( 'Error al crear la reserva.', 'reservas-aldealab' ),
+            ),
+            422
+        );
+    }
+
+    /**
+     * PUT /admin/bookings/{id} — full edit. Reuses buildBookingRequest()
+     * for shape consistency with POST. The `notify_user` flag (default
+     * true) controls whether the modified-booking email fires; we map it
+     * onto BookingRequest::suppressNotifications so the service layer
+     * stays oblivious to UI flag conventions.
+     */
+    public function fullUpdate( WP_REST_Request $request ): WP_REST_Response {
+        $id = (int) $request->get_param( 'id' );
+        if ( $id <= 0 ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_id',
+                    'message' => __( 'Identificador de reserva inválido.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
+
+        $payload = $this->buildBookingRequest( $request );
+        if ( $payload instanceof WP_REST_Response ) {
+            return $payload;
+        }
+
+        // notify_user defaults to true; suppressNotifications is its inverse.
+        $notifyParam = $request->get_param( 'notify_user' );
+        if ( $notifyParam !== null ) {
+            $payload->suppressNotifications = ! (bool) $notifyParam;
+        }
+
+        global $wpdb;
+        $expander = new RecurrenceExpander();
+        $checker  = new AvailabilityChecker( $wpdb );
+        $bookings = new BookingRepository( $wpdb );
+        $profiles = new UserProfileRepository( $wpdb );
+        $service  = new BookingService( $wpdb, $expander, $checker, $bookings, $profiles, null );
+
+        $result = $service->update( $id, $payload );
+
+        if ( $result->success && $result->booking !== null ) {
+            return new WP_REST_Response(
+                array(
+                    'success' => true,
+                    'booking' => $result->booking->toArray(),
+                ),
+                200
+            );
+        }
+
+        if ( $result->errorCode === 'not-found' ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_not_found',
+                    'message' => $result->errorMessage ?? __( 'Reserva no encontrada.', 'reservas-aldealab' ),
+                ),
+                404
+            );
+        }
+
+        if ( $result->errorCode === 'conflict' ) {
+            return new WP_REST_Response(
+                array(
+                    'code'       => 'rest_conflict',
+                    'message'    => $result->errorMessage,
+                    'conflictos' => $result->availability !== null ? $result->availability->conflicts : array(),
+                ),
+                409
+            );
+        }
+
+        return new WP_REST_Response(
+            array(
+                'code'    => 'rest_' . ( $result->errorCode ?? 'error' ),
+                'message' => $result->errorMessage ?? __( 'Error al actualizar la reserva.', 'reservas-aldealab' ),
             ),
             422
         );
