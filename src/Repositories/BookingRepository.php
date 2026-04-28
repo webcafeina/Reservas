@@ -266,6 +266,18 @@ final class BookingRepository {
         return $updated !== false;
     }
 
+    public function countByState( string $state ): int {
+        if ( $state === '' ) {
+            return 0;
+        }
+        $table = Schema::bookings();
+        $count = $this->wpdb->get_var(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $this->wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE estado = %s", $state )
+        );
+        return $count === null ? 0 : (int) $count;
+    }
+
     public function updateNotaAdmin( int $id, ?string $note ): bool {
         if ( $id <= 0 ) {
             return false;
