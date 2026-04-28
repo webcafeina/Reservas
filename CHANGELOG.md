@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.4] — 2026-04-28
+
+### Changed
+
+- **Rol "Gestor de Reservas" con poderes plenos sobre el plugin.**
+  Hasta ahora `reservas_manager` solo tenía `read`,
+  `manage_reservas`, `edit_posts` y `upload_files` — suficiente
+  para entrar al Panel de Reservas pero **no** para crear/borrar
+  salas (CPT) ni gestionar las taxonomías Edificios y Servicios.
+  Ahora se le añaden las caps que le faltaban:
+  - `edit_others_posts`, `edit_published_posts`, `publish_posts`,
+    `delete_posts`, `delete_others_posts`,
+    `delete_published_posts`, `read_private_posts` → para crear,
+    publicar, editar y eliminar salas (incluidas las creadas por
+    otros usuarios).
+  - `manage_categories` → para crear/editar Edificios y Servicios.
+
+  El rol sigue **sin** caps fuera del plugin (no toca usuarios,
+  otros plugins, ajustes generales de WP).
+
+  `RoleManager::ensureRoles()` se vuelve "self-heal":
+  comprueba en cada `admin_init` que cada cap deseada esté
+  presente y la añade si falta. Las instalaciones existentes
+  obtienen las caps nuevas automáticamente la próxima vez que un
+  usuario con acceso al admin de WP cargue cualquier página de
+  wp-admin — no hace falta reactivar el plugin ni tocar BD a
+  mano.
+
 ## [0.13.3] — 2026-04-27
 
 ### Changed

@@ -41,18 +41,45 @@ final class RoleManager {
             );
         }
 
-        // Managers: plugin admin access only, not the whole WP admin.
-        if ( get_role( self::ROLE_MANAGER ) === null ) {
+        // Managers: full control over the plugin (panel + salas CPT +
+        // Edificios/Servicios taxonomies), but no access to the rest of
+        // wp-admin (no users, no other plugins, no settings outside the
+        // plugin's own page). The CPT uses capability_type=post, so we
+        // need the matching post-management caps. `manage_categories` is
+        // the standard cap for managing taxonomies under the same type.
+        $managerCaps = array(
+            'read'                   => true,
+            self::CAP_MANAGE         => true,
+            'upload_files'           => true,
+            // Salas (CPT capability_type=post)
+            'edit_posts'             => true,
+            'edit_others_posts'      => true,
+            'edit_published_posts'   => true,
+            'publish_posts'          => true,
+            'delete_posts'           => true,
+            'delete_others_posts'    => true,
+            'delete_published_posts' => true,
+            'read_private_posts'     => true,
+            // Edificios + Servicios taxonomies
+            'manage_categories'      => true,
+        );
+
+        $manager = get_role( self::ROLE_MANAGER );
+        if ( $manager === null ) {
             add_role(
                 self::ROLE_MANAGER,
                 __( 'Gestor de Reservas', 'reservas-aldealab' ),
-                array(
-                    'read'                => true,
-                    self::CAP_MANAGE      => true,
-                    'edit_posts'          => true,
-                    'upload_files'        => true,
-                )
+                $managerCaps
             );
+        } else {
+            // Self-heal existing role: add any cap that's missing without
+            // touching unrelated caps that may have been added by other
+            // plugins or by hand. Idempotent on every admin pageload.
+            foreach ( array_keys( $managerCaps ) as $cap ) {
+                if ( ! $manager->has_cap( $cap ) ) {
+                    $manager->add_cap( $cap );
+                }
+            }
         }
 
         // Administrators always get manage_reservas, even if they never
