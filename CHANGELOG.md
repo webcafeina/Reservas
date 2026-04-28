@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] — 2026-04-28
+
+### Added
+
+- **Subidor de logo desde Ajustes.** Nueva sección "Logo del panel"
+  en `Ajustes` con previsualización, botón "Subir / Cambiar logo"
+  y "Quitar logo". El archivo se guarda en
+  `wp-content/uploads/reservas-aldealab/admin-logo.{svg,png}`,
+  carpeta que **WordPress nunca toca al actualizar plugins** —
+  el logo persiste indefinidamente entre actualizaciones del zip.
+
+  Validaciones: solo `.svg` o `.png`, máx 2 MB, magic-byte check
+  para evitar archivos renombrados (PNG signature, sniff de
+  `<svg>` para SVG). Si subes un `.svg` cuando ya había un
+  `.png` (o viceversa), el archivo viejo se borra automáticamente
+  para que la resolución sea determinista.
+
+  La URL servida lleva un cache-buster `?v=<mtime>` para que un
+  logo recién subido se muestre al instante sin esperar a que el
+  navegador desaloje el caché.
+
+### Changed
+
+- **Lookup del logo prioriza uploads sobre el plugin.**
+  `AdminAssetLoader::resolveLogoUrl()` delega ahora en el nuevo
+  `AdminLogoStorage::resolveUrl()`:
+  1. `wp-content/uploads/reservas-aldealab/admin-logo.svg|png`
+     (sube por la UI, sobrevive a actualizaciones).
+  2. Fallback a `assets/admin/logo.svg|png` empaquetado (por si en
+     el futuro queremos mandar un logo "por defecto" en el zip).
+
+  Si ya tenías un logo en `assets/admin/logo.png` de la versión
+  `0.14.0`, **se perderá** al actualizar al `v0.14.1` (el zip
+  reemplaza la carpeta del plugin). Vuelve a subirlo desde
+  `Ajustes → Logo del panel` y a partir de ahí persiste.
+
+  Endpoints REST nuevos:
+  - `GET /admin/logo` — estado actual `{ url, source, uploaded_at }`.
+  - `POST /admin/logo` — subida multipart (`file`).
+  - `DELETE /admin/logo` — quita la versión personalizada.
+
+  Todos gateados por `manage_reservas` como el resto del admin.
+
 ## [0.14.0] — 2026-04-28
 
 ### Added
