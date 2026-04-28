@@ -3,16 +3,20 @@
     border: 1px solid var(--ra-color-border);
     border-radius: var(--ra-radius-lg);
     box-shadow: var(--ra-shadow-sm);
-    padding: var(--ra-space-6);
+    /* 2em vertical padding inside the inner card; horizontal padding
+     * keeps the existing token-based spacing. */
+    padding: 2em var(--ra-space-6);
     max-width: var(--ra-step-width);
-    margin: 0 auto;
+    /* 2em gap above so the card breathes away from the steps progress
+     * bar that lives just above it inside the same .reservas-app-root. */
+    margin: 2em auto 0;
 }
 
 @media (max-width: 640px) {
     .frame {
-        /* Tighter padding on mobile — the body padding of #reservas-app
-         * already gives the outer breathing room, so we don't double it. */
-        padding: var(--ra-space-4);
+        /* Tighter horizontal padding on mobile, but keep the 2em vertical
+         * breather to preserve the visual rhythm with the progress bar. */
+        padding: 2em var(--ra-space-4);
     }
 }
 
