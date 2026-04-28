@@ -162,8 +162,15 @@ export function Calendar(): JSX.Element {
                     nowIndicator
                     weekNumbers={false}
                     firstDay={1}
-                    slotMinTime="07:00:00"
-                    slotMaxTime="23:00:00"
+                    /*
+                     * Full 24h window so bookings at any hour render. Was
+                     * 07:00–23:00 previously, which clipped early-morning
+                     * (06:30) and late-night (23:30) reservations from the
+                     * Semana/Día views. The grid is taller but every event
+                     * is now visible.
+                     */
+                    slotMinTime="00:00:00"
+                    slotMaxTime="24:00:00"
                     eventTimeFormat={{
                         hour: '2-digit',
                         minute: '2-digit',
