@@ -65,6 +65,7 @@ export function AdminApp(): JSX.Element {
                 {view.name === 'health' && <Health />}
                 {view.name === 'bookings' && <BookingsList />}
                 {view.name === 'bookings-new' && <BookingNew />}
+                {view.name === 'booking-edit' && <BookingNew editingId={view.id} />}
                 {view.name === 'booking' && <BookingDetail id={view.id} />}
                 {view.name === 'settings' && <SettingsPage />}
             </main>

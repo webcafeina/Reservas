@@ -275,6 +275,60 @@ final class BookingRepository {
         return $updated !== false;
     }
 
+    /**
+     * Replaces an existing booking row + all its booking_dates with the
+     * given snapshot. Caller MUST be inside a transaction so the row update
+     * and the date-set replacement commit atomically. `updated_at` is set
+     * by the table's `ON UPDATE CURRENT_TIMESTAMP`.
+     *
+     * @param array<int, DateTimeInterface> $dates
+     */
+    public function updateFullBooking( Booking $booking, array $dates ): void {
+        if ( $booking->id === null || $booking->id <= 0 ) {
+            throw new InvalidArgumentException( 'Booking id is required for updateFullBooking.' );
+        }
+        if ( $dates === array() ) {
+            throw new InvalidArgumentException( 'Booking must keep at least one date.' );
+        }
+
+        $table_b = Schema::bookings();
+        $table_d = Schema::bookingDates();
+
+        $this->wpdb->update(
+            $table_b,
+            array(
+                'profile_id'      => $booking->profileId,
+                'sala_id'         => $booking->salaId,
+                'estado'          => $booking->estado,
+                'hora_inicio'     => $booking->horaInicio,
+                'hora_fin'        => $booking->horaFin,
+                'rrule'           => $booking->rrule,
+                'fecha_inicio'    => $booking->fechaInicio,
+                'fecha_fin_serie' => $booking->fechaFinSerie,
+                'objeto_reserva'  => $booking->objetoReserva,
+                'nota_admin'      => $booking->notaAdmin,
+            ),
+            array( 'id' => $booking->id )
+        );
+        // Wipe and re-insert booking_dates. Doing it inside the caller's TX
+        // so a mid-flight failure rolls back to the original date set.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $this->wpdb->query(
+            $this->wpdb->prepare( "DELETE FROM {$table_d} WHERE booking_id = %d", $booking->id )
+        );
+        foreach ( $dates as $d ) {
+            $this->wpdb->insert(
+                $table_d,
+                array(
+                    'booking_id'   => $booking->id,
+                    'sala_id'      => $booking->salaId,
+                    'fecha'        => $d->format( 'Y-m-d' ),
+                    'estado_fecha' => 'activa',
+                )
+            );
+        }
+    }
+
     public function delete( int $id ): bool {
         if ( $id <= 0 ) {
             return false;

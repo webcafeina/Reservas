@@ -1,4 +1,4 @@
-import type { RruleInput, Weekday } from './buildRrule';
+import { defaultRruleInput, type RruleInput, type Weekday } from './buildRrule';
 
 const DATE_FORMATTER_ES = new Intl.DateTimeFormat('es-ES', {
     day: 'numeric',
@@ -139,6 +139,98 @@ export function humanizeRawRrule(rule: string): string {
     }
 
     return humanizeFreq(input);
+}
+
+/**
+ * Inverse of `buildRrule()`: turns a raw RFC 5545 RRULE string back into
+ * the structured `RruleInput` shape used by the SPA store. Used when
+ * pre-filling the booking form in edit mode.
+ *
+ * Recognises FREQ, INTERVAL, BYDAY, BYMONTHDAY, BYSETPOS, UNTIL, COUNT.
+ * If the rule can't be parsed, returns `defaultRruleInput()` so the form
+ * doesn't blow up — a developer warning is logged in dev builds via
+ * console.warn (the producer is our own backend, so unparseable rules
+ * indicate a bug and shouldn't happen in production).
+ */
+export function parseRrule(rule: string | null | undefined): RruleInput {
+    if (rule === null || rule === undefined || rule === '') {
+        return defaultRruleInput();
+    }
+    const parts: Record<string, string> = {};
+    for (const segment of rule.split(';')) {
+        const eq = segment.indexOf('=');
+        if (eq === -1) continue;
+        parts[segment.slice(0, eq).trim().toUpperCase()] = segment.slice(eq + 1).trim();
+    }
+
+    const isFreq = (v: string | undefined): v is RruleInput['freq'] =>
+        v === 'DAILY' || v === 'WEEKLY' || v === 'MONTHLY' || v === 'YEARLY';
+    const freq = parts['FREQ'];
+    if (!isFreq(freq)) {
+        return defaultRruleInput();
+    }
+
+    const interval =
+        parts['INTERVAL'] !== undefined && /^\d+$/.test(parts['INTERVAL'])
+            ? Math.max(1, Number(parts['INTERVAL']))
+            : 1;
+
+    const isWeekday = (v: string): v is Weekday =>
+        v === 'MO' ||
+        v === 'TU' ||
+        v === 'WE' ||
+        v === 'TH' ||
+        v === 'FR' ||
+        v === 'SA' ||
+        v === 'SU';
+
+    const out: RruleInput = {
+        freq,
+        interval,
+        end: { kind: 'never' },
+    };
+
+    if (freq === 'WEEKLY' && parts['BYDAY'] !== undefined) {
+        const days = parts['BYDAY']
+            .split(',')
+            .map((d) => d.trim())
+            .filter(isWeekday);
+        if (days.length > 0) out.byweekday = days;
+    }
+
+    if (freq === 'MONTHLY') {
+        if (parts['BYMONTHDAY'] !== undefined && /^\d+$/.test(parts['BYMONTHDAY'])) {
+            const day = Number(parts['BYMONTHDAY']);
+            if (day >= 1 && day <= 31) {
+                out.monthly = { mode: 'day-of-month', day };
+            }
+        } else if (
+            parts['BYDAY'] !== undefined &&
+            parts['BYSETPOS'] !== undefined &&
+            isWeekday(parts['BYDAY'])
+        ) {
+            const nthRaw = parts['BYSETPOS'];
+            const nth = nthRaw === '-1' ? -1 : Number(nthRaw);
+            if (nth === -1 || nth === 1 || nth === 2 || nth === 3 || nth === 4) {
+                out.monthly = { mode: 'nth-weekday', nth, weekday: parts['BYDAY'] };
+            }
+        }
+    }
+
+    // End condition: UNTIL wins over COUNT if both are present (RFC 5545
+    // forbids combining them, but we're defensive).
+    if (parts['UNTIL'] !== undefined) {
+        // UNTIL formats: YYYYMMDD or YYYYMMDDTHHMMSSZ.
+        const m = /^(\d{4})(\d{2})(\d{2})/.exec(parts['UNTIL']);
+        if (m !== null) {
+            out.end = { kind: 'until', date: `${m[1]}-${m[2]}-${m[3]}` };
+        }
+    } else if (parts['COUNT'] !== undefined && /^\d+$/.test(parts['COUNT'])) {
+        const count = Math.max(1, Number(parts['COUNT']));
+        out.end = { kind: 'count', count };
+    }
+
+    return out;
 }
 
 /** Human-readable summary of the end condition. */
