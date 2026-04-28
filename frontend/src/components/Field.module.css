@@ -16,6 +16,12 @@
 
 .input {
     width: 100%;
+    /* min-width:0 lets the input shrink below its intrinsic content
+     * size when nested inside a flex/grid container. Without it iOS
+     * Safari ignores width:100% on date/time inputs and overflows.
+     * max-width caps it as a belt-and-suspenders. */
+    min-width: 0;
+    max-width: 100%;
     padding: var(--ra-space-3);
     border: 1px solid var(--ra-color-border);
     border-radius: var(--ra-radius-md);
@@ -25,6 +31,19 @@
     background: var(--ra-color-bg);
     transition: border-color var(--ra-duration-fast) var(--ra-ease);
     min-height: 44px;
+}
+
+/*
+ * Native date/time inputs on iOS Safari render with an intrinsic
+ * minimum width baked into their UA stylesheet that overrides our
+ * width:100%. Stripping `appearance` normalises the box without
+ * affecting the native picker that opens on tap.
+ */
+.input[type='date'],
+.input[type='time'],
+.input[type='datetime-local'] {
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .input:hover:not(:disabled) {

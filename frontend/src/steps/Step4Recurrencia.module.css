@@ -46,6 +46,11 @@
 
 .dateInput {
     flex: 1;
+    /* See Field.module.css: same iOS Safari intrinsic-width fix. */
+    min-width: 0;
+    max-width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
     padding: var(--ra-space-3);
     border: 1px solid var(--ra-color-border);
     border-radius: var(--ra-radius-md);
