@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.7] — 2026-04-28
+
+### Changed
+
+- **Margen del label de paso activo móvil bajado a 0.6em**
+  (antes 0.8em).
+- **Más aire entre el paso activo y la barra fina** en móvil:
+  `margin-top: var(--ra-space-3)` en `.bar` dentro del media query
+  móvil. Antes la fila quedaba prácticamente pegada a la barra
+  ahora que el bullet es más grande.
+
+### Fixed
+
+- **Inputs de fecha/hora desbordaban su contenedor en móvil
+  (iOS Safari).** El UA-stylesheet de Safari le mete a
+  `<input type="date">`, `<input type="time">` y
+  `<input type="datetime-local">` un ancho mínimo intrínseco que
+  ignora `width: 100%`. Fix en dos frentes:
+  - `.input` (en `Field.module.css`) gana `min-width: 0` +
+    `max-width: 100%`.
+  - Para los tipos de fecha/hora se añade `appearance: none`
+    (con prefijo `-webkit-`) que neutraliza el ancho mínimo del
+    UA-stylesheet sin afectar al picker nativo que se abre al
+    pulsarlos.
+  - Mismo tratamiento aplicado al `.dateInput` directo de
+    `Step4Recurrencia.module.css` (las exclusiones de fechas), que
+    no usaba la clase `.input` compartida.
+
 ## [0.15.6] — 2026-04-28
 
 ### Changed
