@@ -31,11 +31,16 @@ const STATE_COLORS: Record<string, string> = {
 };
 
 function toIsoDate(d: Date): string {
-    // Use UTC components to avoid TZ shifts when FullCalendar gives us a
-    // local-midnight Date that crosses the date line.
-    const yyyy = d.getUTCFullYear();
-    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-    const dd = String(d.getUTCDate()).padStart(2, '0');
+    // FullCalendar hands us Date objects representing the LOCAL midnight
+    // of the visible range boundary, so we must read them with the local
+    // accessors. The previous UTC version drifted by one day in any TZ
+    // east of Greenwich (Madrid +1/+2), which was harmless on the wider
+    // views (the off-by-one fell inside the range buffer) but on
+    // timeGridDay — exactly 24h of range — it shifted the query a full
+    // day off and the API returned no events.
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
 }
 
@@ -62,9 +67,11 @@ export function Calendar(): JSX.Element {
     const handleDatesSet = (arg: DatesSetArg): void => {
         const from = toIsoDate(arg.start);
         // FullCalendar's `end` is exclusive — back off one day for the
-        // inclusive range our API expects.
+        // inclusive range our API expects. Use local setDate/getDate to
+        // stay consistent with toIsoDate above; UTC accessors drifted by
+        // one day in TZs east of Greenwich.
         const endExclusive = new Date(arg.end);
-        endExclusive.setUTCDate(endExclusive.getUTCDate() - 1);
+        endExclusive.setDate(endExclusive.getDate() - 1);
         const to = toIsoDate(endExclusive);
         // Avoid loops by only updating when the range actually changes.
         if (range === null || range.from !== from || range.to !== to) {
