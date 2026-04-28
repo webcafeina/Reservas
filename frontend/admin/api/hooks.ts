@@ -167,6 +167,20 @@ export function usePdfTemplates() {
     });
 }
 
+export interface AdminLogoStatus {
+    url: string | null;
+    source: 'uploads' | 'packaged' | null;
+    uploaded_at: string | null;
+}
+
+export function useAdminLogo() {
+    return useQuery({
+        queryKey: ['admin', 'logo'],
+        queryFn: () => adminApi.get<AdminLogoStatus>('/admin/logo'),
+        staleTime: 30_000,
+    });
+}
+
 export interface CalendarEvent {
     id: string;
     booking_id: number;

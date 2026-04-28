@@ -5,6 +5,7 @@ import { SelectField, TextField, TextareaField } from '../../src/components/Fiel
 import { ErrorMessage } from '../../src/components/ErrorMessage';
 import { useSettings, useUpdateSettings, type Settings as SettingsShape } from '../api/hooks';
 
+import { AdminLogo } from './AdminLogo';
 import { PdfTemplates } from './PdfTemplates';
 
 import styles from './Settings.module.css';
@@ -78,8 +79,8 @@ export function SettingsPage(): JSX.Element {
                     >
                         Cloudflare Turnstile
                     </a>{' '}
-                    y pega aquí las claves. Si las dejas vacías, el plugin no pedirá Turnstile
-                    (no recomendado en producción).
+                    y pega aquí las claves. Si las dejas vacías, el plugin no pedirá Turnstile (no
+                    recomendado en producción).
                 </p>
                 <div className={styles.row}>
                     <TextField
@@ -152,9 +153,8 @@ export function SettingsPage(): JSX.Element {
             <section className={styles.group}>
                 <h2>Notificaciones SMS (opcional)</h2>
                 <p className={styles.muted}>
-                    Si activas un proveedor SMS, cada confirmación / cancelación enviará
-                    también un SMS al móvil del solicitante. Si lo dejas en "Ninguno",
-                    no se envía ningún SMS.
+                    Si activas un proveedor SMS, cada confirmación / cancelación enviará también un
+                    SMS al móvil del solicitante. Si lo dejas en «Ninguno», no se envía ningún SMS.
                 </p>
                 <SelectField
                     label="Proveedor"
@@ -192,10 +192,20 @@ export function SettingsPage(): JSX.Element {
             </section>
 
             <section className={styles.group}>
+                <h2>Logo del panel</h2>
+                <p className={styles.muted}>
+                    Imagen que se muestra a la derecha del título «Gestor de reservas de AldeaLab»
+                    en el header del panel. El archivo se guarda en wp-content/uploads/, por lo que
+                    persiste a actualizaciones del plugin.
+                </p>
+                <AdminLogo />
+            </section>
+
+            <section className={styles.group}>
                 <h2>Plantillas PDF</h2>
                 <p className={styles.muted}>
-                    Sube una plantilla oficial actualizada si el Ayuntamiento la revisa.
-                    Si se elimina la personalizada, el plugin usa la que viene empaquetada.
+                    Sube una plantilla oficial actualizada si el Ayuntamiento la revisa. Si se
+                    elimina la personalizada, el plugin usa la que viene empaquetada.
                 </p>
                 <PdfTemplates />
             </section>
@@ -212,8 +222,8 @@ export function SettingsPage(): JSX.Element {
                         <strong>Eliminar todos los datos al desinstalar el plugin.</strong>
                         <br />
                         <small>
-                            Borra tablas, reservas, perfiles y logs. Solo actívalo si sabes lo
-                            que haces — esta acción no se puede deshacer.
+                            Borra tablas, reservas, perfiles y logs. Solo actívalo si sabes lo que
+                            haces — esta acción no se puede deshacer.
                         </small>
                     </span>
                 </label>
@@ -229,11 +239,7 @@ export function SettingsPage(): JSX.Element {
                     {update.isPending ? 'Guardando…' : 'Guardar ajustes'}
                 </Button>
                 {feedback !== null && (
-                    <span
-                        className={
-                            feedback === 'Ajustes guardados.' ? styles.ok : styles.err
-                        }
-                    >
+                    <span className={feedback === 'Ajustes guardados.' ? styles.ok : styles.err}>
                         {feedback}
                     </span>
                 )}
