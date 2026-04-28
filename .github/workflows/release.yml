@@ -58,6 +58,7 @@ jobs:
             --include='assets/' \
             --include='assets/pdf-templates/***' \
             --include='assets/email/***' \
+            --include='assets/admin/***' \
             --include='assets/dist/***' \
             --include='languages/***' \
             --exclude='*' \
