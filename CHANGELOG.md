@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] — 2026-04-28
+
+### Added
+
+- **Logo del cliente opcional en el header del Panel admin.** A la
+  derecha de la cabecera (con el bloque H1 + nav alineado a la
+  izquierda) aparece ahora una imagen vertical-centrada cuando el
+  cliente coloca un archivo en `assets/admin/logo.svg` o
+  `assets/admin/logo.png` dentro de la instalación del plugin. El
+  SVG tiene preferencia sobre el PNG cuando ambos están presentes
+  (escala mejor en pantallas de alta densidad).
+
+  Si no hay archivo, no se renderiza nada y el header queda
+  exactamente como estaba (regresión zero).
+
+  Tamaño máximo: 48 px de alto, ancho automático manteniendo
+  proporciones. La imagen es decorativa (`alt=""` +
+  `aria-hidden="true"`) — el branding semántico sigue en el
+  `<h1>`. `onError` la oculta si el archivo no carga, para no
+  dejar un icono roto.
+
+  Implementación:
+  - `AdminAssetLoader::resolveLogoUrl()` busca el archivo en disco
+    al localizar el bootstrap del admin y expone `logoUrl` en
+    `window.ReservasAldealabAdmin` (null si no existe).
+  - `AdminApp.tsx` reorganiza el header como flex horizontal con
+    `headerLeft` (H1 + nav apilados) + `headerLogo` cuando hay URL.
+  - El workflow de release añade `--include='assets/admin/***'` al
+    rsync para que el directorio (y el logo) viajen en el zip.
+
+  **Cómo poner el logo**: deja `logo.svg` o `logo.png` en
+  `wp-content/plugins/reservas-aldealab/assets/admin/` y recarga
+  el Panel.
+
 ## [0.13.4] — 2026-04-28
 
 ### Changed
