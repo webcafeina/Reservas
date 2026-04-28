@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.6] — 2026-04-28
+
+### Changed
+
+- **ProgressBar móvil: sustituye `gap` flex por `margin-left` en el
+  label.** El `gap: 1em` no estaba aplicándose visualmente. Ahora
+  el label del paso activo lleva un `margin-left: 0.8em` directo
+  que sí funciona en cualquier navegador objetivo. Sin cambios en
+  tablet/desktop.
+
 ## [0.15.5] — 2026-04-28
 
 ### Changed
