@@ -74,7 +74,26 @@
 }
 
 @media (max-width: 640px) {
-    .label {
+    /*
+     * On mobile we collapse the bullet row to ONLY the active step. The
+     * thin progress bar below already conveys the overall position;
+     * showing 8 bullets in a grid wrapped to two rows and looked broken.
+     * The single visible step lays out horizontally as "3 · Fechas" so
+     * the user keeps the textual context that gets dropped on desktop.
+     */
+    .steps {
+        display: flex;
+        justify-content: center;
+    }
+    .step:not(.active) {
         display: none;
+    }
+    .step.active {
+        flex-direction: row;
+        align-items: center;
+    }
+    .label {
+        display: inline;
+        font-size: var(--ra-font-size-sm);
     }
 }
