@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.3] — 2026-04-28
+
+### Fixed
+
+- **Vistas Semana/Día del calendario clipaban reservas fuera de
+  07:00–23:00.** Una reserva a las 06:30 no se veía (caía fuera
+  del `slotMinTime`); una reserva a las 23:30 tampoco (fuera del
+  `slotMaxTime`). Se amplía la ventana del time-grid a las
+  **24 h completas** (`slotMinTime: '00:00:00'`,
+  `slotMaxTime: '24:00:00'`) para que cualquier reserva,
+  independientemente de la hora, se renderice. El grid es
+  ligeramente más alto pero ya no se pierde nada.
+
 ## [0.14.2] — 2026-04-28
 
 ### Fixed
