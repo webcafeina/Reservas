@@ -63,7 +63,15 @@ final class ProfileController {
 
         global $wpdb;
         $repo    = new UserProfileRepository( $wpdb );
+        // "Fila del plugin gana": the explicitly-saved profile from a
+        // previous booking always wins. Only when there's no row yet
+        // (first booking ever for this WP user) we fall back to user
+        // metas so the form pre-fills with the data they've already
+        // entered in their AldeaLab account.
         $profile = $repo->findForUser( $uid );
+        if ( $profile === null ) {
+            $profile = $repo->buildFromUserMeta( $uid );
+        }
         if ( $profile === null ) {
             return new WP_REST_Response( array( 'profile' => null ), 200 );
         }
