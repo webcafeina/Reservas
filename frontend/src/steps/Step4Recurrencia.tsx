@@ -77,7 +77,9 @@ export function Step4Recurrencia(): JSX.Element {
                     <Button variant="ghost" onClick={goBack}>
                         ← Atrás
                     </Button>
-                    <Button onClick={() => setStep(5)}>Siguiente →</Button>
+                    <Button onClick={() => setStep(5)} data-step-advance>
+                        Siguiente →
+                    </Button>
                 </>
             }
         >

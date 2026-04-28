@@ -24,7 +24,7 @@ export function Step5Horario(): JSX.Element {
                     >
                         ← Atrás
                     </Button>
-                    <Button onClick={() => setStep(6)} disabled={invalid}>
+                    <Button onClick={() => setStep(6)} disabled={invalid} data-step-advance>
                         Siguiente →
                     </Button>
                 </>

@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { ProgressBar } from './components/ProgressBar';
 import { WebcafeinaFooter } from './components/WebcafeinaFooter';
 import { useBookingStore } from './store/bookingStore';
@@ -23,6 +25,47 @@ const STEP_LABELS = [
 
 export function App(): JSX.Element {
     const step = useBookingStore((s) => s.currentStep);
+
+    /*
+     * Enter advances to the next step on Steps 1–6. Each "Siguiente"
+     * button opts in via `data-step-advance`; the Confirmar reserva
+     * button on Step 7 deliberately does NOT, so the user has to click
+     * to commit the booking. Step 8 is the success screen.
+     *
+     * We also skip:
+     *   - non-plain Enter (Shift/Ctrl/Meta/Alt) — modifier shortcuts.
+     *   - Enter inside a <textarea> (multi-line input).
+     *   - Enter on a <button> or <a> (those handle their own activation).
+     *   - Enter inside contentEditable.
+     */
+    useEffect(() => {
+        if (step < 1 || step > 6) {
+            return;
+        }
+        const handler = (e: KeyboardEvent): void => {
+            if (e.key !== 'Enter') return;
+            if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+
+            const target = e.target;
+            if (target instanceof HTMLElement) {
+                const tag = target.tagName.toLowerCase();
+                if (tag === 'textarea' || tag === 'button' || tag === 'a') return;
+                if (target.isContentEditable) return;
+            }
+
+            const btn = document.querySelector<HTMLButtonElement>(
+                '[data-step-advance]:not([disabled])',
+            );
+            if (btn !== null) {
+                e.preventDefault();
+                btn.click();
+            }
+        };
+        document.addEventListener('keydown', handler);
+        return () => {
+            document.removeEventListener('keydown', handler);
+        };
+    }, [step]);
 
     return (
         <div className="reservas-app-root">

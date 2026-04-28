@@ -36,7 +36,9 @@ export function Step1Aforo(): JSX.Element {
             actions={
                 <>
                     <span />
-                    <Button onClick={goNext}>Siguiente →</Button>
+                    <Button onClick={goNext} data-step-advance>
+                        Siguiente →
+                    </Button>
                 </>
             }
         >
