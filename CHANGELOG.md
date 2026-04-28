@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.2] — 2026-04-28
+
+### Fixed
+
+- **Pre-rellenado del formulario público para usuarios logueados
+  sin reservas previas**. Hasta ahora `GET /user/profile` solo
+  miraba en `wp_reservas_user_profiles` (filtrando por `user_id`)
+  y devolvía `null` si el usuario aún no había hecho ninguna
+  reserva con el plugin → el formulario se quedaba vacío aunque
+  tuviera sus datos guardados como user metas.
+
+  Ahora, si no hay fila en la tabla del plugin,
+  `UserProfileRepository::buildFromUserMeta()` construye un
+  `UserProfile` leyendo las claves `wp_usermeta` configuradas en
+  la cuenta AldeaLab (`nif_usuario`, `nombre_usuario`,
+  `apellido1_usuario`, `apellido2_usuario`, `email_usuario`,
+  `movil_usuario`, `telefono_usuario`, `empresa`,
+  `via_direccion_usuario`, `numero_direccion_usuario`,
+  `letra_direccion_usuario`, `escalera_direccion_usuario`,
+  `piso_direccion_usuario`, `puerta_direccion_usuario`,
+  `municipio_usuario`, `provincia_usuario`, `cp_usuario`).
+
+  Si el meta `email_usuario` está vacío, fallback a
+  `user_email` del propio registro de WP.
+
+  **Estrategia "fila del plugin gana"**: el fallback solo se
+  consulta cuando NO hay perfil del plugin para ese usuario. En
+  cuanto el usuario crea su primera reserva, `upsert()` guarda la
+  fila y a partir de ahí esa fila es la fuente de verdad — si el
+  usuario edita sus datos en el form de la reserva, lo que se
+  guarda en BD del plugin manda; las metas de WP no se tocan ni
+  se sobrescriben con lo guardado.
+
 ## [0.16.1] — 2026-04-28
 
 ### Fixed
