@@ -14,6 +14,7 @@ use WP_REST_Response;
 use WebcafeinaReservas\Models\UserProfile;
 use WebcafeinaReservas\Repositories\UserProfileRepository;
 use WebcafeinaReservas\Rest\RestApi;
+use WebcafeinaReservas\Support\Provincias;
 
 /**
  * GET  /user/profile — read logged-in user's stored profile (for form prefill).
@@ -115,6 +116,15 @@ final class ProfileController {
                 array(
                     'code'    => 'rest_invalid_email',
                     'message' => __( 'El email no es válido.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
+        if ( ! Provincias::isValid( $profile->provincia ) ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_provincia',
+                    'message' => __( 'La provincia no es válida. Selecciona una de la lista.', 'reservas-aldealab' ),
                 ),
                 400
             );

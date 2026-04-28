@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 
 import { Button } from '../components/Button';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { TextField, TextareaField } from '../components/Field';
+import { SelectField, TextField, TextareaField } from '../components/Field';
 import { StepFrame } from '../components/StepFrame';
 import { useProfile } from '../api/profile';
 import { useBookingStore } from '../store/bookingStore';
+import { PROVINCIAS, isProvincia } from '../data/provincias';
 import { isValidProfile, validateProfile } from '../hooks/profileValidation';
 
 import styles from './Step6Perfil.module.css';
@@ -161,12 +162,21 @@ export function Step6Perfil(): JSX.Element {
                     required
                     error={errors.municipio ?? null}
                 />
-                <TextField
+                <SelectField
                     label="Provincia"
                     value={profile.provincia}
                     onChange={(e) => patchProfile({ provincia: e.target.value })}
                     required
                     error={errors.provincia ?? null}
+                    hint={
+                        profile.provincia !== '' && !isProvincia(profile.provincia)
+                            ? `El valor anterior ("${profile.provincia}") no está en la lista. Selecciona una.`
+                            : ''
+                    }
+                    options={[
+                        { value: '', label: '— Selecciona —' },
+                        ...PROVINCIAS.map((p) => ({ value: p, label: p })),
+                    ]}
                 />
                 <TextField
                     label="Código postal"

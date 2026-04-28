@@ -21,6 +21,7 @@ use WebcafeinaReservas\Services\BookingRequest;
 use WebcafeinaReservas\Services\BookingService;
 use WebcafeinaReservas\Services\RecurrenceExpander;
 use WebcafeinaReservas\Services\TurnstileVerifier;
+use WebcafeinaReservas\Support\Provincias;
 
 /**
  * POST /bookings — create a new booking. Requires a valid Turnstile token
@@ -141,6 +142,15 @@ final class BookingsController {
                 array(
                     'code'    => 'rest_invalid_email',
                     'message' => __( 'El email no es válido.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
+        if ( ! Provincias::isValid( $profile->provincia ) ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_provincia',
+                    'message' => __( 'La provincia no es válida. Selecciona una de la lista.', 'reservas-aldealab' ),
                 ),
                 400
             );

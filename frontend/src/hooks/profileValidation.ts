@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { isProvincia } from '../data/provincias';
 import type { UserProfile } from '../types/profile';
 
 export const profileSchema = z.object({
@@ -9,7 +10,14 @@ export const profileSchema = z.object({
     via: z.string().min(1, 'Requerido'),
     numero: z.string().min(1, 'Requerido'),
     municipio: z.string().min(1, 'Requerido'),
-    provincia: z.string().min(1, 'Requerido'),
+    // `provincia` must match the canonical Spanish list. The dropdown
+    // is the only entry path in the UI; the refine guards against
+    // legacy values pre-filled from old user profiles or admin edits
+    // of bookings created before this validation tightened.
+    provincia: z
+        .string()
+        .min(1, 'Requerido')
+        .refine(isProvincia, { message: 'Selecciona una provincia de la lista' }),
     codigo_postal: z
         .string()
         .min(1, 'Requerido')

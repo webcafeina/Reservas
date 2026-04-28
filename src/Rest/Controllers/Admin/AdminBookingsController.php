@@ -21,6 +21,7 @@ use WebcafeinaReservas\Services\BookingRequest;
 use WebcafeinaReservas\Services\BookingService;
 use WebcafeinaReservas\Services\EmailNotifier;
 use WebcafeinaReservas\Services\RecurrenceExpander;
+use WebcafeinaReservas\Support\Provincias;
 
 /**
  * GET    /admin/bookings         — paginated list with filters.
@@ -438,6 +439,15 @@ final class AdminBookingsController {
                 array(
                     'code'    => 'rest_invalid_email',
                     'message' => __( 'El email no es válido.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
+        if ( ! Provincias::isValid( $profile->provincia ) ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_provincia',
+                    'message' => __( 'La provincia no es válida. Selecciona una de la lista.', 'reservas-aldealab' ),
                 ),
                 400
             );

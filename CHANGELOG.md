@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] — 2026-04-28
+
+### Changed
+
+- **Provincia: campo libre → desplegable cerrado con la lista
+  oficial española.** El input de texto en el formulario público
+  (Step 6) y en el de creación/edición manual del admin pasa a
+  ser un `<select>` con las **52 entradas** (50 provincias + Ceuta
+  y Melilla). Las bilingües se renderizan en orden
+  regional/castellano separadas por `/`: `A Coruña/La Coruña`,
+  `Bizkaia/Vizcaya`, `Lleida/Lérida`, `València/Valencia`,
+  `Illes Balears/Islas Baleares`, etc.
+
+  El valor que se guarda en BD es la etiqueta completa con la
+  barra — lo que se ve en la UI es lo que va al CSV exportado, al
+  PDF oficial y a los emails, sin lookups ni mapeos extra.
+
+### Added
+
+- **Validación estricta de provincia en el backend.** Los tres
+  endpoints que ingestan el perfil — `POST /bookings`,
+  `POST/PUT /admin/bookings`, `PUT /user/profile` — rechazan con
+  HTTP 400 + `rest_invalid_provincia` cualquier valor que no
+  esté en la lista canónica. Sin migración de datos: las
+  reservas antiguas conservan su provincia literal en BD; solo
+  los nuevos envíos están sujetos al cierre.
+
+  Al editar una reserva legacy con una provincia no canónica
+  (`"MADRID "`, `"Madrid (Comunidad)"`, etc.), el select queda
+  sin selección y un hint explica el motivo:
+  `El valor anterior ("X") no está en la lista. Selecciona una.`
+  El botón Guardar no se desbloquea hasta elegir una válida.
+
+  Nuevos archivos: `src/Support/Provincias.php` (PHP) +
+  `frontend/src/data/provincias.ts` (TS) — idénticas, espejos
+  manuales que conviene mantener sincronizados si algún día
+  cambia un nombre oficial.
+
 ## [0.15.9] — 2026-04-28
 
 ### Changed
