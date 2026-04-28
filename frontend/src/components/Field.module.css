@@ -46,6 +46,26 @@
     appearance: none;
 }
 
+/*
+ * Selects: WordPress admin (wp-admin/css/forms.css) styles bare
+ * `select` aggressively (custom arrow, min-height:30px,
+ * max-width:25rem, etc.) and those rules leak into our admin SPA
+ * and beat plain `.input`. `select.input` raises specificity
+ * (0,1,1) so it wins, then we strip the appearance and draw a
+ * matching caret as a background SVG so the field reads identical
+ * to the rest of the form on both the public booking form and the
+ * wp-admin panel.
+ */
+select.input {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path fill='none' stroke='%235f6368' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1l5 5 5-5'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px;
+    padding-right: 36px;
+}
+
 .input:hover:not(:disabled) {
     border-color: var(--ra-color-border-strong);
 }
