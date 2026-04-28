@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.2] — 2026-04-28
+
+### Fixed
+
+- **Vista "Día" del calendario aparecía en blanco.** El conversor
+  `toIsoDate()` en `Calendar.tsx` extraía año/mes/día con
+  `getUTC*()` sobre el `Date` que FullCalendar entrega en `arg.start`
+  / `arg.end`. Esos `Date` representan **medianoche local** del
+  rango visible — al leerlos con accesores UTC en TZ positivas
+  (Madrid +1/+2) salía el día anterior. En mes/semana/año/lista la
+  query a `/admin/calendar` quedaba 1 día desplazada pero el rango
+  era lo bastante amplio para cubrir los eventos. En `timeGridDay`
+  el rango es exactamente 24 h, así que el desfase dejaba la query
+  fuera del día real → calendario vacío.
+
+  Fix: usar accesores locales (`getFullYear` / `getMonth` /
+  `getDate` y `setDate`). Sin más cambios: el endpoint de calendario
+  y el resto del flujo siguen igual.
+
 ## [0.14.1] — 2026-04-28
 
 ### Added
