@@ -46,7 +46,7 @@ export function Step3Fechas(): JSX.Element {
                     <Button variant="ghost" onClick={goBack}>
                         ← Atrás
                     </Button>
-                    <Button onClick={handleNext} disabled={fechaInicio === ''}>
+                    <Button onClick={handleNext} disabled={fechaInicio === ''} data-step-advance>
                         Siguiente →
                     </Button>
                 </>

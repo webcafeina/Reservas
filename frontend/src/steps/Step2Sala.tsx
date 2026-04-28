@@ -31,7 +31,7 @@ export function Step2Sala(): JSX.Element {
                     <Button variant="ghost" onClick={goBack}>
                         ← Atrás
                     </Button>
-                    <Button onClick={goNext} disabled={selectedSalaId === null}>
+                    <Button onClick={goNext} disabled={selectedSalaId === null} data-step-advance>
                         Siguiente →
                     </Button>
                 </>

@@ -40,7 +40,7 @@ export function Step6Perfil(): JSX.Element {
                     <Button variant="ghost" onClick={goBack}>
                         ← Atrás
                     </Button>
-                    <Button onClick={() => setStep(7)} disabled={!canProceed}>
+                    <Button onClick={() => setStep(7)} disabled={!canProceed} data-step-advance>
                         Siguiente →
                     </Button>
                 </>

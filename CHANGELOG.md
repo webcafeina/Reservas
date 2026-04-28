@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.2] — 2026-04-28
+
+### Added
+
+- **Pulsar Enter avanza al siguiente paso del formulario público
+  (Pasos 1–6)**, igual que pulsar el botón "Siguiente". El paso 7
+  (Resumen) está deliberadamente excluido: el usuario tiene que
+  hacer click en "Confirmar reserva" para crear la reserva, no se
+  puede confirmar con Enter sin querer.
+
+  Implementación: listener `keydown` en `App.tsx` activo solo
+  durante `step ∈ [1..6]`. El botón "Siguiente" de cada paso lleva
+  ahora el atributo `data-step-advance`; el handler busca el botón
+  visible no deshabilitado y llama a `.click()`. Se ignoran:
+  Enter con modificadores (Shift/Ctrl/Meta/Alt), Enter sobre un
+  `<textarea>` (multilínea), Enter sobre un `<button>` o `<a>`
+  (esos elementos ya manejan su propia activación con Enter, no
+  queremos doble disparo) y `contenteditable`.
+
+  Si el botón "Siguiente" está deshabilitado (validación pendiente
+  en ese paso), Enter no hace nada — coherente con el botón.
+
 ## [0.15.1] — 2026-04-28
 
 ### Changed
