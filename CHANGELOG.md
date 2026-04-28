@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] — 2026-04-28
+
+### Added
+
+- **Globo de notificación nativo de WordPress en el menú lateral
+  con el conteo de reservas pendientes**. Cuando entra una reserva
+  nueva por el formulario público queda en estado `pendiente`
+  esperando aprobación; hasta ahora el admin solo se enteraba por
+  email y, si estaba navegando wp-admin gestionando otra cosa, no
+  había ningún indicador visual.
+
+  Ahora aparece el mismo globo rojo con conteo que WordPress usa
+  junto a "Comentarios" cuando hay comentarios pendientes de
+  moderación, tanto en el item top-level "Reservas" como en el
+  submenú "Panel de control". Solo se cuentan las reservas en
+  estado `pendiente`: en cuanto el admin las confirma o cancela,
+  el contador baja automáticamente al recargar.
+
+  Implementación: nuevo método `BookingRepository::countByState()`
+  ejecuta un `SELECT COUNT(*) FROM wp_reservas_bookings WHERE
+  estado = %s` por pageload (sin caché ni heartbeat — es < 1 ms
+  con el índice de la columna), y `AdminMenu::registerPanel()`
+  inyecta el span `awaiting-mod` con la clase nativa de wp-admin
+  en los labels del menú. Sin CSS propio, sin polling — el badge
+  se refresca al recargar la página.
+
+  Si la tabla aún no existe (instalación recién activada antes de
+  la migración), el conteo cae a 0 y el menú renderiza sin badge,
+  por lo que el plugin sigue accesible para gestionar la
+  situación.
+
 ## [0.16.2] — 2026-04-28
 
 ### Fixed

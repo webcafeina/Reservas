@@ -9,7 +9,9 @@ namespace WebcafeinaReservas\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use WebcafeinaReservas\Models\BookingState;
 use WebcafeinaReservas\PostTypes\SalaCpt;
+use WebcafeinaReservas\Repositories\BookingRepository;
 use WebcafeinaReservas\Roles\RoleManager;
 
 /**
@@ -38,9 +40,13 @@ final class AdminMenu {
     }
 
     public static function registerPanel(): void {
+        global $wpdb;
+        $pendientes = ( new BookingRepository( $wpdb ) )->countByState( BookingState::PENDIENTE );
+        $badge      = self::renderBadge( $pendientes );
+
         add_menu_page(
             __( 'Reservas', 'reservas-aldealab' ),
-            __( 'Reservas', 'reservas-aldealab' ),
+            __( 'Reservas', 'reservas-aldealab' ) . $badge,
             RoleManager::CAP_MANAGE,
             self::SLUG,
             array( self::class, 'renderPage' ),
@@ -54,10 +60,32 @@ final class AdminMenu {
         add_submenu_page(
             self::SLUG,
             __( 'Panel de control', 'reservas-aldealab' ),
-            __( 'Panel de control', 'reservas-aldealab' ),
+            __( 'Panel de control', 'reservas-aldealab' ) . $badge,
             RoleManager::CAP_MANAGE,
             self::SLUG,
             array( self::class, 'renderPage' )
+        );
+    }
+
+    /**
+     * Render the WP-native pending-count bubble (same markup as Comments
+     * pending moderation). Returns empty string when count is 0 so the menu
+     * label stays unchanged.
+     */
+    private static function renderBadge( int $count ): string {
+        if ( $count <= 0 ) {
+            return '';
+        }
+        $count_i18n = number_format_i18n( $count );
+        return sprintf(
+            ' <span class="awaiting-mod count-%1$d"><span class="pending-count" aria-hidden="true">%2$s</span><span class="screen-reader-text">%3$s</span></span>',
+            $count,
+            $count_i18n,
+            sprintf(
+                /* translators: %s: number of pending bookings */
+                _n( '%s reserva pendiente', '%s reservas pendientes', $count, 'reservas-aldealab' ),
+                $count_i18n
+            )
         );
     }
 
