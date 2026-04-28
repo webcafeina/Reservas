@@ -78,7 +78,9 @@
 
 .reservas-app-root {
     min-height: 360px;
-    padding: var(--ra-space-6);
+    /* 2em vertical breather so the whole booking form sits a bit taller
+     * inside the page; horizontal padding stays on the design token. */
+    padding: 2em var(--ra-space-6);
     border: 1px solid var(--ra-color-border);
     border-radius: var(--ra-radius-lg);
     background: var(--ra-color-bg);

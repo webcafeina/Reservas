@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] — 2026-04-28
+
+### Changed
+
+- **Más aire vertical en el formulario público.**
+  - `.reservas-app-root` (la tarjeta exterior que envuelve la barra
+    de pasos + el StepFrame) pasa a tener `2em` de padding arriba y
+    abajo (antes usaba el token `--ra-space-6`). El padding
+    horizontal se mantiene.
+  - El `.frame` (la tarjeta interior con título + contenido del
+    paso actual) recibe ahora `margin-top: 2em`, separándose
+    visiblemente de la barra de pasos que vive justo encima.
+  - El propio `.frame` también pasa a `padding-block: 2em` (antes
+    `--ra-space-6`), dejando el padding horizontal según token.
+    En móvil (≤ 640px) el padding-inline sigue siendo más
+    estrecho, pero el vertical de 2em se mantiene para conservar
+    el ritmo visual con la barra de pasos.
+
 ## [0.15.0] — 2026-04-28
 
 ### Added
