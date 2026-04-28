@@ -5,6 +5,84 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] — 2026-04-28
+
+### Added
+
+- **Edición completa de reservas existentes desde el panel admin.**
+  Hasta ahora solo eran editables `estado` y `nota_admin`; cualquier
+  otra corrección obligaba a borrar y recrear la reserva, perdiendo
+  el `id`. Ahora desde la página de detalle hay un botón "Editar
+  reserva" que abre `#/bookings/{id}/edit` — el mismo formulario de
+  creación reutilizado, **pre-rellenado con los datos actuales**:
+  sala, fecha de inicio, horario, recurrencia (RRULE + fechas
+  excluidas reconstruidas), objeto y todos los datos del solicitante
+  (NIF, nombre, email, móvil, dirección, empresa). El admin cambia
+  lo que quiera y pulsa "Guardar cambios".
+
+  Backend:
+  - `BookingService::update()` nuevo, paralelo a `create()`. Re-
+    expande fechas, comprueba disponibilidad con
+    `excludeBookingId` (la reserva no choca consigo misma; el
+    parámetro ya existía en `AvailabilityChecker`), upserts el
+    profile, y reemplaza atómicamente la fila + las
+    `booking_dates` bajo una sola transacción.
+  - `BookingRepository::updateFullBooking()` nuevo: `wpdb->update`
+    + `DELETE` + `INSERT` masivo, todo dentro de la TX del caller.
+  - Endpoint REST `PUT /admin/bookings/{id}` con el mismo payload
+    que `POST /admin/bookings` + un flag `notify_user` (default
+    true).
+  - `GET /admin/bookings/{id}` ahora incluye `fechas_excluidas`,
+    derivadas comparando la expansión natural del RRULE con las
+    `booking_dates` activas — se necesitan para reabrir el picker
+    de exclusiones en modo edición.
+
+- **Email "Tu reserva ha sido modificada" con diff explícito al
+  solicitante** (por defecto sí, con checkbox "No notificar al
+  solicitante" para saltarlo). Plantilla nueva
+  `src/Emails/templates/modified-user.php` con tabla de cambios:
+
+  | Campo   | Antes        | Ahora        |
+  |---------|--------------|--------------|
+  | Sala    | Sala A       | Sala B       |
+  | Horario | 10:00–12:00  | 11:00–13:00  |
+  | …       | …            | …            |
+
+  El diff cubre: sala, rango de fechas, horario, recurrencia,
+  objeto, nombre completo del solicitante, email, móvil y empresa.
+  Si el admin guarda sin tocar nada, el diff queda vacío y NO se
+  envía email.
+
+  PDF oficial regenerado y adjunto cuando corresponda (misma
+  lógica `shouldAttachPdf` que el resto: usuario alojado en sala
+  no-CPA → sin PDF). El despacho es asíncrono via
+  `wp_schedule_single_event` con un snapshot del booking original
+  como segundo argumento, así el handler tiene los valores
+  "antes" disponibles cuando el cron lo ejecuta.
+
+  Nuevo hook `EmailNotifier::HOOK_MODIFIED` =
+  `reservas_aldealab_booking_modified`.
+
+### Changed
+
+- **`BookingNew` admite modo edición** vía nueva prop opcional
+  `editingId`. Cuando está presente, el componente carga la
+  reserva con `useAdminBooking`, pre-rellena estados con `useEffect`
+  one-shot (guarded por `useRef` para evitar bucles), cambia el
+  título a "Editar reserva #N" y el botón final a "Guardar
+  cambios". El cancelar vuelve al detalle (no a la lista). En modo
+  creación nada cambia.
+
+- **`humanizeRrule.ts`**: nueva función `parseRrule(rule: string)`
+  inversa de `buildRrule()`. Reconoce FREQ, INTERVAL, BYDAY,
+  BYMONTHDAY, BYSETPOS, UNTIL y COUNT. Si la regla no se reconoce
+  cae a `defaultRruleInput()` para que el form no rompa.
+
+- **Botón "Editar reserva"** en la tarjeta Gestión del detalle.
+  El botón "Guardar cambios" sigue funcionando para el camino
+  rápido de cambiar solo estado o nota — no obligamos a entrar a
+  la edición completa para esos casos.
+
 ## [0.14.3] — 2026-04-28
 
 ### Fixed
