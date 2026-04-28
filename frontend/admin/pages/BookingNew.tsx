@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '../../src/components/Button';
 import { ErrorMessage } from '../../src/components/ErrorMessage';
 import { TextField, SelectField, TextareaField } from '../../src/components/Field';
+import { PROVINCIAS, isProvincia } from '../../src/data/provincias';
 import { OccurrenceCalendar } from '../../src/components/OccurrenceCalendar';
 import { SalaCard } from '../../src/components/SalaCard';
 import { useSpaces } from '../../src/api/spaces';
@@ -555,12 +556,21 @@ export function BookingNew({ editingId }: BookingNewProps = {}): JSX.Element {
                         required
                         error={profileErrors.municipio ?? null}
                     />
-                    <TextField
+                    <SelectField
                         label="Provincia"
                         value={profile.provincia}
                         onChange={(e) => patchProfile({ provincia: e.target.value })}
                         required
                         error={profileErrors.provincia ?? null}
+                        hint={
+                            profile.provincia !== '' && !isProvincia(profile.provincia)
+                                ? `El valor anterior ("${profile.provincia}") no está en la lista. Selecciona una.`
+                                : ''
+                        }
+                        options={[
+                            { value: '', label: '— Selecciona —' },
+                            ...PROVINCIAS.map((p) => ({ value: p, label: p })),
+                        ]}
                     />
                     <TextField
                         label="Código postal"
