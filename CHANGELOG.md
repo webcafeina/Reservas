@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.1] — 2026-04-28
+
+### Fixed
+
+- **`<select>` en el panel admin se renderizaba con el estilo
+  nativo del navegador en lugar de con la apariencia
+  homogénea de los `<input>`/`<textarea>` de la misma página.**
+  WordPress carga `wp-admin/css/forms.css` que aplica reglas
+  agresivas a `select` desnudo (caret propio, `min-height`,
+  `max-width: 25rem`, etc.) que ganaban a nuestra clase `.input`.
+
+  Fix: nueva regla `select.input` (especificidad 0,1,1, vence
+  tanto a `.input` como al `select` plano de wp-admin) que
+  neutraliza `appearance` y dibuja un caret propio (chevron SVG
+  inline) con `padding-right: 36px` para reservar espacio. Se
+  aplica también al formulario público — antes el navegador
+  pintaba SU caret nativo, ahora todos comparten el mismo
+  visualmente.
+
 ## [0.16.0] — 2026-04-28
 
 ### Changed
