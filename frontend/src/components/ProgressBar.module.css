@@ -112,6 +112,6 @@
      * the bullet is taller now.
      */
     .bar {
-        margin-top: var(--ra-space-3, 12px);
+        margin-top: 1em;
     }
 }
