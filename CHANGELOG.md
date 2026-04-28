@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.4] — 2026-04-28
+
+### Changed
+
+- **ProgressBar móvil: bullet + label más grandes y separados.**
+  En el paso activo único de móvil:
+  - Bullet pasa de 28×28 px a 56×56 px (con `font-size: 1.5rem`).
+  - Label pasa de `--ra-font-size-sm` a `1.25rem` y se renderiza
+    con peso semibold para emparejar la jerarquía con el bullet.
+  - Separación entre bullet y label sube de `--ra-space-1` a
+    `--ra-space-4` (16 px).
+
+  Tablet/desktop sin cambios.
+
 ## [0.15.3] — 2026-04-28
 
 ### Changed
