@@ -490,7 +490,8 @@ final class EmailNotifier {
     }
 
     /**
-     * Non-CPA sala + user has `usuario_alojado` role → no PDF. Otherwise, PDF.
+     * Non-CPA sala + user has any of the tenant role aliases (see
+     * `RoleManager::TENANT_ROLES`) → no PDF. Otherwise, PDF.
      */
     public static function shouldAttachPdf( Booking $booking, Sala $sala ): bool {
         if ( $sala->esCpa ) {
@@ -503,7 +504,8 @@ final class EmailNotifier {
         if ( ! $user instanceof \WP_User ) {
             return true;
         }
-        return ! in_array( RoleManager::ROLE_TENANT, (array) $user->roles, true );
+        $isTenant = array_intersect( RoleManager::TENANT_ROLES, (array) $user->roles ) !== array();
+        return ! $isTenant;
     }
 
     /**
