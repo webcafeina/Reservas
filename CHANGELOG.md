@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.1] — 2026-04-30
+
+### Changed
+
+- **Capturas de la guía pasan de PNG a WebP**. Las 11 capturas que
+  ilustran cada paso del wizard, los emails y el PDF rellenado se
+  redistribuyen ahora en formato WebP (calidad ~85). El conjunto
+  pasa de ~3 MB en PNG a ~450 KB en WebP — reducción del ~85% sin
+  pérdida visible en pantalla ni al imprimir a PDF. Todas las
+  referencias del HTML y la tabla del README se actualizan a la
+  nueva extensión. Soporte de WebP en navegadores modernos
+  (Chrome, Firefox, Safari 14+, Edge) garantizado tanto para la
+  vista web como para la impresión a PDF.
+
 ## [0.21.0] — 2026-04-30
 
 ### Added

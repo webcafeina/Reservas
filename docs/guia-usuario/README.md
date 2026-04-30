@@ -45,21 +45,22 @@ Crea las capturas con estos nombres exactos y mételos en
 
 | Archivo                            | Qué debe verse                                                                |
 | ---------------------------------- | ----------------------------------------------------------------------------- |
-| `01-paso-aforo.png`                | Filtro de aforo y servicios marcados                                          |
-| `02-paso-sala.png`                 | Catálogo de salas con una seleccionada                                        |
-| `03-paso-fechas.png`               | Conmutador "Fecha única / Recurrente" con un día elegido                      |
-| `04-paso-recurrencia.png`          | Patrón recurrente configurado y calendario con la serie                       |
-| `05-paso-horario.png`              | Hora inicio y fin rellenadas                                                  |
-| `06-paso-perfil-logueado.png`      | Paso 6 con campos prerellenados (usuario logueado)                            |
-| `06-paso-perfil-invitado.png`      | Paso 6 con campos vacíos (opcional, usuario invitado)                         |
-| `07-paso-resumen.png`              | Resumen completo + Cloudflare Turnstile                                       |
-| `08-paso-exito.png`                | Pantalla de éxito con número de reserva y descarga `.ics`                     |
-| `09-email-confirmacion.png`        | Email de confirmación recibido en una bandeja de entrada                      |
-| `10-pdf-rellenado.png`             | PDF adjunto abierto con los datos de la reserva rellenados                    |
+| `01-paso-aforo.webp`               | Filtro de aforo y servicios marcados                                          |
+| `02-paso-sala.webp`                | Catálogo de salas con una seleccionada                                        |
+| `03-paso-fechas.webp`              | Conmutador "Fecha única / Recurrente" con un día elegido                      |
+| `04-paso-recurrencia.webp`         | Patrón recurrente configurado y calendario con la serie                       |
+| `05-paso-horario.webp`             | Hora inicio y fin rellenadas                                                  |
+| `06-paso-perfil-logueado.webp`     | Paso 6 con campos prerellenados (usuario logueado)                            |
+| `06-paso-perfil-invitado.webp`     | Paso 6 con campos vacíos (opcional, usuario invitado)                         |
+| `07-paso-resumen.webp`             | Resumen completo + Cloudflare Turnstile                                       |
+| `08-paso-exito.webp`               | Pantalla de éxito con número de reserva y descarga `.ics`                     |
+| `09-email-confirmacion.webp`       | Email de confirmación recibido en una bandeja de entrada                      |
+| `10-pdf-rellenado.webp`            | PDF adjunto abierto con los datos de la reserva rellenados                    |
 
-**Resolución sugerida**: 1600 × … píxeles (alto libre). Formato PNG.
-Si las haces más grandes no pasa nada, el documento las redimensiona;
-si las haces mucho más pequeñas se verán pixeladas en A4.
+**Resolución sugerida**: 1600 × … píxeles (alto libre). Formato WebP
+con calidad 80-90 (compromiso típico para capturas de UI). Si las haces
+más grandes no pasa nada, el documento las redimensiona; si las haces
+mucho más pequeñas se verán pixeladas en A4.
 
 ## Imprimir a PDF (modo offline)
 
