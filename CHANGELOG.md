@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] — 2026-04-30
+
+### Added
+
+- **URL pública dedicada para la guía de usuario, sin tema ni barra
+  de admin**. Hasta ahora la guía solo se servía a través del
+  shortcode `[reservas_aldealab_guia]` dentro de una página WP, lo
+  que arrastraba el header/footer del tema, el título de la página
+  y la admin bar (si el visitante estaba logueado) encima del
+  documento.
+
+  El plugin registra ahora un endpoint en `template_redirect` que
+  responde a `https://<sitio>/?reservas_guia=1` devolviendo la guía
+  como página completa, **sin pasar por el tema de WordPress**. El
+  endpoint lee el HTML estático del plugin, reescribe las rutas
+  relativas de `assets/...` a URLs absolutas (`plugins_url()`) para
+  que el logo y las capturas resuelvan desde cualquier URL, fija
+  cabeceras `Content-Type: text/html` y `nocache_headers()`, y muere
+  con `exit` antes de que WP cargue el tema.
+
+  Resultado: la guía se ve a pantalla completa, con su maquetación
+  intacta y sin nada del tema alrededor. Es la opción recomendada
+  para enlazarla desde el menú principal o un botón en el
+  formulario.
+
+  El shortcode `[reservas_aldealab_guia]` sigue existiendo para
+  quien prefiera embeber la guía dentro de una página WP con el
+  tema alrededor.
+
+  Implementación: nueva clase `WebcafeinaReservas\Frontend\UserGuidePage`,
+  registrada en `Plugin::boot()` junto al resto de elementos de
+  frontend.
+
 ## [0.21.1] — 2026-04-30
 
 ### Changed

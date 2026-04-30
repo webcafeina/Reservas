@@ -78,24 +78,52 @@ mucho más pequeñas se verán pixeladas en A4.
      colores de los callouts y la portada).
 4. Pulsa "Guardar". Listo.
 
-## Acceder desde la web (modo embed)
+## Acceder desde la web
 
-El plugin registra el shortcode `[reservas_aldealab_guia]`. Para
-publicar la guía en la web:
+El plugin ofrece dos formas de servir la guía. Elige la que mejor
+encaje con cómo quieres mostrarla:
 
-1. En wp-admin → Páginas → Añadir nueva, crea una página llamada
-   por ejemplo "Guía de uso de reservas".
-2. Pega en el contenido el shortcode:
+### Opción A — URL pública dedicada (recomendada)
+
+```
+https://<tu-sitio>/?reservas_guia=1
+```
+
+Esta URL devuelve la guía como **página completa, sin pasar por el
+tema de WordPress**: no aparece la barra de admin, ni el header del
+tema, ni el título de página, ni el footer. Solo la guía a pantalla
+completa, con toda la maquetación cuidada del HTML.
+
+Para enlazarla:
+
+- Pégala directamente en el menú principal de WP (Apariencia →
+  Menús → Enlace personalizado).
+- O ponla como botón en el formulario de reservas, en un email, etc.
+
+### Opción B — Shortcode dentro de una página WP
+
+Si prefieres que la guía viva dentro de una página WordPress
+estándar (con el header/footer del tema alrededor):
+
+1. Crea una página: wp-admin → Páginas → Añadir nueva, llámala por
+   ejemplo "Guía de uso de reservas".
+2. Pega el shortcode en el contenido:
    ```
    [reservas_aldealab_guia]
    ```
-3. Publica la página y enlázala desde donde quieras (menú principal,
-   pie, etc.).
+3. Publica.
 
-La guía se carga dentro de un `<iframe>` con sus propios estilos, sin
-interferir con el tema. Cualquier actualización del HTML (cambios de
-texto, capturas nuevas) se refleja al instante en la web sin tener
-que volver a editar la página.
+La guía se incrusta en un `<iframe>` con sus estilos aislados del
+tema. Útil si quieres mantener el header/footer/menú de tu sitio
+alrededor del documento.
+
+> **Nota**: con esta opción aparecerán encima de la guía la barra de
+> admin (si estás logueado) y el título de la página, porque son
+> elementos que el tema añade fuera del iframe. Si quieres una
+> visualización 100% limpia, usa la Opción A.
+
+Cualquier actualización del HTML (cambios de texto, capturas nuevas)
+se refleja al instante en ambas opciones tras un release.
 
 ## Mantener actualizado
 
