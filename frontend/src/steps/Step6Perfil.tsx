@@ -107,11 +107,12 @@ export function Step6Perfil(): JSX.Element {
                 />
                 <TextField
                     label="Empresa"
-                    hint="Opcional"
                     value={profile.empresa ?? ''}
                     onChange={(e) =>
                         patchProfile({ empresa: e.target.value === '' ? null : e.target.value })
                     }
+                    required
+                    error={errors.empresa ?? null}
                 />
                 <TextField
                     label="Calle / Plaza / Avenida"

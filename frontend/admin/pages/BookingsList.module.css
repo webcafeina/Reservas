@@ -223,6 +223,37 @@ a.exportLink:hover {
 }
 
 /*
+ * Inline "Confirmar" button shown only on rows whose estado is `pendiente`.
+ * Mirrors the muted-icon-on-rest, tinted-on-hover pattern of `.deleteIconBtn`
+ * but in success-green so the two siblings read as opposite verbs at a glance.
+ */
+.approveIconBtn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--ra-radius-sm, 4px);
+    padding: 6px;
+    cursor: pointer;
+    color: var(--ra-color-success, #1f7a3a);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background var(--ra-duration-fast, 0.15s) var(--ra-ease, ease),
+        border-color var(--ra-duration-fast, 0.15s) var(--ra-ease, ease);
+}
+
+.approveIconBtn:hover:not(:disabled) {
+    color: var(--ra-color-success, #1f7a3a);
+    background: rgba(31, 122, 58, 0.1);
+    border-color: rgba(31, 122, 58, 0.3);
+}
+
+.approveIconBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/*
  * Recurring "Fechas" cell — toggle button that expands the list of
  * individual sessions.
  */
