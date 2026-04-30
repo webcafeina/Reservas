@@ -93,7 +93,7 @@
         h3 {
             font-size: 13pt;
             color: var(--body);
-            margin-top: 1.4em;
+            margin-top: 2em;
         }
 
         p {
@@ -194,11 +194,26 @@
 
         section.step {
             page-break-before: always;
+            /* Screen-only top breathing room — the page break already
+               separates sections in print, but on screen (and in the
+               iframe-embedded web view) sections flow continuously and
+               the blue section heading was sitting too close to the
+               previous figure. */
+            margin-top: 56pt;
         }
 
         section.step:first-of-type,
         section#antes-de-empezar {
             page-break-before: auto;
+            margin-top: 0;
+        }
+
+        @media print {
+            /* Page breaks already handle separation; keep print
+               margins as-is so we don't waste vertical space. */
+            section.step {
+                margin-top: 0;
+            }
         }
 
         section .lead {
@@ -337,6 +352,31 @@
             font-size: 0.95em;
         }
 
+        /* ---------- Web-only video tutorial ---------- */
+
+        .video-tutorial {
+            margin: 18pt 0 26pt;
+            padding: 14pt;
+            background: var(--primary-soft);
+            border-left: 4px solid var(--primary);
+            border-radius: 6px;
+        }
+
+        .video-tutorial-label {
+            margin: 0 0 10pt;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .video-tutorial video {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            background: #000;
+        }
+
         /* ---------- Stepper / paso badge ---------- */
 
         .step-badge {
@@ -382,6 +422,12 @@
             a {
                 color: inherit;
                 text-decoration: none;
+            }
+
+            /* Hide the embedded tutorial video when printing — it makes
+               no sense in a static PDF and would print as a black box. */
+            .video-tutorial {
+                display: none;
             }
         }
     </style>
@@ -456,6 +502,22 @@
                 Aldealab desde el formulario público de la web. Tardarás
                 alrededor de dos minutos en hacer una reserva sencilla.
             </p>
+
+            <!-- Web-only video tutorial. Hidden in print via @media print. -->
+            <div class="video-tutorial">
+                <p class="video-tutorial-label">
+                    ¿Prefieres verlo en vídeo? Te lo contamos en menos de
+                    dos minutos:
+                </p>
+                <video
+                    controls
+                    preload="metadata"
+                    playsinline
+                    src="https://www.aldealab.es/wp-content/uploads/2026/04/VIDEO-ALDEALAB-TUTORIAL-RESERVAS.mp4"
+                >
+                    Tu navegador no puede reproducir este vídeo.
+                </video>
+            </div>
 
             <h3>¿Dónde está el formulario?</h3>
             <p>
@@ -931,8 +993,17 @@
                     <span class="cap-num">Captura 9</span>Email de
                     confirmación recibido en una bandeja de entrada
                     (Gmail u Outlook), con el cuerpo del mensaje y los
-                    adjuntos visibles. Opcional: una segunda captura del
-                    PDF abierto.
+                    adjuntos visibles.
+                </figcaption>
+            </figure>
+
+            <figure>
+                <img src="assets/capturas/10-pdf-rellenado.png" alt=""
+                    onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'" />
+                <figcaption>
+                    <span class="cap-num">Captura 10</span>El PDF adjunto
+                    abierto, con los datos de tu reserva ya rellenados
+                    sobre la plantilla oficial de Aldealab.
                 </figcaption>
             </figure>
 
@@ -960,16 +1031,6 @@
                     permite que otra persona la pueda reservar.
                 </p>
             </div>
-
-            <figure>
-                <img src="assets/capturas/10-email-aceptacion.png" alt=""
-                    onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'" />
-                <figcaption>
-                    <span class="cap-num">Captura 10</span>Email
-                    "¡Reserva confirmada!" tal como llega a la bandeja de
-                    entrada del usuario.
-                </figcaption>
-            </figure>
 
             <h3>9.4 — Si te la rechazan o cancelan</h3>
             <p>
