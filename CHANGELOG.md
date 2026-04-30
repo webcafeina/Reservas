@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] — 2026-04-30
+
+### Added
+
+- **Guía de usuario disponible también desde la web mediante
+  shortcode**. La guía HTML para los trabajadores que ya vivía en
+  `docs/guia-usuario/` para imprimirse a PDF se puede ahora publicar
+  en cualquier página de WordPress con `[reservas_aldealab_guia]`.
+  El shortcode embebe la guía dentro de un `<iframe>` con sus
+  propios estilos, sin riesgo de interferir con el tema activo, y
+  añade un cache-buster basado en el `mtime` del HTML para que las
+  actualizaciones se vean al instante tras un despliegue.
+
+  La URL del formulario (`https://aldealab.es/reservas/`) y el
+  email de contacto (`aldealab@ayto-caceres.es`) van ahora literales
+  en el HTML como enlaces clicables — ya no requieren ser
+  sustituidos manualmente antes de imprimir.
+
+### Changed
+
+- **Versión y fecha de la guía estampadas automáticamente en el
+  release**. El workflow `release.yml` ejecuta un `sed` antes del
+  empaquetado que sustituye los marcadores `[VERSIÓN]` y `[FECHA]`
+  de la portada por el número del tag y el mes/año del despliegue.
+  El zip distribuido lleva siempre los valores correctos sin
+  intervención manual.
+
+  El zip ahora incluye también la carpeta `docs/guia-usuario/`
+  completa (HTML, logo y carpeta `capturas/`) — antes solo viajaba
+  el código del plugin. Esto permite que el shortcode sirva el
+  documento directamente desde el plugin instalado.
+
 ## [0.19.0] — 2026-04-30
 
 ### Added

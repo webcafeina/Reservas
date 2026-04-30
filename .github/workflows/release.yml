@@ -38,7 +38,20 @@ jobs:
 
       - name: Resolve version from tag
         id: vars
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          # Spanish-localised "Month YYYY" — used to stamp the user guide.
+          LC_TIME=es_ES.UTF-8 echo "guide_date=$(date '+%B %Y')" >> "$GITHUB_OUTPUT" \
+            || echo "guide_date=$(date '+%B %Y')" >> "$GITHUB_OUTPUT"
+
+      - name: Stamp user guide with version and date
+        run: |
+          set -euo pipefail
+          GUIDE="docs/guia-usuario/guia-aldealab.html"
+          sed -i \
+            -e "s/\[VERSIÓN\]/${{ steps.vars.outputs.version }}/g" \
+            -e "s/\[FECHA\]/${{ steps.vars.outputs.guide_date }}/g" \
+            "$GUIDE"
 
       - name: Assemble plugin folder
         run: |
@@ -61,6 +74,8 @@ jobs:
             --include='assets/admin/***' \
             --include='assets/dist/***' \
             --include='languages/***' \
+            --include='docs/' \
+            --include='docs/guia-usuario/***' \
             --exclude='*' \
             ./ "$OUT"/
           # Clean up dev artifacts that may have slipped in.
