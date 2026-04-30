@@ -40,9 +40,15 @@ jobs:
         id: vars
         run: |
           echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-          # Spanish-localised "Month YYYY" — used to stamp the user guide.
-          LC_TIME=es_ES.UTF-8 echo "guide_date=$(date '+%B %Y')" >> "$GITHUB_OUTPUT" \
-            || echo "guide_date=$(date '+%B %Y')" >> "$GITHUB_OUTPUT"
+          # Spanish "Month YYYY" used to stamp the user guide. We don't
+          # rely on LC_TIME because the GitHub Actions runner image
+          # doesn't ship the es_ES.UTF-8 locale by default — `date`
+          # would silently fall back to English. Mapping by month
+          # number is locale-proof.
+          MONTHS_ES=(Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre Noviembre Diciembre)
+          MONTH_NUM=$(date +%-m)
+          YEAR=$(date +%Y)
+          echo "guide_date=${MONTHS_ES[$((MONTH_NUM-1))]} $YEAR" >> "$GITHUB_OUTPUT"
 
       - name: Stamp user guide with version and date
         run: |
