@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] — 2026-04-30
+
+### Added
+
+- **Botón "Confirmar" directo en el listado de reservas para las
+  pendientes**. En la columna de acciones de cada fila aparece un nuevo
+  botón con icono de check verde (junto a "Ver" y la papelera) **solo
+  cuando la reserva está en estado `pendiente`**. Pulsarlo pide una
+  confirmación rápida y, si se acepta, cambia el estado a `confirmada`
+  con exactamente el mismo flujo que entrar al detalle y guardar:
+  dispara el cron `EmailNotifier::HOOK_CONFIRMED` que envía el email de
+  notificación al solicitante. Ahorra dos clicks al admin cuando solo
+  necesita aprobar la reserva tal como llega.
+
+  El botón queda deshabilitado durante el envío para evitar dobles
+  pulsaciones, y la mutación invalida ahora también las queries de
+  stats y calendario (no solo la lista) — así el contador de pendientes
+  del dashboard y el color del evento en el calendario se refrescan
+  inmediatamente.
+
+### Changed
+
+- **Empresa pasa a ser un campo obligatorio** tanto en el formulario
+  público de reserva (Step 6 — datos personales) como en el formulario
+  del admin que crea/edita una reserva manualmente. El cambio se aplica
+  en tres capas:
+
+  - Schema Zod del frontend público (`profileValidation.ts`) — devuelve
+    "Requerido" si el campo viene vacío o `null`.
+  - Marca visual de obligatorio (asterisco) y mensaje de error inline
+    en el campo, igual que el resto de campos del formulario.
+  - Validación en backend: `BookingsController` (POST público de
+    reservas), `ProfileController` (PUT del perfil del usuario logueado)
+    y `AdminBookingsController` (POST/PUT admin) devuelven ahora
+    `400 rest_invalid_empresa` si el campo está vacío.
+
+  El tipo `UserProfile.empresa` se mantiene como `string | null` para
+  no romper la lectura de reservas antiguas que se guardaron sin
+  empresa cuando el campo era opcional. La obligatoriedad solo se
+  aplica en la escritura.
+
 ## [0.18.0] — 2026-04-30
 
 ### Added

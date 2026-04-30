@@ -24,6 +24,13 @@ export const profileSchema = z.object({
         .regex(/^\d{5}$/, 'CP inválido (5 dígitos)'),
     movil: z.string().min(9, 'Móvil inválido'),
     email: z.string().email('Email inválido'),
+    // `empresa` is stored as `string | null` to accommodate legacy rows
+    // (older bookings created when the field was optional). For new
+    // bookings we require a non-empty value.
+    empresa: z
+        .string()
+        .nullable()
+        .refine((v) => v !== null && v.trim().length > 0, { message: 'Requerido' }),
 });
 
 export type ProfileErrors = Partial<Record<keyof UserProfile, string>>;

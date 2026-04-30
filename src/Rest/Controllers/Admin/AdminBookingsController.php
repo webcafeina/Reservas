@@ -452,6 +452,15 @@ final class AdminBookingsController {
                 400
             );
         }
+        if ( $profile->empresa === null || trim( $profile->empresa ) === '' ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_empresa',
+                    'message' => __( 'El campo empresa es obligatorio.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
 
         $payload                  = new BookingRequest();
         $payload->salaId          = $sala_id;

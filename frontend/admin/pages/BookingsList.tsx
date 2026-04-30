@@ -6,6 +6,7 @@ import {
     buildExportUrl,
     useAdminBookings,
     useDeleteBooking,
+    useUpdateBooking,
     type BookingFilters,
     type BookingSort,
 } from '../api/hooks';
@@ -35,6 +36,7 @@ export function BookingsList(): JSX.Element {
     const [expanded, setExpanded] = useState<Set<number>>(new Set());
     const { data, isLoading, isError } = useAdminBookings(filters);
     const deleteMutation = useDeleteBooking();
+    const updateMutation = useUpdateBooking();
 
     const removeBooking = (id: number, label: string): void => {
         if (
@@ -45,6 +47,17 @@ export function BookingsList(): JSX.Element {
             return;
         }
         deleteMutation.mutate(id);
+    };
+
+    const approveBooking = (id: number, label: string): void => {
+        if (
+            !window.confirm(
+                `¿Confirmar la reserva ${label}? Se enviará un email de notificación al solicitante.`,
+            )
+        ) {
+            return;
+        }
+        updateMutation.mutate({ id, payload: { estado: 'confirmada' } });
     };
 
     const updateFilter = <K extends keyof BookingFilters>(
@@ -242,6 +255,23 @@ export function BookingsList(): JSX.Element {
                                                 >
                                                     Ver
                                                 </Button>
+                                                {b.estado === 'pendiente' && (
+                                                    <button
+                                                        type="button"
+                                                        className={styles.approveIconBtn}
+                                                        title="Confirmar reserva"
+                                                        aria-label={`Confirmar reserva #${b.id}`}
+                                                        onClick={() =>
+                                                            approveBooking(b.id, `#${b.id}`)
+                                                        }
+                                                        disabled={
+                                                            updateMutation.isPending &&
+                                                            updateMutation.variables?.id === b.id
+                                                        }
+                                                    >
+                                                        <CheckIcon />
+                                                    </button>
+                                                )}
                                                 <button
                                                     type="button"
                                                     className={styles.deleteIconBtn}
@@ -322,6 +352,29 @@ function TrashIcon(): JSX.Element {
             <path d="M10 11v6" />
             <path d="M14 11v6" />
             <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        </svg>
+    );
+}
+
+/**
+ * Inline check icon used by the per-row "Confirmar" action shown only on
+ * pending bookings. Same `currentColor` stroke convention as the trash
+ * icon so the wrapping button's CSS controls the green tint.
+ */
+function CheckIcon(): JSX.Element {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <polyline points="20 6 9 17 4 12" />
         </svg>
     );
 }

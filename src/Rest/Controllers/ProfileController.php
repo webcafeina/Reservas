@@ -137,6 +137,15 @@ final class ProfileController {
                 400
             );
         }
+        if ( $profile->empresa === null || trim( $profile->empresa ) === '' ) {
+            return new WP_REST_Response(
+                array(
+                    'code'    => 'rest_invalid_empresa',
+                    'message' => __( 'El campo empresa es obligatorio.', 'reservas-aldealab' ),
+                ),
+                400
+            );
+        }
 
         global $wpdb;
         $repo    = new UserProfileRepository( $wpdb );

@@ -55,7 +55,11 @@ export function useUpdateBooking() {
         mutationFn: ({ id, payload }: { id: number; payload: Partial<Booking> }) =>
             adminApi.patch<Booking>(`/admin/bookings/${id}`, payload),
         onSuccess: async () => {
+            // A state change ripples into the pending-counter (stats) and
+            // the calendar's colour-by-state view, so invalidate those too.
             await qc.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'stats'] });
+            await qc.invalidateQueries({ queryKey: ['admin', 'calendar'] });
         },
     });
 }
