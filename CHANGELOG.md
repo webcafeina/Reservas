@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] — 2026-04-30
+
+### Added
+
+- **Detección de sesión caducada en el panel admin con modal "Recargar"**.
+  Hasta ahora, si un trabajador dejaba el panel abierto en su navegador
+  más de 24 horas (típico al no apagar el ordenador entre días), el
+  nonce REST de WordPress caducaba silenciosamente: al pulsar
+  "Confirmar" o "Cancelar" la petición devolvía 403, el SPA mostraba un
+  mensaje de error genérico y el admin podía pensar que la acción se
+  había ejecutado cuando en realidad no.
+
+  Ahora el cliente REST del panel intercepta los códigos
+  `rest_cookie_invalid_nonce`, `rest_cookie_invalid` y
+  `rest_not_logged_in` (y, como red de seguridad, cualquier 401/403
+  desconocido) y muestra un modal a pantalla completa que pide recargar
+  la página. La recarga destruye el SPA, fuerza a WP a servir un nonce
+  fresco en el HTML y restaura el flujo normal. El modal cancela y
+  limpia toda la caché de React Query para detener cualquier polling
+  en bucle con la credencial muerta.
+
+- **Refresco automático del panel admin mientras la pestaña está abierta**.
+  Las tres queries más visibles (lista de reservas, calendario y stats
+  del dashboard) se refrescan ahora cada 60 segundos cuando la pestaña
+  está visible, además de cuando el admin vuelve a la pestaña tras
+  navegar a otra (`refetchOnWindowFocus`) o reconecta tras perder red
+  (`refetchOnReconnect`). Resultado: un trabajador con el panel abierto
+  todo el día ve los cambios que hacen sus compañeros sin tener que
+  recargar manualmente.
+
+  El polling se pausa automáticamente cuando la pestaña está oculta
+  (`refetchIntervalInBackground` queda en su valor por defecto `false`),
+  por lo que el coste real es de tres requests por minuto solo mientras
+  el admin está mirando activamente el panel. La query de detalle
+  individual de una reserva se queda sin polling: con
+  `refetchOnWindowFocus` ya cubre el escenario de "vuelvo tras horas".
+
+  El globo nativo de WordPress en el menú lateral
+  (`awaiting-mod`, introducido en v0.17.0) sigue refrescándose solo al
+  recargar wp-admin — ese badge es server-side y vive fuera del SPA.
+  Lo que se mantiene fresco automáticamente es todo lo que se ve dentro
+  del panel.
+
 ## [0.17.0] — 2026-04-28
 
 ### Added

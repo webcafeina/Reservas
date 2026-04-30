@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { AdminApp } from './AdminApp';
+import { registerQueryClient } from './state/sessionExpired';
 import '../src/styles/tokens.css';
 import './styles/admin.css';
 
@@ -13,10 +14,15 @@ const queryClient = new QueryClient({
         queries: {
             retry: 1,
             staleTime: 30_000,
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
         },
     },
 });
+
+// Lets the session-expired store cancel and clear all queries when the
+// nonce dies, so we stop polling REST in a loop with a dead credential.
+registerQueryClient(queryClient);
 
 function mount(): void {
     const container = document.getElementById(MOUNT_ID);

@@ -1,5 +1,6 @@
 import { WebcafeinaFooter } from '../src/components/WebcafeinaFooter';
 
+import { SessionExpiredModal } from './components/SessionExpiredModal';
 import { Dashboard } from './pages/Dashboard';
 import { Health } from './pages/Health';
 import { BookingsList } from './pages/BookingsList';
@@ -71,6 +72,7 @@ export function AdminApp(): JSX.Element {
             </main>
 
             <WebcafeinaFooter />
+            <SessionExpiredModal />
         </div>
     );
 }

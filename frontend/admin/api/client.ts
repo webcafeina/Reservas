@@ -5,6 +5,19 @@
  */
 
 import { ApiError, type ApiErrorPayload } from '../../src/api/client';
+import { markSessionExpired } from '../state/sessionExpired';
+
+/**
+ * REST error codes that mean the WP nonce or auth cookie is no longer
+ * valid (typical when the admin left the panel open > 24h). We trip the
+ * "session expired" modal on these *and* on bare 401/403 as a safety net
+ * for any code path that returns the right status without a known code.
+ */
+const NONCE_ERROR_CODES = new Set([
+    'rest_cookie_invalid_nonce',
+    'rest_cookie_invalid',
+    'rest_not_logged_in',
+]);
 
 function getBootstrap(): { restBase: string; nonce: string } {
     const w = typeof window !== 'undefined' ? window.ReservasAldealabAdmin : undefined;
@@ -60,6 +73,13 @@ async function request<T>(
             json !== null && typeof json === 'object'
                 ? (json as ApiErrorPayload)
                 : { code: 'rest_unknown', message: `HTTP ${res.status}` };
+        if (
+            res.status === 401 ||
+            res.status === 403 ||
+            (typeof payload.code === 'string' && NONCE_ERROR_CODES.has(payload.code))
+        ) {
+            markSessionExpired();
+        }
         throw new ApiError(res.status, payload);
     }
 

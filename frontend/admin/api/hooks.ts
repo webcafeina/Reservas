@@ -33,6 +33,11 @@ export function useAdminBookings(filters: BookingFilters) {
                 filters as Record<string, unknown>,
             ),
         staleTime: 15_000,
+        // Poll every 60s while the tab is visible. Keeps the listing fresh
+        // for admins who leave the panel open all day; pauses automatically
+        // when the tab is hidden because `refetchIntervalInBackground` is
+        // false by default.
+        refetchInterval: 60_000,
     });
 }
 
@@ -135,6 +140,7 @@ export function useAdminStats() {
         queryKey: ['admin', 'stats'],
         queryFn: () => adminApi.get<AdminStats>('/admin/stats'),
         staleTime: 60_000,
+        refetchInterval: 60_000,
     });
 }
 
@@ -249,6 +255,7 @@ export function useCalendarEvents(
         queryFn: () => adminApi.get<{ events: CalendarEvent[] }>('/admin/calendar', params),
         enabled: from !== null && to !== null,
         staleTime: 30_000,
+        refetchInterval: 60_000,
     });
 }
 
