@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] — 2026-04-30
+
+### Added
+
+- **Capturas de pantalla en la guía de usuario**. Los 11 huecos
+  preparados en la guía v0.20.0 vienen ahora rellenos con las capturas
+  finales de cada paso del wizard, los emails que recibe el usuario y
+  el PDF rellenado abierto. La sección 9.3 (email de aceptación)
+  pierde su `<figure>` y se queda solo con texto, ya que esa captura
+  no se incluye finalmente.
+
+- **Vídeo tutorial integrado en la versión web de la guía**. La
+  sección 0 "Antes de empezar" muestra ahora, justo después del
+  párrafo de bienvenida, un reproductor `<video>` con el tutorial
+  oficial alojado en la Media Library de WordPress
+  (`https://www.aldealab.es/wp-content/uploads/2026/04/VIDEO-ALDEALAB-TUTORIAL-RESERVAS.mp4`).
+  El bloque tiene callout azul y se oculta automáticamente con
+  `@media print { .video-tutorial { display: none; } }` para que el
+  PDF impreso no muestre un rectángulo negro vacío.
+
+### Changed
+
+- **Más aire entre secciones en la guía**. Los epígrafes azules de
+  cada sección (`<h2>`) y los subtítulos (`<h3>`) tenían demasiado
+  poco margen superior, lo que hacía que cada sección pareciera
+  pegada a la anterior cuando se ve en pantalla / dentro del iframe
+  del shortcode. Ahora `section.step` lleva `margin-top: 56pt` en
+  pantalla (anulado en print, donde el `page-break-before` ya
+  separa) y los `h3` pasan de `margin-top: 1.4em` a `2em` para
+  airear los subtítulos como "9.1 — Email de confirmación".
+
 ## [0.20.0] — 2026-04-30
 
 ### Added

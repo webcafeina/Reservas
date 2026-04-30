@@ -55,7 +55,7 @@ Crea las capturas con estos nombres exactos y mételos en
 | `07-paso-resumen.png`              | Resumen completo + Cloudflare Turnstile                                       |
 | `08-paso-exito.png`                | Pantalla de éxito con número de reserva y descarga `.ics`                     |
 | `09-email-confirmacion.png`        | Email de confirmación recibido en una bandeja de entrada                      |
-| `10-email-aceptacion.png`          | Email "¡Reserva confirmada!" recibido                                         |
+| `10-pdf-rellenado.png`             | PDF adjunto abierto con los datos de la reserva rellenados                    |
 
 **Resolución sugerida**: 1600 × … píxeles (alto libre). Formato PNG.
 Si las haces más grandes no pasa nada, el documento las redimensiona;
