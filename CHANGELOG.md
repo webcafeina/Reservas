@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.3] — 2026-04-30
+
+### Fixed
+
+- **Fecha de la guía aparecía en inglés en la portada**. El step
+  `Resolve version from tag` del workflow de release usaba
+  `LC_TIME=es_ES.UTF-8 date '+%B %Y'`, pero la imagen del runner de
+  GitHub Actions no trae la locale `es_ES.UTF-8` instalada por
+  defecto, así que `date` caía silenciosamente al locale por
+  defecto (inglés) y producía cosas como "April 2026". Ahora el
+  workflow mapea el número de mes (`date +%-m`) contra un array
+  bash de nombres en español
+  (`Enero Febrero Marzo … Diciembre`), garantizando el resultado
+  correcto sin depender de qué locales tenga instaladas el runner.
+
+### Changed
+
+- **Línea de versión y fecha más cerca del título en la portada**.
+  El subtítulo tenía `margin-bottom: 60px` y la línea de meta
+  `margin-top: 80px` — total 140px de aire entre ambos, demasiado.
+  Ahora subtítulo a `margin-bottom: 14px` y meta a `margin-top: 0`,
+  que mantiene el bloque "logo + título + subtítulo + versión/fecha"
+  agrupado visualmente arriba.
+
 ## [0.22.2] — 2026-04-30
 
 ### Changed
