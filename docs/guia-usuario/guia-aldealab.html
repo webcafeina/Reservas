@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Guía de reservas de salas · Aldealab</title>
+        <style>
+            :root {
+                --primary: #0b5394;
+                --primary-soft: #e6eef8;
+                --accent: #f39c12;
+                --accent-soft: #fdf3e0;
+                --success: #1f7a3a;
+                --success-soft: #e7f4ec;
+                --info-soft: #e9f1fb;
+                --tip-soft: #fff8db;
+                --tip-border: #e9c84a;
+                --logged-soft: #e6f4ea;
+                --logged-border: #4caf78;
+                --guest-soft: #fdecd9;
+                --guest-border: #d98028;
+                --body: #1f2937;
+                --muted: #475569;
+                --rule: #d8dee6;
+                --bg-soft: #f8fafc;
+                --placeholder-bg: #fff3a3;
+                --font-stack:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial, sans-serif;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 18mm 16mm 20mm;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: var(--font-stack);
+                color: var(--body);
+                font-size: 11.5pt;
+                line-height: 1.55;
+                background: #fff;
+            }
+
+            /* Container only constrains on screen; on print the @page handles margins. */
+            .doc {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 32px 28px 64px;
+            }
+
+            @media print {
+                .doc {
+                    max-width: none;
+                    margin: 0;
+                    padding: 0;
+                }
+            }
+
+            /* ---------- Headings ---------- */
+
+            h1,
+            h2,
+            h3 {
+                color: var(--primary);
+                font-weight: 700;
+                line-height: 1.25;
+                margin: 0 0 0.5em;
+            }
+
+            h1 {
+                font-size: 26pt;
+                letter-spacing: -0.01em;
+            }
+
+            h2 {
+                font-size: 17pt;
+                margin-top: 0;
+                padding-bottom: 6pt;
+                border-bottom: 2px solid var(--primary);
+            }
+
+            h3 {
+                font-size: 13pt;
+                color: var(--body);
+                margin-top: 1.4em;
+            }
+
+            p {
+                margin: 0 0 0.7em;
+            }
+
+            small,
+            .muted {
+                color: var(--muted);
+            }
+
+            ul,
+            ol {
+                margin: 0 0 0.9em 1.2em;
+                padding: 0;
+            }
+
+            li {
+                margin: 0 0 0.3em;
+            }
+
+            code,
+            kbd {
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: 0.92em;
+                background: var(--bg-soft);
+                padding: 1px 6px;
+                border-radius: 4px;
+                border: 1px solid var(--rule);
+            }
+
+            /* ---------- Cover ---------- */
+
+            .cover {
+                text-align: center;
+                padding: 80px 0 40px;
+                page-break-after: always;
+            }
+
+            .cover img.logo {
+                max-width: 260px;
+                height: auto;
+                margin: 0 auto 32px;
+                display: block;
+            }
+
+            .cover h1 {
+                font-size: 32pt;
+                margin: 0 0 8pt;
+            }
+
+            .cover .subtitle {
+                font-size: 14pt;
+                color: var(--muted);
+                margin: 0 0 60px;
+            }
+
+            .cover .meta {
+                margin-top: 80px;
+                font-size: 10.5pt;
+                color: var(--muted);
+            }
+
+            /* ---------- TOC ---------- */
+
+            .toc {
+                page-break-after: always;
+            }
+
+            .toc ol {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .toc li {
+                padding: 6pt 0;
+                border-bottom: 1px dotted var(--rule);
+                display: flex;
+                justify-content: space-between;
+                gap: 12pt;
+            }
+
+            .toc a {
+                color: var(--body);
+                text-decoration: none;
+            }
+
+            .toc .num {
+                color: var(--primary);
+                font-weight: 600;
+                min-width: 28pt;
+                display: inline-block;
+            }
+
+            /* ---------- Sections ---------- */
+
+            section.step {
+                page-break-before: always;
+            }
+
+            section.step:first-of-type,
+            section#antes-de-empezar {
+                page-break-before: auto;
+            }
+
+            section .lead {
+                font-size: 11.5pt;
+                color: var(--muted);
+                margin-bottom: 1.2em;
+            }
+
+            /* ---------- Callouts ---------- */
+
+            .callout {
+                border-left: 4px solid;
+                padding: 10pt 14pt;
+                margin: 12pt 0;
+                border-radius: 4px;
+                background: var(--info-soft);
+                border-left-color: var(--primary);
+            }
+
+            .callout.tip {
+                background: var(--tip-soft);
+                border-left-color: var(--tip-border);
+            }
+
+            .callout.logged {
+                background: var(--logged-soft);
+                border-left-color: var(--logged-border);
+            }
+
+            .callout.guest {
+                background: var(--guest-soft);
+                border-left-color: var(--guest-border);
+            }
+
+            .callout > .label {
+                display: inline-block;
+                font-weight: 700;
+                font-size: 9.5pt;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: inherit;
+                margin-bottom: 4pt;
+            }
+
+            .callout p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Two-column callout block for "logged vs guest" */
+
+            .two-col {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12pt;
+                margin: 14pt 0;
+            }
+
+            /* ---------- Figures (capture placeholders) ---------- */
+
+            figure {
+                margin: 14pt 0;
+                padding: 0;
+                border: 1px dashed var(--rule);
+                border-radius: 6px;
+                background: var(--bg-soft);
+                page-break-inside: avoid;
+            }
+
+            figure img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+                border-radius: 6px 6px 0 0;
+            }
+
+            figure figcaption {
+                font-size: 9.5pt;
+                font-style: italic;
+                color: var(--muted);
+                padding: 8pt 12pt;
+                border-top: 1px solid var(--rule);
+                background: #fff;
+                border-radius: 0 0 6px 6px;
+            }
+
+            figure figcaption .cap-num {
+                display: inline-block;
+                font-style: normal;
+                font-weight: 700;
+                color: var(--primary);
+                margin-right: 6pt;
+            }
+
+            /* When the image fails to load (no captura yet), the JS-less
+       fallback: the <img> is hidden via onerror, but we also style
+       a visible "missing capture" placeholder block that takes the
+       img's space inside the figure. */
+            figure .placeholder-shot {
+                display: block;
+                padding: 32pt 16pt;
+                text-align: center;
+                color: var(--muted);
+                font-size: 10pt;
+                background: repeating-linear-gradient(
+                    135deg,
+                    var(--bg-soft),
+                    var(--bg-soft) 10px,
+                    #eef2f6 10px,
+                    #eef2f6 20px
+                );
+                border-radius: 6px 6px 0 0;
+            }
+
+            /* ---------- Inline placeholders for client to fill ---------- */
+
+            .placeholder-url,
+            .placeholder-email,
+            .placeholder-version,
+            .placeholder-date {
+                background: var(--placeholder-bg);
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: 0.95em;
+                padding: 1px 6px;
+                border-radius: 3px;
+                border: 1px solid #e6c200;
+            }
+
+            /* ---------- Stepper / paso badge ---------- */
+
+            .step-badge {
+                display: inline-block;
+                background: var(--primary);
+                color: #fff;
+                font-size: 10pt;
+                font-weight: 700;
+                padding: 2pt 8pt;
+                border-radius: 12pt;
+                letter-spacing: 0.03em;
+                vertical-align: middle;
+                margin-right: 8pt;
+            }
+
+            /* ---------- Footer ---------- */
+
+            .doc-footer {
+                margin-top: 60pt;
+                padding-top: 12pt;
+                border-top: 2px solid var(--primary);
+                color: var(--muted);
+                font-size: 9.5pt;
+                text-align: center;
+                page-break-before: always;
+            }
+
+            .doc-footer strong {
+                color: var(--body);
+            }
+
+            /* ---------- Print tweaks ---------- */
+
+            @media print {
+                .callout,
+                figure,
+                h2,
+                h3 {
+                    page-break-inside: avoid;
+                }
+                a {
+                    color: inherit;
+                    text-decoration: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="doc">
+            <!-- =============== COVER =============== -->
+            <header class="cover">
+                <img
+                    class="logo"
+                    src="assets/logo-aldealab.png"
+                    alt="Logo de Aldealab"
+                />
+                <h1>Guía de reservas de salas</h1>
+                <p class="subtitle">
+                    Manual de uso del formulario público para trabajadores
+                </p>
+                <div class="meta">
+                    Versión
+                    <span class="placeholder-version">[VERSIÓN]</span> · Última
+                    actualización
+                    <span class="placeholder-date">[FECHA]</span>
+                </div>
+            </header>
+
+            <!-- =============== TOC =============== -->
+            <section class="toc">
+                <h2>Índice</h2>
+                <ol>
+                    <li>
+                        <a href="#antes-de-empezar"
+                            ><span class="num">0</span>Antes de empezar</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-1"
+                            ><span class="num">1</span>Filtrar por aforo y
+                            servicios</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-2"
+                            ><span class="num">2</span>Elegir la sala</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-3"
+                            ><span class="num">3</span>Fecha única o
+                            recurrente</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-4"
+                            ><span class="num">4</span>Configurar la recurrencia
+                            <small>(si aplica)</small></a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-5"
+                            ><span class="num">5</span>Horario de la reserva</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-6"
+                            ><span class="num">6</span>Tus datos personales</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-7"
+                            ><span class="num">7</span>Revisar y enviar</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#paso-8"
+                            ><span class="num">8</span>Reserva enviada</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#despues"
+                            ><span class="num">9</span>¿Y ahora qué? Lo que
+                            pasa después de enviar</a
+                        >
+                    </li>
+                    <li>
+                        <a href="#faq"
+                            ><span class="num">10</span>Preguntas habituales</a
+                        >
+                    </li>
+                </ol>
+            </section>
+
+            <!-- =============== ANTES DE EMPEZAR =============== -->
+            <section id="antes-de-empezar" class="step">
+                <h2>0. Antes de empezar</h2>
+                <p class="lead">
+                    Esta guía te explica paso a paso cómo reservar una sala de
+                    Aldealab desde el formulario público de la web. Tardarás
+                    alrededor de dos minutos en hacer una reserva sencilla.
+                </p>
+
+                <h3>¿Dónde está el formulario?</h3>
+                <p>
+                    Accede a la página de reservas desde el navegador de tu
+                    ordenador o tu móvil:
+                </p>
+                <p>
+                    <span class="placeholder-url">[INSERTAR URL]</span>
+                </p>
+
+                <h3>¿Tienes cuenta de Aldealab?</h3>
+                <p>
+                    El formulario funciona para cualquier persona, pero la
+                    experiencia cambia ligeramente según si has iniciado sesión
+                    o no:
+                </p>
+
+                <div class="two-col">
+                    <div class="callout logged">
+                        <span class="label">Con cuenta · iniciada sesión</span>
+                        <p>
+                            El formulario reconoce que eres tú y
+                            <strong>rellena automáticamente</strong> tus datos
+                            personales y tu dirección en el paso 6. Solo tienes
+                            que elegir la sala, las fechas y el horario.
+                        </p>
+                    </div>
+                    <div class="callout guest">
+                        <span class="label">Sin cuenta · invitado</span>
+                        <p>
+                            Puedes reservar igualmente, pero
+                            <strong>tendrás que rellenar tus datos a mano</strong>
+                            en el paso 6 (NIF, nombre, dirección, etc.). El
+                            resto de pasos es idéntico.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="callout tip">
+                    <span class="label">Consejo</span>
+                    <p>
+                        Si vas a reservar a menudo, te ahorrarás tiempo en
+                        cada nueva reserva si entras con tu cuenta de
+                        Aldealab antes de abrir el formulario.
+                    </p>
+                </div>
+            </section>
+
+            <!-- =============== PASO 1 =============== -->
+            <section id="paso-1" class="step">
+                <h2><span class="step-badge">Paso 1</span>Filtrar por aforo y servicios</h2>
+                <p class="lead">
+                    El formulario te muestra el catálogo completo de salas. Si
+                    sabes cuántas personas asistirán o necesitas servicios
+                    concretos (proyector, pizarra, conexión a videollamada,
+                    etc.), úsalos para acotar.
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>
+                        <strong>Aforo</strong>: indica el número aproximado de
+                        asistentes. Puedes dejarlo vacío si no lo sabes aún.
+                    </li>
+                    <li>
+                        <strong>Servicios</strong>: marca los que necesites. La
+                        lista se actualiza automáticamente.
+                    </li>
+                </ul>
+
+                <div class="callout tip">
+                    <span class="label">Consejo</span>
+                    <p>
+                        Si no estás seguro del aforo, déjalo en blanco — verás
+                        más opciones en el siguiente paso y podrás afinar
+                        después.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/01-paso-aforo.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 1</span>Pantalla del Paso
+                        1 con el filtro de aforo (mínimo y máximo) visible y
+                        algunos servicios marcados (por ejemplo "Proyector" y
+                        "Pizarra"). Debe verse el botón "Siguiente" abajo.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 2 =============== -->
+            <section id="paso-2" class="step">
+                <h2><span class="step-badge">Paso 2</span>Elegir la sala</h2>
+                <p class="lead">
+                    Verás las salas que cumplen los filtros del paso anterior,
+                    cada una con su nombre, aforo, edificio y los servicios que
+                    incluye.
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>Lee la información de cada tarjeta.</li>
+                    <li>Pulsa la sala que quieras reservar.</li>
+                    <li>
+                        Cuando esté seleccionada, el botón "Siguiente" se
+                        activará.
+                    </li>
+                </ul>
+
+                <div class="callout">
+                    <span class="label">Información</span>
+                    <p>
+                        Solo aparecen las salas que están disponibles para
+                        reservar. Si no ves ninguna, vuelve al paso 1 y
+                        relaja los filtros (por ejemplo, baja el aforo
+                        mínimo).
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/02-paso-sala.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 2</span>Catálogo de salas
+                        en formato tarjetas. Una de ellas debe verse claramente
+                        seleccionada (resaltada con borde de color). Idealmente
+                        en la captura se aprecian al menos 3 salas distintas
+                        para mostrar la variedad.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 3 =============== -->
+            <section id="paso-3" class="step">
+                <h2><span class="step-badge">Paso 3</span>Fecha única o recurrente</h2>
+                <p class="lead">
+                    Decide si reservas para un solo día o si necesitas la sala
+                    de forma recurrente (por ejemplo, todos los lunes durante
+                    un trimestre).
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>
+                        Marca <strong>"Fecha única"</strong> y elige el día en
+                        el calendario, <em>o</em>
+                    </li>
+                    <li>
+                        Marca <strong>"Recurrente"</strong> y selecciona la
+                        fecha de inicio. Configurarás el patrón en el paso 4.
+                    </li>
+                </ul>
+
+                <div class="callout tip">
+                    <span class="label">Consejo</span>
+                    <p>
+                        Si dudas, empieza por una fecha única. Puedes hacer otra
+                        reserva más adelante si la necesitas.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/03-paso-fechas.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 3</span>El conmutador
+                        "Fecha única / Recurrente" visible y un día concreto
+                        marcado en el selector de fecha. Mejor mostrar la
+                        opción "Fecha única" seleccionada porque es la más
+                        común.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 4 =============== -->
+            <section id="paso-4" class="step">
+                <h2>
+                    <span class="step-badge">Paso 4</span>Configurar la
+                    recurrencia
+                </h2>
+                <p class="lead">
+                    Solo aparece si en el paso anterior elegiste
+                    <strong>"Recurrente"</strong>. Aquí decides cada cuánto se
+                    repite y hasta cuándo.
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>
+                        <strong>Patrón</strong>: diario, semanal, mensual o
+                        anual.
+                    </li>
+                    <li>
+                        <strong>Intervalo</strong>: cada cuántos (cada semana,
+                        cada 2 semanas…).
+                    </li>
+                    <li>
+                        <strong>Días de la semana</strong>: si has elegido
+                        "Semanal", marca lunes/martes/etc.
+                    </li>
+                    <li>
+                        <strong>Fecha de fin</strong>: hasta qué día quieres
+                        que se repita.
+                    </li>
+                    <li>
+                        <strong>Excluir días concretos</strong>: pulsa cualquier
+                        día del calendario para quitarlo de la serie (vacaciones,
+                        festivos, etc.).
+                    </li>
+                </ul>
+
+                <div class="callout">
+                    <span class="label">Información</span>
+                    <p>
+                        El sistema acepta como máximo un año de recurrencia
+                        desde la fecha de inicio. Si necesitas más tiempo,
+                        haz una nueva reserva al cabo del año.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/04-paso-recurrencia.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 4</span>Pantalla de
+                        recurrencia con un patrón configurado de ejemplo, por
+                        ejemplo "Cada lunes hasta el 20 de diciembre". Debe
+                        verse el calendario inferior con las fechas de la
+                        serie y, si es posible, una o dos fechas excluidas
+                        marcadas con un estilo distinto.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 5 =============== -->
+            <section id="paso-5" class="step">
+                <h2><span class="step-badge">Paso 5</span>Horario de la reserva</h2>
+                <p class="lead">
+                    Indica a qué hora empieza y a qué hora termina la reserva.
+                    El mismo horario se aplicará a todas las fechas si la
+                    reserva es recurrente.
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>Selecciona la <strong>hora de inicio</strong>.</li>
+                    <li>
+                        Selecciona la <strong>hora de fin</strong> (debe ser
+                        posterior al inicio).
+                    </li>
+                </ul>
+
+                <div class="callout tip">
+                    <span class="label">Consejo</span>
+                    <p>
+                        Reserva con un poco de margen al principio y al final
+                        — así tendrás tiempo para entrar, preparar lo que
+                        necesites y recoger sin agobios.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/05-paso-horario.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 5</span>Pantalla con la
+                        hora de inicio y de fin rellenadas (por ejemplo 10:00 y
+                        12:00). Si puedes, captura también una variante con la
+                        hora de fin antes que la de inicio para mostrar el
+                        mensaje de error de validación.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 6 =============== -->
+            <section id="paso-6" class="step">
+                <h2><span class="step-badge">Paso 6</span>Tus datos personales</h2>
+                <p class="lead">
+                    Esta es la información que aparecerá en el documento
+                    oficial de la reserva y la que usaremos para contactarte
+                    si hace falta.
+                </p>
+
+                <div class="callout logged">
+                    <span class="label">Si has iniciado sesión</span>
+                    <p>
+                        Verás casi todos los campos rellenados con los datos
+                        de tu cuenta. Revísalos por si quieres ajustar alguno
+                        para esta reserva concreta (por ejemplo, una empresa
+                        o un teléfono distintos).
+                    </p>
+                </div>
+
+                <div class="callout guest">
+                    <span class="label">Si reservas como invitado</span>
+                    <p>
+                        Tendrás que rellenar todos los campos a mano. Se
+                        guardarán para reservas futuras con el mismo email.
+                    </p>
+                </div>
+
+                <h3>Qué se te pide</h3>
+                <ul>
+                    <li>
+                        <strong>Datos personales</strong>: NIF, nombre y
+                        apellidos.
+                    </li>
+                    <li>
+                        <strong>Contacto</strong>: email y móvil
+                        (obligatorios), teléfono fijo (opcional).
+                    </li>
+                    <li>
+                        <strong>Empresa</strong>: nombre de la entidad u
+                        organización a la que perteneces.
+                    </li>
+                    <li>
+                        <strong>Dirección</strong>: vía, número, escalera/piso/puerta
+                        si aplica, municipio, provincia y código postal.
+                    </li>
+                </ul>
+
+                <div class="callout">
+                    <span class="label">Información</span>
+                    <p>
+                        La provincia se elige de una lista cerrada con todas
+                        las provincias españolas. Si tu provincia no aparece
+                        es porque está mal escrita en algún dato previo —
+                        contacta con el equipo de Aldealab para corregirlo.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/06-paso-perfil-logueado.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 6a</span>Formulario del
+                        Paso 6 visto por un usuario <strong>con sesión
+                        iniciada</strong>: la mayoría de campos vienen ya
+                        rellenados con los datos de su cuenta de Aldealab.
+                    </figcaption>
+                </figure>
+
+                <figure>
+                    <img
+                        src="assets/capturas/06-paso-perfil-invitado.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 6b</span>El mismo
+                        formulario visto por un usuario <strong>sin
+                        sesión</strong>: todos los campos están vacíos. Es
+                        opcional incluir esta segunda captura, pero ayuda
+                        a que la guía cubra ambos casos.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 7 =============== -->
+            <section id="paso-7" class="step">
+                <h2><span class="step-badge">Paso 7</span>Revisar y enviar</h2>
+                <p class="lead">
+                    Antes de enviar la reserva verás un resumen completo con
+                    todo lo que has elegido. Es el momento de comprobar que
+                    no hay erratas.
+                </p>
+
+                <h3>Qué hacer</h3>
+                <ul>
+                    <li>
+                        Revisa la sala, las fechas, el horario y tus datos.
+                    </li>
+                    <li>
+                        Si ves algo mal, pulsa el botón "Atrás" y corrígelo.
+                    </li>
+                    <li>
+                        Marca la casilla del CAPTCHA "No soy un robot"
+                        (Cloudflare Turnstile) si te aparece.
+                    </li>
+                    <li>Pulsa "Enviar reserva".</li>
+                </ul>
+
+                <div class="callout">
+                    <span class="label">Información · CAPTCHA</span>
+                    <p>
+                        El CAPTCHA aparece para evitar que sistemas
+                        automatizados envíen reservas falsas. Solo tienes que
+                        marcar la casilla; si te dejas, el botón de enviar
+                        no funciona.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/07-paso-resumen.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 7</span>Pantalla de
+                        resumen completa: sala, fechas, horario, tus datos en
+                        un bloque y el widget de Cloudflare Turnstile visible
+                        antes del botón "Enviar reserva".
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== PASO 8 =============== -->
+            <section id="paso-8" class="step">
+                <h2><span class="step-badge">Paso 8</span>Reserva enviada</h2>
+                <p class="lead">
+                    Si todo ha ido bien, verás una pantalla de confirmación
+                    con el número de tu reserva. <strong>No hace falta que
+                    hagas nada más</strong> — el sistema ya está avisando al
+                    equipo de Aldealab.
+                </p>
+
+                <h3>Qué verás</h3>
+                <ul>
+                    <li>El número de tu reserva (anótalo si quieres).</li>
+                    <li>
+                        Un botón para descargar la reserva como evento de
+                        calendario (<code>.ics</code>) y añadirla a Outlook,
+                        Google Calendar, Apple Calendar, etc.
+                    </li>
+                    <li>
+                        Un mensaje recordándote que recibirás un correo de
+                        confirmación con el resumen y un PDF.
+                    </li>
+                </ul>
+
+                <figure>
+                    <img
+                        src="assets/capturas/08-paso-exito.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 8</span>Pantalla de éxito
+                        con el número de reserva grande, el UUID debajo y el
+                        botón de descarga del fichero <code>.ics</code> bien
+                        visible.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- =============== DESPUÉS DE ENVIAR =============== -->
+            <section id="despues" class="step">
+                <h2>9. ¿Y ahora qué? Lo que pasa después de enviar</h2>
+                <p class="lead">
+                    Tu reserva no queda confirmada al instante: pasa por una
+                    revisión rápida del equipo de Aldealab. A continuación se
+                    explica cada email que recibirás y qué significa cada uno.
+                </p>
+
+                <h3>9.1 — Email de confirmación de envío</h3>
+                <p>
+                    Lo recibes en cuanto pulsas "Enviar reserva". Sirve como
+                    justificante y contiene:
+                </p>
+                <ul>
+                    <li>El resumen de la reserva.</li>
+                    <li>
+                        Un fichero <code>.ics</code> adjunto para añadirla a
+                        tu calendario.
+                    </li>
+                    <li>
+                        Un PDF adjunto con la solicitud oficial (modelo
+                        genérico de Aldealab o, si la sala pertenece al CPA,
+                        el modelo específico). Guárdalo si lo necesitas para
+                        gestiones internas.
+                    </li>
+                </ul>
+
+                <figure>
+                    <img
+                        src="assets/capturas/09-email-confirmacion.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 9</span>Email de
+                        confirmación recibido en una bandeja de entrada
+                        (Gmail u Outlook), con el cuerpo del mensaje y los
+                        adjuntos visibles. Opcional: una segunda captura del
+                        PDF abierto.
+                    </figcaption>
+                </figure>
+
+                <h3>9.2 — Tu reserva está pendiente</h3>
+                <p>
+                    Hasta que el equipo la apruebe, la reserva está
+                    <strong>pendiente</strong>. Significa que ha llegado bien y
+                    está en cola. El equipo recibe una notificación y la
+                    revisa lo antes posible.
+                </p>
+
+                <h3>9.3 — Email de aceptación</h3>
+                <p>
+                    Cuando el equipo confirma tu reserva, recibes un nuevo
+                    correo: <em>"¡Tu reserva ha sido confirmada!"</em>. La
+                    sala es tuya en las fechas y horario que indicaste.
+                </p>
+
+                <div class="callout tip">
+                    <span class="label">Importante</span>
+                    <p>
+                        Si por cualquier motivo finalmente
+                        <strong>no vas a usar la sala</strong>, avisa cuanto
+                        antes al equipo de Aldealab. Liberarla a tiempo
+                        permite que otra persona la pueda reservar.
+                    </p>
+                </div>
+
+                <figure>
+                    <img
+                        src="assets/capturas/10-email-aceptacion.png"
+                        alt=""
+                        onerror="this.outerHTML='&lt;div class=&quot;placeholder-shot&quot;&gt;[Captura pendiente]&lt;/div&gt;'"
+                    />
+                    <figcaption>
+                        <span class="cap-num">Captura 10</span>Email
+                        "¡Reserva confirmada!" tal como llega a la bandeja de
+                        entrada del usuario.
+                    </figcaption>
+                </figure>
+
+                <h3>9.4 — Si te la rechazan o cancelan</h3>
+                <p>
+                    En casos excepcionales (sala no disponible finalmente,
+                    incidencia, etc.) recibirás uno de estos correos:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Devuelta a pendiente</strong>: el equipo
+                        necesita aclarar algo contigo antes de confirmar.
+                        Suele explicarse en el cuerpo del mensaje.
+                    </li>
+                    <li>
+                        <strong>Cancelada</strong>: la reserva no se podrá
+                        llevar a cabo. Si quieres reprogramarla, abre el
+                        formulario y haz una nueva.
+                    </li>
+                    <li>
+                        <strong>Modificada</strong>: el equipo ha ajustado
+                        algún dato (por ejemplo, sala alternativa). El correo
+                        incluye el resumen actualizado.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- =============== FAQ =============== -->
+            <section id="faq" class="step">
+                <h2>10. Preguntas habituales</h2>
+
+                <h3>¿Puedo cancelar yo mismo la reserva desde la web?</h3>
+                <p>
+                    No. La cancelación la hace el equipo de Aldealab.
+                    Escríbeles a
+                    <span class="placeholder-email">[INSERTAR EMAIL DE CONTACTO]</span>
+                    indicando el número de reserva.
+                </p>
+
+                <h3>¿Y editarla (cambiar fecha, hora, sala…)?</h3>
+                <p>
+                    Igual que la cancelación: contacta con el equipo. Para
+                    cambios pequeños suele bastar con un correo; para cambios
+                    grandes a veces es más rápido cancelar y hacer una nueva
+                    reserva.
+                </p>
+
+                <h3>¿Puedo reservar varias fechas a la vez?</h3>
+                <p>
+                    Sí. En el paso 3 marca <strong>"Recurrente"</strong> y
+                    configura el patrón en el paso 4 (cada lunes, cada dos
+                    semanas, etc.).
+                </p>
+
+                <h3>¿Por qué me piden CAPTCHA?</h3>
+                <p>
+                    Para evitar reservas automatizadas hechas por programas.
+                    Solo tienes que marcar la casilla "No soy un robot"; no
+                    hay imágenes que descifrar.
+                </p>
+
+                <h3>No me llega el email de confirmación, ¿qué hago?</h3>
+                <p>
+                    Revisa tu carpeta de spam o correo no deseado. Si tampoco
+                    está ahí, contacta con
+                    <span class="placeholder-email">[INSERTAR EMAIL DE CONTACTO]</span>
+                    indicando tu nombre y el día de la reserva.
+                </p>
+
+                <h3>Tengo cuenta de Aldealab pero el formulario no me reconoce.</h3>
+                <p>
+                    Asegúrate de haber iniciado sesión <em>antes</em> de
+                    abrir el formulario. Si lo abriste primero, recarga la
+                    página tras iniciar sesión.
+                </p>
+            </section>
+
+            <!-- =============== FOOTER =============== -->
+            <footer class="doc-footer">
+                <p>
+                    Si tienes cualquier duda escríbenos a
+                    <strong
+                        ><span class="placeholder-email"
+                            >[INSERTAR EMAIL DE CONTACTO]</span
+                        ></strong
+                    >
+                </p>
+                <p class="muted">
+                    Gestor de reservas de Aldealab · Webcafeína
+                </p>
+            </footer>
+        </div>
+    </body>
+</html>
