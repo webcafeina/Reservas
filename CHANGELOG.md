@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.2] — 2026-04-30
+
+### Changed
+
+- **El plugin reconoce ahora dos variantes del rol "alojado"**:
+  `usuario_alojado` (con guión bajo, el rol que el plugin crea en la
+  activación) y `usuario-alojado` (con guión, alias que ya existe en
+  el sitio creado por otro sistema). Si la cuenta WP del solicitante
+  tiene cualquiera de los dos roles, la lógica de "no adjuntar PDF
+  para alojado en sala no-CPA" se aplica igual.
+
+  Implementación: nueva constante `RoleManager::TENANT_ROLES` con
+  ambas slugs. `EmailNotifier::shouldAttachPdf()` pasa de
+  `in_array(ROLE_TENANT, ...)` a `array_intersect(TENANT_ROLES, ...)`.
+  El plugin sigue creando solo el rol canónico `usuario_alojado` en
+  la activación — los aliases los gestiona quien los haya creado.
+
 ## [0.22.1] — 2026-04-30
 
 ### Fixed

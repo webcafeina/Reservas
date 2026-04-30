@@ -26,6 +26,21 @@ final class RoleManager {
     public const ROLE_TENANT  = 'usuario_alojado';
     public const ROLE_MANAGER = 'reservas_manager';
 
+    /**
+     * Role slugs treated as "tenant of the Aldealab building" by the
+     * plugin. The canonical one (`usuario_alojado`) is created and
+     * removed by the plugin itself. Aliases (e.g. `usuario-alojado`,
+     * with a hyphen) may be created by other systems for the same
+     * audience; we accept any of them when deciding whether to skip
+     * the PDF attachment.
+     *
+     * @var list<string>
+     */
+    public const TENANT_ROLES = array(
+        'usuario_alojado',
+        'usuario-alojado',
+    );
+
     public const CAP_MANAGE = 'manage_reservas';
 
     public static function ensureRoles(): void {
