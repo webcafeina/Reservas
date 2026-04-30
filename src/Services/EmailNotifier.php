@@ -285,12 +285,13 @@ final class EmailNotifier {
         $title          = __( 'Confirmación de tu reserva en Aldealab', 'reservas-aldealab' );
         $fechas_humano  = self::formatDatesHuman( $booking );
         $header_url     = self::headerImageUrl();
+        $ical_url       = self::icalUrlFor( $booking );
 
         $incluye_sede = $includeSedeInstructions;
 
         $content_html = self::renderTemplate(
             'confirmation-user',
-            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede' )
+            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede', 'ical_url' )
         );
         $html = self::renderLayout( $title, $content_html, $header_url );
 
@@ -357,12 +358,13 @@ final class EmailNotifier {
         $title         = __( 'Tu reserva en Aldealab ha sido confirmada', 'reservas-aldealab' );
         $fechas_humano = self::formatDatesHuman( $booking );
         $header_url    = self::headerImageUrl();
+        $ical_url      = self::icalUrlFor( $booking );
 
         $incluye_sede = $includeSedeInstructions;
 
         $content_html = self::renderTemplate(
             'accepted-user',
-            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede' )
+            compact( 'booking', 'profile', 'sala', 'fechas_humano', 'incluye_sede', 'ical_url' )
         );
         $html = self::renderLayout( $title, $content_html, $header_url );
 
@@ -631,6 +633,16 @@ final class EmailNotifier {
 
     private static function headerImageUrl(): string {
         return RESERVAS_ALDEALAB_URL . 'assets/email/header.png';
+    }
+
+    /**
+     * Public URL of the iCal endpoint for a given booking. The endpoint
+     * authenticates via the booking's UUID — same threat model as
+     * unsubscribe links — so the URL embedded in the email is enough
+     * for the recipient to download the calendar event.
+     */
+    private static function icalUrlFor( Booking $booking ): string {
+        return rest_url( 'reservas/v1/bookings/' . $booking->uuid . '/ical' );
     }
 
     /**

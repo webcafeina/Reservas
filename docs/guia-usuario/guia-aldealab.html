@@ -162,6 +162,10 @@
 
         .toc {
             page-break-after: always;
+            /* Screen-only breathing room — in print the page break
+               already separates the TOC from "Antes de empezar"; on
+               screen the two were sitting too close together. */
+            margin-bottom: 56pt;
         }
 
         .toc ol {
@@ -507,7 +511,7 @@
             <div class="video-tutorial">
                 <p class="video-tutorial-label">
                     ¿Prefieres verlo en vídeo? Te lo contamos en menos de
-                    dos minutos:
+                    cinco minutos:
                 </p>
                 <video
                     controls

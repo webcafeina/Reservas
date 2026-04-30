@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.1] — 2026-04-30
+
+### Fixed
+
+- **Botón "Añadir al calendario (.ics)" no descargaba**. El endpoint
+  REST `/wp-json/reservas/v1/bookings/{uuid}/ical` devolvía un
+  `WP_REST_Response` y emitía los bytes del calendario a través de un
+  filter `rest_pre_serve_request` — un truco frágil que dejaba que
+  WP REST Server inyectara `Content-Type: application/json` antes y
+  el navegador, al recibir un MIME equivocado, ignoraba el atributo
+  `download` del `<a>`.
+
+  El controlador (`IcalController::download()`) ahora bypassa el
+  serializador de WP REST: emite los bytes con `header()`,
+  `nocache_headers()`, `Content-Disposition: attachment`,
+  `Content-Length` y `exit`. Mismo patrón fiable que el endpoint
+  público de la guía. El botón de la pantalla de éxito (Step 8) ya
+  descarga el `.ics` correctamente sin tocar nada del frontend.
+
+- **Botón ".ics" en el email de confirmación apuntaba a una URL
+  vacía**. El template `confirmation-user.php` esperaba la variable
+  `$ical_url`, pero `EmailNotifier::sendUserConfirmation()` no la
+  generaba ni la pasaba al `compact()`. El `<a href="">` resultante
+  no llevaba a ningún sitio. Ahora el método construye la URL con
+  `rest_url('reservas/v1/bookings/{uuid}/ical')` (helper privado
+  nuevo `icalUrlFor()`) y la inyecta correctamente.
+
+- **Email de aceptación no incluía botón de calendario**. El
+  template `accepted-user.php` ni siquiera tenía el bloque del
+  botón. Se añade siguiendo el mismo estilo y posición que el de
+  `confirmation-user.php`, y `EmailNotifier::sendUserAccepted()` le
+  pasa la URL del iCal igual que el otro email.
+
+### Changed
+
+- **Más separación entre el índice y la sección "0. Antes de
+  empezar"** en la guía de usuario. El TOC tenía solo un
+  `page-break-after: always` que separa correctamente en print pero
+  no en pantalla / iframe — ahora añade `margin-bottom: 56pt` (mismo
+  valor que el `margin-top` de cada `section.step`, para coherencia
+  visual).
+
+- **Texto del bloque de vídeo tutorial corregido**. La guía decía
+  "Te lo contamos en menos de dos minutos", pero el vídeo final dura
+  unos cuatro minutos. Ahora dice "Te lo contamos en menos de cinco
+  minutos".
+
 ## [0.22.0] — 2026-04-30
 
 ### Added

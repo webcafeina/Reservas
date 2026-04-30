@@ -91,26 +91,17 @@ final class IcalController {
 
         $ics = ( new IcalGenerator() )->build( $booking, $profile, $sala );
 
-        // Stream raw calendar bytes with the right headers.
+        // Bypass WP's REST serializer (which would JSON-encode the body
+        // and override Content-Type to application/json). Emit the raw
+        // calendar bytes with the right headers and exit before the
+        // REST server gets a chance to touch the response.
         $filename = 'reserva-' . $booking->uuid . '.ics';
-        $response = new WP_REST_Response( null, 200 );
-        $response->header( 'Content-Type', 'text/calendar; charset=utf-8' );
-        $response->header( 'Content-Disposition', 'attachment; filename="' . $filename . '"' );
-        $response->header( 'Cache-Control', 'no-cache, no-store, must-revalidate' );
-
-        // WP's REST infrastructure JSON-encodes data; to emit raw bytes we
-        // register a late hook that replaces the body.
-        add_filter(
-            'rest_pre_serve_request',
-            static function ( $served, $_response, $_request, $_server ) use ( $ics ) {
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                echo $ics;
-                return true;
-            },
-            10,
-            4
-        );
-
-        return $response;
+        nocache_headers();
+        header( 'Content-Type: text/calendar; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+        header( 'Content-Length: ' . strlen( $ics ) );
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $ics;
+        exit;
     }
 }
