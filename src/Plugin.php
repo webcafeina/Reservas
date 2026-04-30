@@ -53,6 +53,7 @@ final class Plugin {
 
         // Frontend: shortcode + Vite assets.
         Frontend\FormShortcode::register();
+        Frontend\UserGuideShortcode::register();
         Frontend\AssetLoader::register();
         // Public handler for admin-action magic links from email
         // (?reservas_action=accept|reject&token=...).
