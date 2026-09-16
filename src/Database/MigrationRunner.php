@@ -28,16 +28,35 @@ final class MigrationRunner {
     }
 
     /**
-     * Called on `admin_init`. Cheap no-op when already up to date.
+     * Called on `admin_init`, and by the REST endpoints that write applicant
+     * data before they open their transaction: after an update (zip, FTP,
+     * auto-update) a public booking can arrive before anyone opens the admin,
+     * and it must not hit the old schema. Cheap no-op when already up to date.
      */
     public static function maybeRun(): void {
+        global $wpdb;
         $current = self::getDbVersion();
         $latest  = self::latestAvailableVersion( self::defaultMigrationsPath() );
 
         if ( $latest === null || $current === $latest ) {
             return;
         }
-        self::runFromDirectory( self::defaultMigrationsPath() );
+
+        // Two requests may get here at once (admin pageload + a booking).
+        // MySQL named lock: atomic, released automatically if PHP dies.
+        $lock = $wpdb->prefix . 'reservas_migrations';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        if ( (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 10)', $lock ) ) !== '1' ) {
+            return;
+        }
+        try {
+            // Another request may have finished while we waited for the lock.
+            wp_cache_delete( Schema::OPTION_DB_VERSION, 'options' );
+            self::runFromDirectory( self::defaultMigrationsPath() );
+        } finally {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
+        }
     }
 
     /**

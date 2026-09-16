@@ -29,7 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Migración 003** (se ejecuta sola al entrar en el admin): quita el
+- **Las migraciones pendientes se ejecutan también justo antes de guardar
+  datos de solicitante** (crear reserva pública o desde el panel, editar
+  reserva, `PUT /user/profile`), no solo al entrar en el admin. Si tras
+  actualizar el plugin llegaba una reserva antes de que nadie abriera el
+  admin, chocaba con el índice único antiguo y fallaba. Un bloqueo con
+  nombre de MySQL (`GET_LOCK`) evita que dos peticiones las ejecuten a la
+  vez.
+- **Migración 003**: quita el
   índice único `uq_email` (queda un índice normal `idx_email`) y da a
   cada reserva que compartía fila su propia copia, con los datos que
   tuviera en ese momento. Los valores que se sobrescribieron antes no se
