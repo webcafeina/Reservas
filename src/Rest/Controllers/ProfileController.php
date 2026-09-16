@@ -11,6 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WebcafeinaReservas\Database\MigrationRunner;
 use WebcafeinaReservas\Models\UserProfile;
 use WebcafeinaReservas\Repositories\UserProfileRepository;
 use WebcafeinaReservas\Rest\RestApi;
@@ -148,6 +149,7 @@ final class ProfileController {
         }
 
         global $wpdb;
+        MigrationRunner::maybeRun();
         $repo    = new UserProfileRepository( $wpdb );
         // Never touches the rows owned by the user's bookings.
         $id      = $repo->saveForUser( $profile );

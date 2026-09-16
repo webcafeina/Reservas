@@ -11,6 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WebcafeinaReservas\Database\MigrationRunner;
 use WebcafeinaReservas\Models\UserProfile;
 use WebcafeinaReservas\Repositories\BookingRepository;
 use WebcafeinaReservas\Repositories\UserProfileRepository;
@@ -63,6 +64,7 @@ final class BookingsController {
         }
 
         global $wpdb;
+        MigrationRunner::maybeRun();
         $expander  = new RecurrenceExpander();
         $checker   = new AvailabilityChecker( $wpdb );
         $bookings  = new BookingRepository( $wpdb );
