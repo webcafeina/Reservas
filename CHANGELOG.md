@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.1] — 2026-09-16
+
+### Removed
+
+- **Sección «Datos de solicitantes» de Health**. Ya no se muestra la lista
+  de reservas que compartían datos antes de 0.23.0, y la migración 003 ya
+  no la genera. El fallo de fondo sigue corregido: cada reserva guarda sus
+  propios datos y la migración sigue separando las filas compartidas. En
+  los sitios que ya ejecutaron la 003 con 0.23.0, la opción
+  `reservas_aldealab_shared_profiles_report` se queda sin uso y se borra
+  al desinstalar el plugin.
+
 ## [0.23.0] — 2026-09-16
 
 ### Fixed

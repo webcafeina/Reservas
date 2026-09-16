@@ -154,13 +154,7 @@ final class UserProfileRepository {
      * @throws RuntimeException When the update fails.
      */
     public function update( int $id, UserProfile $profile ): void {
-        $row = self::toRow( $profile );
-        // Explicit: `ON UPDATE CURRENT_TIMESTAMP` skips saves with no actual
-        // change, and the Health review list needs to see that the admin
-        // re-saved (= reviewed) the data. Same clock as the migration 003
-        // report (`current_time`).
-        $row['updated_at'] = current_time( 'mysql' );
-        $ok = $this->wpdb->update( Schema::userProfiles(), $row, array( 'id' => $id ) );
+        $ok = $this->wpdb->update( Schema::userProfiles(), self::toRow( $profile ), array( 'id' => $id ) );
         if ( $ok === false ) {
             throw new RuntimeException( 'No se pudieron actualizar los datos del solicitante: ' . $this->wpdb->last_error );
         }
