@@ -44,7 +44,6 @@ final class AdminHealthController {
     private const CAT_TURN     = 'Anti-spam';
     private const CAT_SMS      = 'SMS';
     private const CAT_ROLES    = 'Roles y permisos';
-    private const CAT_DATA     = 'Datos de solicitantes';
 
     private const FIX_SETTINGS = '#/settings';
 
@@ -74,7 +73,6 @@ final class AdminHealthController {
         foreach ( $this->turnstileChecks( $settings ) as $c )   { $checks[] = $c; }
         foreach ( $this->smsChecks( $settings ) as $c )         { $checks[] = $c; }
         foreach ( $this->roleChecks() as $c )         { $checks[] = $c; }
-        foreach ( $this->sharedProfileChecks() as $c ) { $checks[] = $c; }
 
         $summary = array( 'ok' => 0, 'warn' => 0, 'error' => 0, 'info' => 0 );
         foreach ( $checks as $c ) {
@@ -643,91 +641,6 @@ final class AdminHealthController {
                 null
             );
         }
-        return $out;
-    }
-
-    /**
-     * Bookings that shared the applicant data with other bookings of the
-     * same email until 0.23.0 (report saved by migration 003). Editing one
-     * of them overwrote the data of the others, so the ones not probably
-     * written last are flagged for manual review. A booking drops off the
-     * list once it is saved from the edit form after the migration.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function sharedProfileChecks(): array {
-        global $wpdb;
-        $report = get_option( Schema::OPTION_SHARED_PROFILES_REPORT, null );
-        if ( ! is_array( $report ) || ! isset( $report['items'] ) || ! is_array( $report['items'] ) ) {
-            return array();
-        }
-        $generatedAt = (string) ( $report['generated_at'] ?? '' );
-
-        $out       = array();
-        $hidden    = 0;
-        $bookings  = Schema::bookings();
-        $profiles  = Schema::userProfiles();
-        foreach ( $report['items'] as $item ) {
-            if ( ! is_array( $item ) || empty( $item['revisar'] ) ) {
-                continue;
-            }
-            $id = (int) ( $item['booking_id'] ?? 0 );
-            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-            $profileUpdated = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT up.updated_at FROM {$bookings} b INNER JOIN {$profiles} up ON up.id = b.profile_id WHERE b.id = %d",
-                    $id
-                )
-            );
-            if ( $profileUpdated === null ) {
-                // Booking deleted since.
-                continue;
-            }
-            if ( $generatedAt !== '' && strcmp( (string) $profileUpdated, $generatedAt ) > 0 ) {
-                ++$hidden;
-                continue;
-            }
-            $otras = array_map(
-                static function ( $other ): string {
-                    return '#' . (int) $other;
-                },
-                is_array( $item['compartida_con'] ?? null ) ? $item['compartida_con'] : array()
-            );
-            $sala  = get_the_title( (int) ( $item['sala_id'] ?? 0 ) );
-            $out[] = self::check(
-                'shared-profile-' . $id, self::CAT_DATA, sprintf( 'Revisar datos de la reserva #%d', $id ),
-                'warn',
-                sprintf(
-                    'Reserva del %s%s (`%s`). Hasta la versión 0.23.0 compartía los datos del solicitante con %s y es probable que muestre los datos escritos en otra de ellas. Compara nombre, NIF, dirección y empresa con el email o el PDF que se recibió al crearla y corrígelos si hace falta.',
-                    (string) ( $item['fecha_inicio'] ?? '' ),
-                    $sala !== '' ? ' en ' . $sala : '',
-                    (string) ( $item['email'] ?? '' ),
-                    $otras !== array() ? 'las reservas ' . implode( ', ', $otras ) : 'otras reservas'
-                ),
-                '#/bookings/' . $id
-            );
-        }
-
-        if ( $out === array() && $hidden === 0 ) {
-            return array();
-        }
-        array_unshift(
-            $out,
-            self::check(
-                'shared-profile-summary', self::CAT_DATA, 'Datos compartidos entre reservas (corregido en 0.23.0)',
-                $out === array() ? 'ok' : 'info',
-                $out === array()
-                    ? 'Todas las reservas marcadas para revisión ya se han editado.'
-                    : sprintf(
-                        '%d reserva%s pendiente%s de revisar%s. Cada reserva guarda ya sus propios datos; una reserva desaparece de esta lista en cuanto se guarda desde «Editar», aunque no se cambie nada.',
-                        count( $out ),
-                        count( $out ) === 1 ? '' : 's',
-                        count( $out ) === 1 ? '' : 's',
-                        $hidden > 0 ? sprintf( ' (%d ya revisada%s)', $hidden, $hidden === 1 ? '' : 's' ) : ''
-                    ),
-                null
-            )
-        );
         return $out;
     }
 

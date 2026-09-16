@@ -29,13 +29,6 @@ final class Schema {
     public const OPTION_DB_VERSION = 'reservas_aldealab_db_version';
     public const OPTION_SETTINGS   = 'reservas_aldealab_settings';
 
-    /**
-     * Bookings that shared a profile row when migration 003 split them.
-     * Read by AdminHealthController so AldeaLab can review the ones whose
-     * applicant data was probably overwritten by another booking.
-     */
-    public const OPTION_SHARED_PROFILES_REPORT = 'reservas_aldealab_shared_profiles_report';
-
     public static function tableName( string $baseName ): string {
         global $wpdb;
         return $wpdb->prefix . self::PREFIX . $baseName;
