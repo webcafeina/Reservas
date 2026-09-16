@@ -21,12 +21,12 @@ use wpdb;
  *
  * Flow:
  *  1. Verify Turnstile token (if verifier configured).
- *  2. Upsert the user profile (email-keyed).
- *  3. Expand RRULE → DateTimeImmutable[] (or wrap a single date).
- *  4. START TRANSACTION.
- *  5. checkAndLock availability — FOR UPDATE on booking_dates matching the
+ *  2. Expand RRULE → DateTimeImmutable[] (or wrap a single date).
+ *  3. START TRANSACTION.
+ *  4. checkAndLock availability — FOR UPDATE on booking_dates matching the
  *     sala+dates.
- *  6. Insert booking + booking_dates rows.
+ *  5. Insert the booking's own profile row (never shared with other
+ *     bookings, even with the same email), booking + booking_dates rows.
  *  7. COMMIT.
  *  8. wp_schedule_single_event for async email + PDF dispatch.
  *
@@ -88,11 +88,7 @@ final class BookingService {
             );
         }
 
-        // 3. Upsert profile (outside the availability transaction — it has
-        //    its own constraints and can commit independently).
-        $profileId = $this->profiles->upsert( $request->profile );
-
-        // 4. Availability check + insert under a single transaction.
+        // 3. Availability check + insert under a single transaction.
         //    Admin callers may set `forceOverride = true` on the request to
         //    skip the slot-conflict check (still protected by the FOR
         //    UPDATE semantics of the inserts themselves).
@@ -111,6 +107,10 @@ final class BookingService {
                     return BookingResult::conflict( $availability );
                 }
             }
+
+            // Inside the transaction and after the availability check: a
+            // conflict leaves no orphan profile row behind.
+            $profileId = $this->profiles->insert( $request->profile );
 
             $booking               = new Booking();
             $booking->uuid         = $this->generateUuid();
@@ -143,7 +143,7 @@ final class BookingService {
             return BookingResult::error( 'db-error', $e->getMessage() );
         }
 
-        // 5. Schedule async dispatch — non-blocking. Emails + PDF run later.
+        // 4. Schedule async dispatch — non-blocking. Emails + PDF run later.
         //    Admin callers can set `suppressNotifications = true` to create
         //    a booking silently (e.g. when the user was already contacted
         //    through another channel).
@@ -183,8 +183,6 @@ final class BookingService {
             );
         }
 
-        $profileId = $this->profiles->upsert( $request->profile );
-
         $this->checker->beginTransaction();
         try {
             if ( ! $request->forceOverride ) {
@@ -199,6 +197,15 @@ final class BookingService {
                     $this->checker->rollback();
                     return BookingResult::conflict( $availability );
                 }
+            }
+
+            // Update only this booking's own profile row. Bookings created
+            // before 0.23.0 without a profile get a fresh row.
+            if ( $original->profileId !== null && $original->profileId > 0 ) {
+                $profileId = $original->profileId;
+                $this->profiles->update( $profileId, $request->profile );
+            } else {
+                $profileId = $this->profiles->insert( $request->profile );
             }
 
             $updated                 = new Booking();

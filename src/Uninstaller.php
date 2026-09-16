@@ -33,6 +33,7 @@ final class Uninstaller {
 
         delete_option( 'reservas_aldealab_db_version' );
         delete_option( 'reservas_aldealab_settings' );
+        delete_option( 'reservas_aldealab_shared_profiles_report' );
         delete_option( 'reservas_aldealab_delete_data_on_uninstall' );
     }
 }

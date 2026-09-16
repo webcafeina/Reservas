@@ -73,7 +73,7 @@ final class BookingServiceTest extends TestCase {
             )
         );
 
-        $this->profiles->shouldNotReceive( 'upsert' );
+        $this->profiles->shouldNotReceive( 'insert' );
         $this->checker->shouldNotReceive( 'beginTransaction' );
         $this->bookings->shouldNotReceive( 'create' );
         $this->expander->shouldNotReceive( 'expand' );
@@ -89,7 +89,7 @@ final class BookingServiceTest extends TestCase {
         $dates = array( new DateTimeImmutable( '2026-05-01' ) );
 
         $this->expander->shouldReceive( 'expandSingle' )->once()->andReturn( $dates );
-        $this->profiles->shouldReceive( 'upsert' )->once()->andReturn( 7 );
+        $this->profiles->shouldNotReceive( 'insert' );
 
         $this->checker->shouldReceive( 'beginTransaction' )->once();
         $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn(
@@ -120,7 +120,7 @@ final class BookingServiceTest extends TestCase {
     public function test_happy_path_single_date_inserts_commits_and_schedules_async(): void {
         $dates = array( new DateTimeImmutable( '2026-05-01' ) );
         $this->expander->shouldReceive( 'expandSingle' )->once()->andReturn( $dates );
-        $this->profiles->shouldReceive( 'upsert' )->once()->andReturn( 7 );
+        $this->profiles->shouldReceive( 'insert' )->once()->andReturn( 7 );
 
         $this->checker->shouldReceive( 'beginTransaction' )->once();
         $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn(
@@ -181,7 +181,7 @@ final class BookingServiceTest extends TestCase {
             )
             ->andReturn( $dates );
 
-        $this->profiles->shouldReceive( 'upsert' )->once()->andReturn( 1 );
+        $this->profiles->shouldReceive( 'insert' )->once()->andReturn( 1 );
 
         $this->checker->shouldReceive( 'beginTransaction' )->once();
         $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn(
@@ -216,7 +216,7 @@ final class BookingServiceTest extends TestCase {
         $this->expander->shouldReceive( 'expand' )->once()->andThrow(
             new InvalidArgumentException( 'Bad RRULE' )
         );
-        $this->profiles->shouldNotReceive( 'upsert' );
+        $this->profiles->shouldNotReceive( 'insert' );
         $this->checker->shouldNotReceive( 'beginTransaction' );
 
         $req        = $this->makeRequest();
@@ -231,7 +231,7 @@ final class BookingServiceTest extends TestCase {
 
     public function test_empty_expanded_dates_returns_no_dates_error(): void {
         $this->expander->shouldReceive( 'expandSingle' )->once()->andReturn( array() );
-        $this->profiles->shouldNotReceive( 'upsert' );
+        $this->profiles->shouldNotReceive( 'insert' );
 
         $service = $this->makeService( null );
         $result  = $service->create( $this->makeRequest() );
@@ -244,7 +244,7 @@ final class BookingServiceTest extends TestCase {
         $this->expander->shouldReceive( 'expandSingle' )
             ->once()
             ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
-        $this->profiles->shouldReceive( 'upsert' )->once()->andReturn( 1 );
+        $this->profiles->shouldReceive( 'insert' )->once()->andReturn( 1 );
         $this->checker->shouldReceive( 'beginTransaction' )->once();
         $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn( AvailabilityResult::available() );
         $this->bookings->shouldReceive( 'create' )->once()->andThrow( new \RuntimeException( 'duplicate key' ) );
@@ -262,7 +262,7 @@ final class BookingServiceTest extends TestCase {
         $this->expander->shouldReceive( 'expandSingle' )
             ->once()
             ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
-        $this->profiles->shouldReceive( 'upsert' )->once()->andReturn( 1 );
+        $this->profiles->shouldReceive( 'insert' )->once()->andReturn( 1 );
         $this->checker->shouldReceive( 'beginTransaction' )->once();
         $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn( AvailabilityResult::available() );
         $this->checker->shouldReceive( 'commit' )->once();
@@ -278,6 +278,111 @@ final class BookingServiceTest extends TestCase {
         self::assertTrue( $result->success );
         self::assertSame( '14:30:00', $result->booking->horaInicio );
         self::assertSame( '15:45:00', $result->booking->horaFin );
+    }
+
+    public function test_create_always_inserts_a_new_profile_row_even_for_a_known_email(): void {
+        // Regression: two bookings with the same email used to share one
+        // profile row, so editing one changed the other.
+        $this->expander->shouldReceive( 'expandSingle' )
+            ->twice()
+            ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
+        $this->profiles->shouldReceive( 'insert' )->twice()->andReturn( 7, 8 );
+        $this->profiles->shouldNotReceive( 'update' );
+        $this->checker->shouldReceive( 'beginTransaction' )->twice();
+        $this->checker->shouldReceive( 'checkAndLock' )->twice()->andReturn( AvailabilityResult::available() );
+        $this->checker->shouldReceive( 'commit' )->twice();
+        $this->bookings->shouldReceive( 'create' )->twice()->andReturn( 1, 2 );
+
+        $service = $this->makeService( null );
+        $first   = $service->create( $this->makeRequest() );
+        $second  = $service->create( $this->makeRequest() );
+
+        self::assertSame( 7, $first->booking->profileId );
+        self::assertSame( 8, $second->booking->profileId );
+    }
+
+    public function test_update_overwrites_only_the_profile_row_of_the_edited_booking(): void {
+        $original            = $this->makeStoredBooking( 5, 7 );
+        $this->bookings->shouldReceive( 'find' )->once()->with( 5 )->andReturn( $original );
+        $this->expander->shouldReceive( 'expandSingle' )
+            ->once()
+            ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
+        $this->checker->shouldReceive( 'beginTransaction' )->once();
+        $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn( AvailabilityResult::available() );
+        $this->checker->shouldReceive( 'commit' )->once();
+
+        $req                  = $this->makeRequest();
+        $req->profile->nombre = 'Beatriz';
+        $this->profiles->shouldReceive( 'update' )->once()->with( 7, $req->profile );
+        $this->profiles->shouldNotReceive( 'insert' );
+
+        $captured = null;
+        $this->bookings->shouldReceive( 'updateFullBooking' )->once()->andReturnUsing(
+            function ( Booking $b ) use ( &$captured ): void {
+                $captured = $b;
+            }
+        );
+
+        $result = $this->makeService( null )->update( 5, $req );
+
+        self::assertTrue( $result->success );
+        self::assertSame( 7, $captured->profileId );
+    }
+
+    public function test_update_of_a_booking_without_profile_inserts_one(): void {
+        $this->bookings->shouldReceive( 'find' )->once()->andReturn( $this->makeStoredBooking( 5, null ) );
+        $this->expander->shouldReceive( 'expandSingle' )
+            ->once()
+            ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
+        $this->checker->shouldReceive( 'beginTransaction' )->once();
+        $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn( AvailabilityResult::available() );
+        $this->checker->shouldReceive( 'commit' )->once();
+        $this->profiles->shouldReceive( 'insert' )->once()->andReturn( 9 );
+        $this->profiles->shouldNotReceive( 'update' );
+        $this->bookings->shouldReceive( 'updateFullBooking' )->once();
+
+        $result = $this->makeService( null )->update( 5, $this->makeRequest() );
+
+        self::assertTrue( $result->success );
+        self::assertSame( 9, $result->booking->profileId );
+    }
+
+    public function test_update_conflict_does_not_touch_the_profile(): void {
+        $this->bookings->shouldReceive( 'find' )->once()->andReturn( $this->makeStoredBooking( 5, 7 ) );
+        $this->expander->shouldReceive( 'expandSingle' )
+            ->once()
+            ->andReturn( array( new DateTimeImmutable( '2026-05-01' ) ) );
+        $this->checker->shouldReceive( 'beginTransaction' )->once();
+        $this->checker->shouldReceive( 'checkAndLock' )->once()->andReturn(
+            AvailabilityResult::conflicting( array() )
+        );
+        $this->checker->shouldReceive( 'rollback' )->once();
+        $this->profiles->shouldNotReceive( 'update' );
+        $this->profiles->shouldNotReceive( 'insert' );
+        $this->bookings->shouldNotReceive( 'updateFullBooking' );
+
+        $result = $this->makeService( null )->update( 5, $this->makeRequest() );
+
+        self::assertFalse( $result->success );
+        self::assertSame( 'conflict', $result->errorCode );
+    }
+
+    private function makeStoredBooking( int $id, ?int $profileId ): Booking {
+        $b                = new Booking();
+        $b->id            = $id;
+        $b->uuid          = '00000000-0000-4000-8000-000000000005';
+        $b->userId        = null;
+        $b->profileId     = $profileId;
+        $b->salaId        = 12;
+        $b->estado        = BookingState::CONFIRMADA;
+        $b->horaInicio    = '09:00:00';
+        $b->horaFin       = '10:00:00';
+        $b->rrule         = null;
+        $b->fechaInicio   = '2026-05-01';
+        $b->fechaFinSerie = '2026-05-01';
+        $b->objetoReserva = 'Reunión de prueba';
+        $b->notaAdmin     = null;
+        return $b;
     }
 
     private function makeService( ?TurnstileVerifier $turnstile ): BookingService {

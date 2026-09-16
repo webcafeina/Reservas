@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] — 2026-09-16
+
+### Fixed
+
+- **Editar los datos del solicitante de una reserva cambiaba también los
+  de otras reservas de la misma persona**. Los datos personales vivían en
+  `reservas_user_profiles`, con índice único por email, y todas las
+  reservas con el mismo email apuntaban a la misma fila:
+  `UserProfileRepository::upsert()` la buscaba por email y la
+  sobrescribía. Pasaba al editar desde el panel, al crear una reserva
+  nueva con un email ya usado (cambiaba las anteriores) y al guardar el
+  perfil desde el formulario público (`PUT /user/profile`). Emails, PDF,
+  iCal, listado y CSV leen de esa fila, así que todos mostraban los datos
+  de la última escritura.
+
+  Ahora cada reserva tiene su propia fila de datos del solicitante:
+  `BookingService::create()` inserta siempre una fila nueva y `update()`
+  modifica solo la fila de la reserva editada, dentro de la transacción y
+  después de comprobar disponibilidad (un conflicto ya no deja cambios a
+  medias). `PUT /user/profile` guarda en una fila propia del usuario que
+  no usa ninguna reserva. `upsert()` y `findByEmail()` desaparecen.
+
+### Changed
+
+- **Migración 003** (se ejecuta sola al entrar en el admin): quita el
+  índice único `uq_email` (queda un índice normal `idx_email`) y da a
+  cada reserva que compartía fila su propia copia, con los datos que
+  tuviera en ese momento. Los valores que se sobrescribieron antes no se
+  guardaban en ningún sitio y no se pueden recuperar automáticamente.
+- **Health → «Datos de solicitantes»**: la migración guarda qué reservas
+  compartían datos y marca para revisar las que probablemente muestran
+  datos escritos desde otra reserva, con enlace a cada una. Una reserva
+  sale de la lista en cuanto se guarda desde «Editar». Los datos buenos
+  están en el email de aviso de nueva reserva y en su PDF adjunto, o en
+  una copia de seguridad de la base de datos anterior a la edición.
+
 ## [0.22.3] — 2026-04-30
 
 ### Fixed
