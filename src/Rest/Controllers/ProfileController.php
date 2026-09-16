@@ -149,7 +149,8 @@ final class ProfileController {
 
         global $wpdb;
         $repo    = new UserProfileRepository( $wpdb );
-        $id      = $repo->upsert( $profile );
+        // Never touches the rows owned by the user's bookings.
+        $id      = $repo->saveForUser( $profile );
         $profile->id = $id;
 
         return new WP_REST_Response( array( 'profile' => $profile->toArray() ), 200 );

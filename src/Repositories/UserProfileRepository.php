@@ -10,13 +10,16 @@ namespace WebcafeinaReservas\Repositories;
 defined( 'ABSPATH' ) || exit;
 
 use WebcafeinaReservas\Database\Schema;
+use RuntimeException;
 use WebcafeinaReservas\Models\UserProfile;
 use wpdb;
 
 /**
- * Persistence for reservas_user_profiles. `email` is the natural key:
- * a profile is upserted by email so guest bookings with the same email
- * consolidate under one record.
+ * Persistence for reservas_user_profiles. Each booking owns its own row
+ * (`bookings.profile_id`): the personal data is a snapshot of what was
+ * entered for that booking, so editing one booking never changes another
+ * one with the same email. Until 0.23.0 rows were upserted by email and
+ * shared between bookings — migration 003 split them.
  */
 final class UserProfileRepository {
 
@@ -65,7 +68,7 @@ final class UserProfileRepository {
      *
      * Strategy is "fila del plugin gana": this method is only called if
      * `findForUser()` returned null. Once the user creates their first
-     * booking, `upsert()` writes the row, and from then on the row is
+     * booking, `insert()` writes a row, and from then on the row is
      * the source of truth.
      *
      * Returns null when the user has none of the relevant metas (so the
@@ -127,27 +130,76 @@ final class UserProfileRepository {
         return UserProfile::fromArray( $data );
     }
 
-    public function findByEmail( string $email ): ?UserProfile {
-        $email = trim( $email );
-        if ( $email === '' ) {
-            return null;
+    /**
+     * Inserts a new profile row and returns its id. Every booking gets its
+     * own row (see class docblock), so this is what BookingService::create()
+     * calls.
+     *
+     * @throws RuntimeException When the insert fails, so a caller inside a
+     *                          transaction rolls back.
+     */
+    public function insert( UserProfile $profile ): int {
+        $ok = $this->wpdb->insert( Schema::userProfiles(), self::toRow( $profile ) );
+        if ( $ok === false ) {
+            throw new RuntimeException( 'No se pudieron guardar los datos del solicitante: ' . $this->wpdb->last_error );
         }
-        $table = Schema::userProfiles();
-        $row   = $this->wpdb->get_row(
-            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            $this->wpdb->prepare( "SELECT * FROM {$table} WHERE email = %s LIMIT 1", $email ),
-            ARRAY_A
-        );
-        return is_array( $row ) ? UserProfile::fromArray( $row ) : null;
+        return (int) $this->wpdb->insert_id;
     }
 
     /**
-     * Insert or update by email. Returns the profile id.
+     * Overwrites the profile row `$id`. Only for the row owned by a single
+     * booking (or the standalone row of a WP user) — never look a row up by
+     * email to update it, other bookings may share that email.
+     *
+     * @throws RuntimeException When the update fails.
      */
-    public function upsert( UserProfile $profile ): int {
-        $existing = $this->findByEmail( $profile->email );
+    public function update( int $id, UserProfile $profile ): void {
+        $row = self::toRow( $profile );
+        // Explicit: `ON UPDATE CURRENT_TIMESTAMP` skips saves with no actual
+        // change, and the Health review list needs to see that the admin
+        // re-saved (= reviewed) the data. Same clock as the migration 003
+        // report (`current_time`).
+        $row['updated_at'] = current_time( 'mysql' );
+        $ok = $this->wpdb->update( Schema::userProfiles(), $row, array( 'id' => $id ) );
+        if ( $ok === false ) {
+            throw new RuntimeException( 'No se pudieron actualizar los datos del solicitante: ' . $this->wpdb->last_error );
+        }
+    }
 
-        $data = array(
+    /**
+     * Saves the data a logged-in user edits from the public form
+     * (PUT /user/profile). Updates the user's latest row only when no
+     * booking points at it; otherwise inserts a new row, so the personal
+     * data stored on past bookings stays as it was. Returns the row id.
+     */
+    public function saveForUser( UserProfile $profile ): int {
+        $userId = $profile->userId ?? 0;
+        if ( $userId > 0 ) {
+            $table    = Schema::userProfiles();
+            $bookings = Schema::bookings();
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $id = (int) $this->wpdb->get_var(
+                $this->wpdb->prepare(
+                    "SELECT up.id FROM {$table} up "
+                    . "WHERE up.user_id = %d "
+                    . "AND NOT EXISTS ( SELECT 1 FROM {$bookings} b WHERE b.profile_id = up.id ) "
+                    . 'ORDER BY up.id DESC LIMIT 1',
+                    $userId
+                )
+            );
+            if ( $id > 0 ) {
+                $this->update( $id, $profile );
+                return $id;
+            }
+        }
+        return $this->insert( $profile );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function toRow( UserProfile $profile ): array {
+        return array(
             'user_id'          => $profile->userId,
             'nif'              => $profile->nif,
             'nombre'           => $profile->nombre,
@@ -167,15 +219,5 @@ final class UserProfileRepository {
             'email'            => $profile->email,
             'empresa'          => $profile->empresa,
         );
-
-        $table = Schema::userProfiles();
-
-        if ( $existing !== null && $existing->id !== null ) {
-            $this->wpdb->update( $table, $data, array( 'id' => $existing->id ) );
-            return (int) $existing->id;
-        }
-
-        $this->wpdb->insert( $table, $data );
-        return (int) $this->wpdb->insert_id;
     }
 }
