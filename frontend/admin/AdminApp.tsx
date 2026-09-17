@@ -1,5 +1,6 @@
 import { WebcafeinaFooter } from '../src/components/WebcafeinaFooter';
 
+import { useCachedSettings } from './api/hooks';
 import { SessionExpiredModal } from './components/SessionExpiredModal';
 import { Dashboard } from './pages/Dashboard';
 import { Health } from './pages/Health';
@@ -28,6 +29,15 @@ function isActive(view: AdminView, path: string): boolean {
 export function AdminApp(): JSX.Element {
     const view = useHashRoute();
     const logoUrl = window.ReservasAldealabAdmin?.logoUrl ?? null;
+    // Once the settings are loaded (Ajustes page or after saving) they win,
+    // so a change shows up without reloading; until then use the bootstrap.
+    const settings = useCachedSettings();
+    const firma =
+        settings !== undefined
+            ? settings.firma_panel
+                ? settings.firma_texto
+                : null
+            : (window.ReservasAldealabAdmin?.firma ?? null);
 
     return (
         <div className={styles.wrapper}>
@@ -71,7 +81,7 @@ export function AdminApp(): JSX.Element {
                 {view.name === 'settings' && <SettingsPage />}
             </main>
 
-            <WebcafeinaFooter />
+            <WebcafeinaFooter text={firma} />
             <SessionExpiredModal />
         </div>
     );

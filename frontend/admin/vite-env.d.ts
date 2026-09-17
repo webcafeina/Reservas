@@ -7,6 +7,8 @@ interface ReservasAdminBootstrap {
     adminUrl: string;
     /** URL of the customer-supplied logo; null when no file is present. */
     logoUrl: string | null;
+    /** Footer signature; null when hidden in the admin panel. */
+    firma: string | null;
 }
 
 declare global {

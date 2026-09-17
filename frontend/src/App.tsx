@@ -78,7 +78,7 @@ export function App(): JSX.Element {
             {step === 6 && <Step6Perfil />}
             {step === 7 && <Step7Resumen />}
             {step === 8 && <Step8Exito />}
-            <WebcafeinaFooter />
+            <WebcafeinaFooter text={window.ReservasAldealab?.firma ?? null} />
         </div>
     );
 }

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] — 2026-09-17
+
+### Added
+
+- **Firma del pie configurable desde Ajustes → «Firma del pie»**. La firma
+  «Desarrollado con ❤️ y ☕ por Webcafeína | 2026» estaba escrita a mano
+  en `WebcafeinaFooter` y salía siempre en el formulario público y en el
+  panel. Ahora:
+  - Dos casillas independientes: mostrarla en el formulario público y
+    mostrarla en el panel de administración.
+  - Texto libre de hasta 120 caracteres, con contador, botón «Restaurar
+    texto por defecto» y vista previa. Si el texto contiene «Webcafeína»,
+    esa palabra sigue enlazando a webcafeina.com; si queda vacío, no se
+    muestra ninguna firma.
+  - Por defecto, todo sigue como antes (visible en los dos sitios y con el
+    texto actual, con el año fijo), también en las instalaciones que se
+    actualizan.
+
+  Implementación: claves `firma_texto`, `firma_formulario` y `firma_panel`
+  en `SettingsRegistrar` (con `firmaPara()`), enviadas a
+  `window.ReservasAldealab.firma` y `window.ReservasAldealabAdmin.firma`.
+  En el panel, el pie usa los ajustes en caché para reflejar un cambio al
+  guardar sin recargar.
+
 ## [0.23.1] — 2026-09-16
 
 ### Removed
