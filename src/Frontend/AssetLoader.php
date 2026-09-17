@@ -9,6 +9,7 @@ namespace WebcafeinaReservas\Frontend;
 
 defined( 'ABSPATH' ) || exit;
 
+use WebcafeinaReservas\Admin\SettingsRegistrar;
 use WebcafeinaReservas\Rest\RestApi;
 
 /**
@@ -186,8 +187,8 @@ final class AssetLoader {
     }
 
     private static function localize(): void {
-        $settings = (array) get_option( 'reservas_aldealab_settings', array() );
-        $site_key = isset( $settings['turnstile_site_key'] ) ? (string) $settings['turnstile_site_key'] : '';
+        $settings = SettingsRegistrar::get();
+        $site_key = (string) ( $settings[ SettingsRegistrar::KEY_TURNSTILE_SITE_KEY ] ?? '' );
 
         $data = array(
             'restBase'         => esc_url_raw( rest_url( RestApi::NAMESPACE ) ),
@@ -195,6 +196,7 @@ final class AssetLoader {
             'turnstileSiteKey' => $site_key,
             'locale'           => determine_locale(),
             'isLoggedIn'       => is_user_logged_in(),
+            'firma'            => SettingsRegistrar::firmaPara( SettingsRegistrar::FIRMA_EN_FORMULARIO ),
         );
 
         wp_add_inline_script(

@@ -168,6 +168,7 @@ final class AdminAssetLoader {
             'locale'     => determine_locale(),
             'adminUrl'   => esc_url_raw( admin_url( 'admin.php?page=' . AdminMenu::SLUG ) ),
             'logoUrl'    => self::resolveLogoUrl(),
+            'firma'      => SettingsRegistrar::firmaPara( SettingsRegistrar::FIRMA_EN_PANEL ),
         );
 
         wp_add_inline_script(

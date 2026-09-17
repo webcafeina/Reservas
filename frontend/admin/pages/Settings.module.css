@@ -55,6 +55,21 @@
     font-weight: normal;
 }
 
+.firmaActions {
+    display: flex;
+}
+
+.firmaPreview {
+    border: 1px dashed var(--ra-color-border);
+    border-radius: var(--ra-radius-md);
+    padding: var(--ra-space-3);
+}
+
+.firmaPreview footer {
+    margin-top: 0;
+    padding-bottom: 0;
+}
+
 .footer {
     display: flex;
     align-items: center;

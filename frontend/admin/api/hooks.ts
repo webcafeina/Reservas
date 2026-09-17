@@ -163,6 +163,9 @@ export interface Settings {
     twilio_account_sid: string;
     twilio_auth_token: string;
     twilio_from_number: string;
+    firma_texto: string;
+    firma_formulario: boolean;
+    firma_panel: boolean;
 }
 
 export function useSettings() {
@@ -171,6 +174,19 @@ export function useSettings() {
         queryFn: () => adminApi.get<Settings>('/admin/settings'),
         staleTime: 60_000,
     });
+}
+
+/**
+ * Settings already in the query cache (loaded by the Ajustes page or written
+ * after saving), without triggering a request of its own. `undefined` until
+ * then.
+ */
+export function useCachedSettings(): Settings | undefined {
+    return useQuery({
+        queryKey: ['admin', 'settings'],
+        queryFn: () => adminApi.get<Settings>('/admin/settings'),
+        enabled: false,
+    }).data;
 }
 
 export function useUpdateSettings() {

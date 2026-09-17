@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../../src/components/Button';
 import { SelectField, TextField, TextareaField } from '../../src/components/Field';
 import { ErrorMessage } from '../../src/components/ErrorMessage';
+import { FIRMA_DEFECTO, FIRMA_MAX, WebcafeinaFooter } from '../../src/components/WebcafeinaFooter';
 import { useSettings, useUpdateSettings, type Settings as SettingsShape } from '../api/hooks';
 
 import { AdminLogo } from './AdminLogo';
@@ -208,6 +209,54 @@ export function SettingsPage(): JSX.Element {
                     elimina la personalizada, el plugin usa la que viene empaquetada.
                 </p>
                 <PdfTemplates />
+            </section>
+
+            <section className={styles.group}>
+                <h2>Firma del pie</h2>
+                <p className={styles.muted}>
+                    Texto que aparece al final del formulario de reservas y del panel. Si contiene
+                    «Webcafeína», esa palabra enlaza a webcafeina.com.
+                </p>
+                <label className={styles.checkbox}>
+                    <input
+                        type="checkbox"
+                        checked={form.firma_formulario}
+                        onChange={(e) => patch('firma_formulario', e.target.checked)}
+                    />
+                    <span>Mostrar en el formulario público</span>
+                </label>
+                <label className={styles.checkbox}>
+                    <input
+                        type="checkbox"
+                        checked={form.firma_panel}
+                        onChange={(e) => patch('firma_panel', e.target.checked)}
+                    />
+                    <span>Mostrar en el panel de administración</span>
+                </label>
+                <TextField
+                    label="Texto de la firma"
+                    value={form.firma_texto}
+                    maxLength={FIRMA_MAX}
+                    onChange={(e) => patch('firma_texto', e.target.value)}
+                    hint={`${form.firma_texto.length}/${FIRMA_MAX} caracteres. Si lo dejas vacío, no se muestra ninguna firma.`}
+                />
+                <div className={styles.firmaActions}>
+                    <Button
+                        variant="secondary"
+                        onClick={() => patch('firma_texto', FIRMA_DEFECTO)}
+                        disabled={form.firma_texto === FIRMA_DEFECTO}
+                    >
+                        Restaurar texto por defecto
+                    </Button>
+                </div>
+                <div className={styles.firmaPreview} aria-label="Vista previa de la firma">
+                    <span className={styles.muted}>Vista previa</span>
+                    {form.firma_texto.trim() === '' ? (
+                        <p className={styles.muted}>Sin firma.</p>
+                    ) : (
+                        <WebcafeinaFooter text={form.firma_texto} />
+                    )}
+                </div>
             </section>
 
             <section className={styles.group}>

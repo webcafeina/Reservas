@@ -36,6 +36,19 @@ final class SettingsRegistrar {
     public const KEY_TWILIO_TOKEN        = 'twilio_auth_token';
     public const KEY_TWILIO_FROM         = 'twilio_from_number';
 
+    public const KEY_FIRMA_TEXTO      = 'firma_texto';
+    public const KEY_FIRMA_FORMULARIO = 'firma_formulario';
+    public const KEY_FIRMA_PANEL      = 'firma_panel';
+
+    /** Footer signature shown until the admin changes it (year fixed on purpose). */
+    public const FIRMA_DEFECTO = 'Desarrollado con ❤️ y ☕ por Webcafeína | 2026';
+
+    /** Max characters (not bytes) of the footer signature. */
+    public const FIRMA_MAX = 120;
+
+    public const FIRMA_EN_FORMULARIO = 'formulario';
+    public const FIRMA_EN_PANEL      = 'panel';
+
     public static function register(): void {
         add_action( 'init', array( self::class, 'registerSetting' ) );
     }
@@ -72,6 +85,9 @@ final class SettingsRegistrar {
             self::KEY_TWILIO_SID          => '',
             self::KEY_TWILIO_TOKEN        => '',
             self::KEY_TWILIO_FROM         => '',
+            self::KEY_FIRMA_TEXTO         => self::FIRMA_DEFECTO,
+            self::KEY_FIRMA_FORMULARIO    => true,
+            self::KEY_FIRMA_PANEL         => true,
         );
     }
 
@@ -135,7 +151,28 @@ final class SettingsRegistrar {
 
         $merged[ self::KEY_DELETE_ON_UNINSTALL ] = ! empty( $merged[ self::KEY_DELETE_ON_UNINSTALL ] );
 
+        // Footer signature: free text (empty = no signature) + one switch per screen.
+        $firma = trim( sanitize_text_field( (string) ( $merged[ self::KEY_FIRMA_TEXTO ] ?? '' ) ) );
+        $merged[ self::KEY_FIRMA_TEXTO ]      = mb_substr( $firma, 0, self::FIRMA_MAX );
+        $merged[ self::KEY_FIRMA_FORMULARIO ] = ! empty( $merged[ self::KEY_FIRMA_FORMULARIO ] );
+        $merged[ self::KEY_FIRMA_PANEL ]      = ! empty( $merged[ self::KEY_FIRMA_PANEL ] );
+
         return $merged;
+    }
+
+    /**
+     * Footer signature for one screen (`FIRMA_EN_FORMULARIO` or
+     * `FIRMA_EN_PANEL`), or null when it's switched off there or the text
+     * is empty.
+     */
+    public static function firmaPara( string $donde ): ?string {
+        $settings = self::get();
+        $key      = $donde === self::FIRMA_EN_PANEL ? self::KEY_FIRMA_PANEL : self::KEY_FIRMA_FORMULARIO;
+        if ( empty( $settings[ $key ] ) ) {
+            return null;
+        }
+        $texto = trim( (string) ( $settings[ self::KEY_FIRMA_TEXTO ] ?? '' ) );
+        return $texto === '' ? null : $texto;
     }
 
     /**
